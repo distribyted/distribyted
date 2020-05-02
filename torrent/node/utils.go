@@ -39,13 +39,6 @@ func LoadNodeByPath(ctx context.Context, pool *ants.Pool, fp string, reader Read
 
 	ext := path.Ext(base)
 	switch ext {
-	case ".zip":
-		n := NewZipFolder(pool, reader, fileLength, base)
-		p.AddChild(
-			strings.TrimRight(base, ext),
-			p.NewPersistentInode(ctx, n, fs.StableAttr{
-				Mode: syscall.S_IFDIR,
-			}), true)
 	default:
 		n := NewFileWithBlocks(
 			reader,

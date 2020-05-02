@@ -6,9 +6,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ajnavarro/distribyted/config"
 	"github.com/ajnavarro/distribyted/mount"
+	"github.com/ajnavarro/distribyted/stats"
 	"github.com/anacrolix/missinggo/v2/filecache"
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/storage"
@@ -65,7 +67,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mountService := mount.NewService(c, pool)
+	ss := stats.NewTorrent()
+	mountService := mount.NewTorrent(c, pool, ss)
+
+	go func() {
+		log.Println("Starting timer")
+		timer := time.Tick(2000 * time.Millisecond)
+
+		for {
+			<-timer
+			stats := ss.Global()
+			log.Println("DOWN speed:", stats.DownloadSpeed())
+			log.Println("UP speed:", stats.UploadSpeed())
+			tStats, err := ss.Torrent("852299c530aaed8fa06bdf32d9bd909e0bb76fe7")
+			if err == nil {
+				log.Println("torrentDownload", tStats.DownloadedBytes)
+				log.Println("first chunk", tStats.PieceChunks[0].NumPieces, tStats.PieceChunks[0].Status)
+			}
+		}
+	}()
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)

@@ -62,7 +62,7 @@ func (tr *File) Open(ctx context.Context, flags uint32) (fh fs.FileHandle, fuseF
 			log.Println("error opening reader for file", err)
 			return nil, fuse.FOPEN_KEEP_CACHE, syscall.EIO
 		}
-		log.Println("OPEN", r)
+
 		tr.r = r
 	}
 
@@ -70,8 +70,6 @@ func (tr *File) Open(ctx context.Context, flags uint32) (fh fs.FileHandle, fuseF
 }
 
 func (tr *File) Read(ctx context.Context, f fs.FileHandle, dest []byte, off int64) (fuse.ReadResult, syscall.Errno) {
-	log.Println("READ", len(dest), off)
-
 	end := int(math.Min(float64(len(dest)), float64(int64(tr.len)-off)))
 
 	buf := dest[:end]
@@ -82,7 +80,7 @@ func (tr *File) Read(ctx context.Context, f fs.FileHandle, dest []byte, off int6
 		log.Println("error read data", err)
 		return nil, syscall.EIO
 	}
-	log.Println("READ AT ERR", err, n)
+
 	buf = buf[:n]
 	return fuse.ReadResultData(buf), fs.OK
 }
