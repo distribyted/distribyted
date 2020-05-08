@@ -1,0 +1,17 @@
+{
+  "name": "distribyted",
+  "version": "0.1.0",
+  "description": "",
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "chart.js": "^2.9.3",
+    "chartjs-plugin-stacked100": "^0.7.1"
+  },
+  "scripts": {
+    "dev": "parcel watch index.html --out-dir ../assets",
+    "build": "parcel build index.html"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4"
+  }
+}

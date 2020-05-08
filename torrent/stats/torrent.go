@@ -3,6 +3,7 @@ package stats
 import (
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/anacrolix/torrent"
@@ -11,14 +12,14 @@ import (
 
 var ErrTorrentNotFound = errors.New("torrent not found")
 
-type PieceStatus rune
+type PieceStatus string
 
 const (
-	Checking PieceStatus = 'H'
-	Partial  PieceStatus = 'P'
-	Complete PieceStatus = 'C'
-	Waiting  PieceStatus = 'W'
-	Error    PieceStatus = '?'
+	Checking PieceStatus = "H"
+	Partial  PieceStatus = "P"
+	Complete PieceStatus = "C"
+	Waiting  PieceStatus = "W"
+	Error    PieceStatus = "?"
 )
 
 type PieceChunk struct {
@@ -29,19 +30,19 @@ type PieceChunk struct {
 type TorrentStats struct {
 	DownloadedBytes int64
 	UploadedBytes   int64
-	TimePassed      time.Duration
+	TimePassed      float64
 	PieceChunks     []*PieceChunk
 }
 
 type GlobalTorrentStats struct {
 	DownloadedBytes int64
 	UploadedBytes   int64
-	TimePassed      time.Duration
+	TimePassed      float64
 }
 
 func (s *GlobalTorrentStats) speed(bytes int64) float64 {
 	var bs float64
-	t := s.TimePassed.Seconds()
+	t := s.TimePassed
 	if t != 0 {
 		bs = float64(bytes) / t
 	}
@@ -122,7 +123,7 @@ func (s *Torrent) Global() *GlobalTorrentStats {
 	return &GlobalTorrentStats{
 		DownloadedBytes: totalDownload,
 		UploadedBytes:   totalUpload,
-		TimePassed:      timePassed,
+		TimePassed:      timePassed.Seconds(),
 	}
 }
 
@@ -132,6 +133,8 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 	if s.returnPreviousMeasurements(now) {
 		ts.DownloadedBytes = prev.downloadBytes
 		ts.UploadedBytes = prev.uploadBytes
+
+		log.Println("Using previous stats")
 	} else {
 		st := t.Stats()
 
@@ -151,7 +154,7 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 		s.previousStats[t.InfoHash().String()] = ist
 	}
 
-	ts.TimePassed = now.Sub(prev.time)
+	ts.TimePassed = now.Sub(prev.time).Seconds()
 
 	if chunks {
 		var pch []*PieceChunk

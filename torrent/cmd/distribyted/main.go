@@ -6,14 +6,15 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
+	"github.com/ajnavarro/distribyted"
 	"github.com/ajnavarro/distribyted/config"
 	"github.com/ajnavarro/distribyted/mount"
 	"github.com/ajnavarro/distribyted/stats"
 	"github.com/anacrolix/missinggo/v2/filecache"
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/storage"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-yaml"
 	"github.com/panjf2000/ants/v2"
@@ -70,23 +71,6 @@ func main() {
 	ss := stats.NewTorrent()
 	mountService := mount.NewTorrent(c, pool, ss)
 
-	go func() {
-		log.Println("Starting timer")
-		timer := time.Tick(2000 * time.Millisecond)
-
-		for {
-			<-timer
-			stats := ss.Global()
-			log.Println("DOWN speed:", stats.DownloadSpeed())
-			log.Println("UP speed:", stats.UploadSpeed())
-			tStats, err := ss.Torrent("852299c530aaed8fa06bdf32d9bd909e0bb76fe7")
-			if err == nil {
-				log.Println("torrentDownload", tStats.DownloadedBytes)
-				log.Println("first chunk", tStats.PieceChunks[0].NumPieces, tStats.PieceChunks[0].Status)
-			}
-		}
-	}()
-
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
@@ -110,16 +94,35 @@ func main() {
 	}
 
 	r := gin.Default()
+	fs := distribyted.NewBinaryFileSystem()
+	file, err := fs.Open("index.html")
+	if err != nil {
+		log.Println("PUES SI QUE NO ESTá", err)
+	} else {
+		log.Println("FILE", file)
+	}
 
-	r.GET("/", func(ctx *gin.Context) {
+	r.Use(static.Serve("/", fs))
+
+	r.GET("/api/status", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
-			"torrentNum":    len(c.Torrents()),
 			"cacheItems":    fc.Info().NumItems,
 			"cacheFilled":   fc.Info().Filled / 1024 / 1024,
 			"cacheCapacity": fc.Info().Capacity / 1024 / 1024,
 			"poolCap":       pool.Cap(),
 			"poolFree":      pool.Free(),
+			"torrentStats":  ss.Global(),
 		})
+	})
+
+	r.GET("/api/status/:torrent", func(ctx *gin.Context) {
+		hash := ctx.Param("torrent")
+		stats, err := ss.Torrent(hash)
+		if err != nil {
+			ctx.AbortWithError(404, err)
+		}
+
+		ctx.JSON(200, stats)
 	})
 
 	if err := r.Run(":4444"); err != nil {
