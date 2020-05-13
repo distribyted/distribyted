@@ -23,4 +23,4 @@ var humanize = {
     }
 };
 
-module.exports = humanize;
+export default humanize;

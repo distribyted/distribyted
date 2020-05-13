@@ -2,12 +2,12 @@
 max-cache-size: 1024
 metadata-folder-name: ./_DATA/metadata
 mountPoints:
-  # - path: ./_DATA/snes
-  #   magnets:
-  #     - uri: "magnet:?xt=urn:btih:3F8CA07909879B3102EFE1CD43E233C48E489519&dn=677+Super+Nintendo+%2F+SNES+ROMs&tr=udp%3A%2F%2Ftracker.ccc.se%3A80&tr=http%3A%2F%2Ftracker.ccc.de%2Fannounce&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=http%3A%2F%2Ftracker.ccc.de%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce"
-  # - path: ./_DATA/nes
-  #   magnets:
-  #     - uri: "magnet:?xt=urn:btih:54F1FFB2861EE322B8641CEE232538A357341578&dn=706+Nintendo+%2F+NES+ROMs&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Ffr33domtracker.h33t.com%3A3310%2Fannounce&tr=udp%3A%2F%2Ftracker.istole.it%3A80%2Fannounce&tr=http%3A%2F%2Finferno.demonoid.me%3A3417%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce"
+  - path: ./_DATA/snes
+    magnets:
+      - uri: "magnet:?xt=urn:btih:3F8CA07909879B3102EFE1CD43E233C48E489519&dn=677+Super+Nintendo+%2F+SNES+ROMs&tr=udp%3A%2F%2Ftracker.ccc.se%3A80&tr=http%3A%2F%2Ftracker.ccc.de%2Fannounce&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=http%3A%2F%2Ftracker.ccc.de%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce"
+  - path: ./_DATA/nes
+    magnets:
+      - uri: "magnet:?xt=urn:btih:54F1FFB2861EE322B8641CEE232538A357341578&dn=706+Nintendo+%2F+NES+ROMs&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Ffr33domtracker.h33t.com%3A3310%2Fannounce&tr=udp%3A%2F%2Ftracker.istole.it%3A80%2Fannounce&tr=http%3A%2F%2Finferno.demonoid.me%3A3417%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce"
   - path: ./_DATA/psx
     magnets:
       # - uri: "magnet:?xt=urn:btih:3D41D4E6024AA4AB905BF0E6354D57F680C654F3&dn=Sony%20PlayStation%20%28PAL%29%20%5bRedump%5d&tr=http%3a%2f%2fbt2.t-ru.org%2fann%3fmagnet"

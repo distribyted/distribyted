@@ -1,8 +1,8 @@
-var Humanize = require('./humanize.js');
-var Chart = require('chart.js');
-var _ = require('chartjs-plugin-stacked100');
+import Humanize from './humanize.js';
+import Chart from 'chart.js';
+import _ from 'chartjs-plugin-stacked100';
 
-var ctx = document.getElementById('chart').getContext('2d');
+var ctx = document.getElementById('chart-general-network').getContext('2d');
 
 var downloadData = [];
 var uploadData = [];
@@ -65,23 +65,72 @@ var chart = new Chart(ctx, {
     }
 });
 
-new Chart(document.getElementById("chart-example"), {
+var piecesData = []
+var fileChart = new Chart(document.getElementById("chart-file-chunks"), {
     type: "horizontalBar",
     data: {
-      labels: ["File"],
-      datasets: [
-        { label: "bad", data: [25], backgroundColor: "rgba(244, 143, 177, 0.6)" },
-        { label: "better", data: [10], backgroundColor: "rgba(255, 235, 59, 0.6)" },
-        { label: "good", data: [8], backgroundColor: "rgba(100, 181, 246, 0.6)" },
-        { label: "s", data: [25], backgroundColor: "rgba(244, 143, 177, 0.6)" },
-      ]
+        labels: ["File"],
+        datasets: piecesData,
     },
     options: {
-      plugins: {
-        stacked100: { enable: true }
-      }
+        animation: {
+            duration: 0
+        },
+        plugins: {
+            stacked100: { enable: true }
+        }
     }
-  });
+});
+
+
+setInterval(function () {
+    fetch('/api/status/852299c530aaed8fa06bdf32d9bd909e0bb76fe7')
+        .then(function (response) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                console.log('Error getting data from server. Response: ' + response.status);
+            }
+        }).then(function (stats) {
+            piecesData.length = 0;
+            stats.PieceChunks.forEach(element => {
+                var label, color;
+                switch (element.Status) {
+                    case "H":
+                        label = "checking";
+                        color = "#8a5999";
+                        break;
+                    case "P":
+                        label = "partial";
+                        color = "#be9600";
+                        break;
+                    case "C":
+                        label = "complete";
+                        color = "#208f09";
+                        break;
+                    case "W":
+                        label = "waiting";
+                        color = "#8a5999";
+                        break;
+                    case "?":
+                        label = "error";
+                        color = "#ff5f5c";
+                        break;
+                    default:
+                        label = "unknown";
+                        color = "gray";
+                        break;
+                }
+                piecesData.push({
+                    label: label,
+                    data: [element.NumPieces],
+                    backgroundColor: color,
+                });
+
+            });
+            fileChart.update();
+        })
+}, 2000)
 
 setInterval(function () {
     fetch('/api/status')

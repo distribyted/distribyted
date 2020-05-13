@@ -11,6 +11,7 @@ import (
 	"github.com/ajnavarro/distribyted/config"
 	"github.com/ajnavarro/distribyted/mount"
 	"github.com/ajnavarro/distribyted/stats"
+	tlog "github.com/anacrolix/log"
 	"github.com/anacrolix/missinggo/v2/filecache"
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/storage"
@@ -54,6 +55,7 @@ func main() {
 
 	// TODO download and upload limits
 	torrentCfg := torrent.NewDefaultClientConfig()
+	torrentCfg.Logger = tlog.Default.WithDefaultLevel(tlog.Info).FilterLevel(tlog.Info)
 	torrentCfg.Seed = true
 	torrentCfg.DisableTCP = true
 	torrentCfg.DefaultStorage = st

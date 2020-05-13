@@ -4,8 +4,11 @@
   "description": "",
   "dependencies": {
     "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.14.0",
     "chart.js": "^2.9.3",
-    "chartjs-plugin-stacked100": "^0.7.1"
+    "chartjs-plugin-stacked100": "^0.7.1",
+    "portal-vue": "^2.1.7",
+    "vue": "^2.6.11"
   },
   "scripts": {
     "dev": "parcel watch index.html --out-dir ../assets",
