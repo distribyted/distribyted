@@ -9,11 +9,12 @@ type Root struct {
 }
 
 type MountPoint struct {
-	Path    string `yaml:"path"`
-	Magnets []struct {
-		URI        string `yaml:"uri"`
-		FolderName string `yaml:"folderName,omitempty"`
-	} `yaml:"magnets"`
+	Path     string `yaml:"path"`
+	Torrents []struct {
+		MagnetURI   string `yaml:"magnetUri"`
+		TorrentPath string `yaml:"torrentPath"`
+		FolderName  string `yaml:"folderName,omitempty"`
+	} `yaml:"torrents"`
 }
 
 func AddDefaults(r *Root) *Root {

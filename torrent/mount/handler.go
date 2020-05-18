@@ -1,6 +1,7 @@
 package mount
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/panjf2000/ants/v2"
 )
 
-type Torrent struct {
+type Handler struct {
 	c    *torrent.Client
 	s    *stats.Torrent
 	opts *fs.Options
@@ -22,8 +23,8 @@ type Torrent struct {
 	servers map[string]*fuse.Server
 }
 
-func NewTorrent(c *torrent.Client, pool *ants.Pool, s *stats.Torrent) *Torrent {
-	return &Torrent{
+func NewHandler(c *torrent.Client, pool *ants.Pool, s *stats.Torrent) *Handler {
+	return &Handler{
 		c:       c,
 		s:       s,
 		opts:    &fs.Options{},
@@ -32,17 +33,31 @@ func NewTorrent(c *torrent.Client, pool *ants.Pool, s *stats.Torrent) *Torrent {
 	}
 }
 
-func (s *Torrent) Mount(mpc *config.MountPoint) error {
+func (s *Handler) Mount(mpc *config.MountPoint) error {
 	var torrents []*torrent.Torrent
-	for _, magnet := range mpc.Magnets {
-		t, err := s.c.AddMagnet(magnet.URI)
+	for _, mpcTorrent := range mpc.Torrents {
+		var t *torrent.Torrent
+		var err error
+
+		switch {
+		case mpcTorrent.MagnetURI != "":
+			t, err = s.c.AddMagnet(mpcTorrent.MagnetURI)
+			break
+		case mpcTorrent.TorrentPath != "":
+			t, err = s.c.AddTorrentFromFile(mpcTorrent.TorrentPath)
+			break
+		default:
+			err = fmt.Errorf("no magnet URI or torrent path provided")
+		}
+
 		if err != nil {
 			return err
 		}
+
 		log.Println("getting torrent info", t.Name())
 		<-t.GotInfo()
 
-		s.s.Add(t)
+		s.s.Add(mpc.Path, t)
 
 		log.Println("torrent info obtained", t.Name())
 		torrents = append(torrents, t)
@@ -65,7 +80,7 @@ func (s *Torrent) Mount(mpc *config.MountPoint) error {
 	return nil
 }
 
-func (s *Torrent) Close() {
+func (s *Handler) Close() {
 	for path, server := range s.servers {
 		log.Println("unmounting", path)
 		err := server.Unmount()

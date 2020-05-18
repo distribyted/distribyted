@@ -4,7 +4,7 @@ function logn(n, b) {
     return Math.log(n) / Math.log(b);
 }
 
-var humanize = {
+var Humanize = {
     bytes: function (s, base) {
         if (s < 10) {
             return s.toFixed(0) + " B";
@@ -18,9 +18,7 @@ var humanize = {
         if (val < 10) {
             f = val.toFixed(1);
         }
-        console.log("OUT", f + suffix);
+
         return f + suffix;
     }
 };
-
-export default humanize;

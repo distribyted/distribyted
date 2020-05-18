@@ -9,8 +9,8 @@ type binaryFileSystem struct {
 	http.FileSystem
 }
 
-func NewBinaryFileSystem() *binaryFileSystem {
-	return &binaryFileSystem{Assets}
+func NewBinaryFileSystem(fs http.FileSystem) *binaryFileSystem {
+	return &binaryFileSystem{fs}
 }
 
 func (fs *binaryFileSystem) Exists(prefix string, filepath string) bool {

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {{template "common_header.html"}}
+</head>
+
+<body>
+    {{template "navbar.html"}}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <canvas id="chart-general-network"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <canvas id="chart-cache" height="400"></canvas>
+            </div>
+            <div class="col-sm">
+                <h3>
+                    <svg class="bi bi-arrow-down" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M4.646 9.646a.5.5 0 01.708 0L8 12.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z"
+                            clip-rule="evenodd" />
+                        <path fill-rule="evenodd" d="M8 2.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V3a.5.5 0 01.5-.5z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span id="down-speed-text"></span>
+                </h3>
+            </div>
+            <div class="col-sm">
+                <h3>
+                    <svg class="bi bi-arrow-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M8 3.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V4a.5.5 0 01.5-.5z"
+                            clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M7.646 2.646a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L8 3.707 5.354 6.354a.5.5 0 11-.708-.708l3-3z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span id="up-speed-text"></span>
+                </h3>
+            </div>
+            <div class="col-sm">
+                <canvas id="chart-workers" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+    {{template "common_footer.html"}}
+    <script src="assets/js/Chart.bundle.min.js"></script>
+    <script src="assets/js/humanize.js"></script>
+    <script src="assets/js/general_chart.js"></script>
+    <script src="assets/js/single_bar_chart.js"></script>
+    <script src="assets/js/general.js"></script>
+</body>
+
+</html>

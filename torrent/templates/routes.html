@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {{template "common_header.html"}}
+</head>
+
+<body>
+    {{template "navbar.html"}}
+
+    <div class="container">
+        {{if not .}}
+        <div class="alert alert-warning" role="alert">
+            No routes found.
+        </div>
+        {{end}}
+
+        {{range .}}
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title">{{.Name}}</h5>
+                {{range .TorrentStats}}
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5>{{.Name}}</h5>
+                            </div>
+                            <div class="col">
+                                <p id="up-down-speed-text-{{.Hash}}">...</p>
+                            </div>
+                            <div class="col">
+                                <div id="file-chunks-{{.Hash}}" class="progress">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{template "common_footer.html"}}
+    <script src="assets/js/humanize.js"></script>
+    <script src="assets/js/file_chunks.js"></script>
+    <script src="assets/js/routes.js"></script>
+</body>
+</body>
+
+</html>

@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,6 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-yaml"
 	"github.com/panjf2000/ants/v2"
+	"github.com/shurcooL/httpfs/html/vfstemplate"
 )
 
 func main() {
@@ -71,7 +73,7 @@ func main() {
 	}
 
 	ss := stats.NewTorrent()
-	mountService := mount.NewTorrent(c, pool, ss)
+	mountService := mount.NewHandler(c, pool, ss)
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
@@ -96,15 +98,25 @@ func main() {
 	}
 
 	r := gin.Default()
-	fs := distribyted.NewBinaryFileSystem()
-	file, err := fs.Open("index.html")
+	assets := distribyted.NewBinaryFileSystem(distribyted.Assets)
+	r.Use(static.Serve("/assets", assets))
+
+	t, err := vfstemplate.ParseGlob(distribyted.Templates, nil, "*")
 	if err != nil {
-		log.Println("PUES SI QUE NO ESTá", err)
-	} else {
-		log.Println("FILE", file)
+		log.Fatal(err)
 	}
 
-	r.Use(static.Serve("/", fs))
+	r.SetHTMLTemplate(t)
+
+	//	r.LoadHTMLGlob("templates/*")
+
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
+	r.GET("/routes", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "routes.html", ss.RoutesStats())
+	})
 
 	r.GET("/api/status", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
@@ -113,17 +125,12 @@ func main() {
 			"cacheCapacity": fc.Info().Capacity / 1024 / 1024,
 			"poolCap":       pool.Cap(),
 			"poolFree":      pool.Free(),
-			"torrentStats":  ss.Global(),
+			"torrentStats":  ss.GlobalStats(),
 		})
 	})
 
-	r.GET("/api/status/:torrent", func(ctx *gin.Context) {
-		hash := ctx.Param("torrent")
-		stats, err := ss.Torrent(hash)
-		if err != nil {
-			ctx.AbortWithError(404, err)
-		}
-
+	r.GET("/api/routes", func(ctx *gin.Context) {
+		stats := ss.RoutesStats()
 		ctx.JSON(200, stats)
 	})
 

@@ -8,3 +8,4 @@ import (
 )
 
 var Assets http.FileSystem = http.Dir("assets")
+var Templates http.FileSystem = http.Dir("templates")

@@ -2,12 +2,10 @@ package stats
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/anacrolix/torrent"
-	"github.com/dustin/go-humanize"
 )
 
 var ErrTorrentNotFound = errors.New("torrent not found")
@@ -23,39 +21,29 @@ const (
 )
 
 type PieceChunk struct {
-	Status    PieceStatus
-	NumPieces int
+	Status    PieceStatus `json:"status"`
+	NumPieces int         `json:"numPieces"`
 }
 
 type TorrentStats struct {
-	DownloadedBytes int64
-	UploadedBytes   int64
-	TimePassed      float64
-	PieceChunks     []*PieceChunk
+	Name            string        `json:"name"`
+	Hash            string        `json:"hash"`
+	DownloadedBytes int64         `json:"downloadedBytes"`
+	UploadedBytes   int64         `json:"uploadedBytes"`
+	TimePassed      float64       `json:"timePassed"`
+	PieceChunks     []*PieceChunk `json:"pieceChunks"`
+	TotalPieces     int           `json:"totalPieces"`
 }
 
 type GlobalTorrentStats struct {
-	DownloadedBytes int64
-	UploadedBytes   int64
-	TimePassed      float64
+	DownloadedBytes int64   `json:"downloadedBytes"`
+	UploadedBytes   int64   `json:"uploadedBytes"`
+	TimePassed      float64 `json:"timePassed"`
 }
 
-func (s *GlobalTorrentStats) speed(bytes int64) float64 {
-	var bs float64
-	t := s.TimePassed
-	if t != 0 {
-		bs = float64(bytes) / t
-	}
-
-	return bs
-}
-
-func (s *GlobalTorrentStats) DownloadSpeed() string {
-	return fmt.Sprintf(" %s/s", humanize.IBytes(uint64(s.speed(s.DownloadedBytes))))
-}
-
-func (s *GlobalTorrentStats) UploadSpeed() string {
-	return fmt.Sprintf(" %s/s", humanize.IBytes(uint64(s.speed(s.UploadedBytes))))
+type RouteStats struct {
+	Name         string          `json:"name"`
+	TorrentStats []*TorrentStats `json:"torrentStats"`
 }
 
 type stats struct {
@@ -67,26 +55,31 @@ type stats struct {
 }
 
 type Torrent struct {
-	torrents      map[string]*torrent.Torrent
-	previousStats map[string]*stats
+	torrents        map[string]*torrent.Torrent
+	torrentsByRoute map[string][]*torrent.Torrent
+	previousStats   map[string]*stats
 
 	gTime time.Time
 }
 
 func NewTorrent() *Torrent {
 	return &Torrent{
-		gTime:         time.Now(),
-		torrents:      make(map[string]*torrent.Torrent),
-		previousStats: make(map[string]*stats),
+		gTime:           time.Now(),
+		torrents:        make(map[string]*torrent.Torrent),
+		torrentsByRoute: make(map[string][]*torrent.Torrent),
+		previousStats:   make(map[string]*stats),
 	}
 }
 
-func (s *Torrent) Add(t *torrent.Torrent) {
+func (s *Torrent) Add(route string, t *torrent.Torrent) {
 	s.torrents[t.InfoHash().String()] = t
 	s.previousStats[t.InfoHash().String()] = &stats{}
+
+	tbr := s.torrentsByRoute[route]
+	s.torrentsByRoute[route] = append(tbr, t)
 }
 
-func (s *Torrent) Torrent(hash string) (*TorrentStats, error) {
+func (s *Torrent) Stats(hash string) (*TorrentStats, error) {
 	t, ok := s.torrents[hash]
 	if !(ok) {
 		return nil, ErrTorrentNotFound
@@ -97,16 +90,27 @@ func (s *Torrent) Torrent(hash string) (*TorrentStats, error) {
 	return s.stats(now, t, true), nil
 }
 
-func (s *Torrent) List() []string {
-	var result []string
-	for hash := range s.torrents {
-		result = append(result, hash)
+func (s *Torrent) RoutesStats() []*RouteStats {
+	now := time.Now()
+
+	var out []*RouteStats
+	for r, tl := range s.torrentsByRoute {
+		var tStats []*TorrentStats
+		for _, t := range tl {
+			ts := s.stats(now, t, true)
+			tStats = append(tStats, ts)
+		}
+		rs := &RouteStats{
+			Name:         r,
+			TorrentStats: tStats,
+		}
+		out = append(out, rs)
 	}
 
-	return result
+	return out
 }
 
-func (s *Torrent) Global() *GlobalTorrentStats {
+func (s *Torrent) GlobalStats() *GlobalTorrentStats {
 	now := time.Now()
 
 	var totalDownload int64
@@ -155,7 +159,7 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 	}
 
 	ts.TimePassed = now.Sub(prev.time).Seconds()
-
+	var totalPieces int
 	if chunks {
 		var pch []*PieceChunk
 		for _, psr := range t.PieceStateRuns() {
@@ -177,10 +181,14 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 				Status:    s,
 				NumPieces: psr.Length,
 			})
+			totalPieces += psr.Length
 		}
 		ts.PieceChunks = pch
 	}
 
+	ts.Hash = t.InfoHash().String()
+	ts.Name = t.Name()
+	ts.TotalPieces = totalPieces
 	return ts
 }
 
