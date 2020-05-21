@@ -20,8 +20,12 @@ function fetchData() {
 
                     var download = torrentStat.downloadedBytes / torrentStat.timePassed;
                     var upload = torrentStat.uploadedBytes / torrentStat.timePassed;
+                    var seeders = torrentStat.seeders
+                    var peers = torrentStat.peers
                     document.getElementById("up-down-speed-text-" + torrentStat.hash).innerText =
                         Humanize.bytes(download, 1024) + "/s down, " + Humanize.bytes(upload, 1024) + "/s up";
+                        document.getElementById("peers-seeders-" + torrentStat.hash).innerText = 
+                        peers + " peers, " + seeders + " seeders."
 
                 });
             });

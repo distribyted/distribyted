@@ -30,6 +30,8 @@ type TorrentStats struct {
 	Hash            string        `json:"hash"`
 	DownloadedBytes int64         `json:"downloadedBytes"`
 	UploadedBytes   int64         `json:"uploadedBytes"`
+	Peers           int           `json:"peers"`
+	Seeders         int           `json:"seeders"`
 	TimePassed      float64       `json:"timePassed"`
 	PieceChunks     []*PieceChunk `json:"pieceChunks"`
 	TotalPieces     int           `json:"totalPieces"`
@@ -51,6 +53,8 @@ type stats struct {
 	downloadBytes      int64
 	totalUploadBytes   int64
 	uploadBytes        int64
+	peers              int
+	seeders            int
 	time               time.Time
 }
 
@@ -141,7 +145,6 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 		log.Println("Using previous stats")
 	} else {
 		st := t.Stats()
-
 		rd := st.BytesReadData.Int64()
 		wd := st.BytesWrittenData.Int64()
 		ist := &stats{
@@ -150,10 +153,14 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 			totalDownloadBytes: rd,
 			totalUploadBytes:   wd,
 			time:               now,
+			peers:              st.TotalPeers,
+			seeders:            st.ConnectedSeeders,
 		}
 
 		ts.DownloadedBytes = ist.downloadBytes
 		ts.UploadedBytes = ist.uploadBytes
+		ts.Peers = ist.peers
+		ts.Seeders = ist.seeders
 
 		s.previousStats[t.InfoHash().String()] = ist
 	}
