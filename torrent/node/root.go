@@ -29,7 +29,7 @@ func (root *Root) OnAdd(ctx context.Context) {
 		root.pool.Submit(func() {
 			root.AddChild(
 				filepath.Clean(torrent.Name()),
-				root.NewPersistentInode(ctx, &Folder{t: torrent, pool: root.pool}, fs.StableAttr{
+				root.NewPersistentInode(ctx, &Torrent{t: torrent, pool: root.pool}, fs.StableAttr{
 					Mode: syscall.S_IFDIR,
 				}), true)
 		})

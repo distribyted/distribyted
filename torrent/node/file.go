@@ -14,6 +14,7 @@ import (
 var _ fs.NodeGetattrer = &File{}
 var _ fs.NodeOpener = &File{}
 var _ fs.NodeReader = &File{}
+var _ fs.NodeReleaser = &File{}
 
 // File is a fuse node for files inside a torrent
 type File struct {
@@ -60,7 +61,7 @@ func (tr *File) Open(ctx context.Context, flags uint32) (fh fs.FileHandle, fuseF
 		r, err := tr.f()
 		if err != nil {
 			log.Println("error opening reader for file", err)
-			return nil, fuse.FOPEN_KEEP_CACHE, syscall.EIO
+			return nil, 0, syscall.EIO
 		}
 
 		tr.r = r
@@ -71,6 +72,9 @@ func (tr *File) Open(ctx context.Context, flags uint32) (fh fs.FileHandle, fuseF
 
 func (tr *File) Read(ctx context.Context, f fs.FileHandle, dest []byte, off int64) (fuse.ReadResult, syscall.Errno) {
 	end := int(math.Min(float64(len(dest)), float64(int64(tr.len)-off)))
+	if end < 0 {
+		end = 0
+	}
 
 	buf := dest[:end]
 
@@ -83,4 +87,21 @@ func (tr *File) Read(ctx context.Context, f fs.FileHandle, dest []byte, off int6
 
 	buf = buf[:n]
 	return fuse.ReadResultData(buf), fs.OK
+}
+
+func (tr *File) Release(ctx context.Context, f fs.FileHandle) syscall.Errno {
+	log.Println("closing file...")
+	if tr.r != nil {
+		closer, ok := tr.r.(io.Closer)
+		if ok {
+			if err := closer.Close(); err != nil {
+				log.Println("error closing file", err)
+				return syscall.EIO
+			}
+		} else {
+			log.Println("file is not implementing close method")
+		}
+	}
+
+	return fs.OK
 }

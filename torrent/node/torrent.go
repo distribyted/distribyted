@@ -12,17 +12,17 @@ import (
 	"github.com/panjf2000/ants/v2"
 )
 
-var _ fs.NodeOnAdder = &Folder{}
-var _ fs.NodeGetattrer = &Folder{}
+var _ fs.NodeOnAdder = &Torrent{}
+var _ fs.NodeGetattrer = &Torrent{}
 
-type Folder struct {
+type Torrent struct {
 	fs.Inode
 	t *torrent.Torrent
 
 	pool *ants.Pool
 }
 
-func (folder *Folder) OnAdd(ctx context.Context) {
+func (folder *Torrent) OnAdd(ctx context.Context) {
 	for _, file := range folder.t.Files() {
 		file := file
 		LoadNodeByPath(
@@ -38,7 +38,7 @@ func (folder *Folder) OnAdd(ctx context.Context) {
 	}
 }
 
-func (folder *Folder) Getattr(ctx context.Context, f fs.FileHandle, out *fuse.AttrOut) syscall.Errno {
+func (folder *Torrent) Getattr(ctx context.Context, f fs.FileHandle, out *fuse.AttrOut) syscall.Errno {
 	out.Mode = syscall.S_IFDIR & 07777
 
 	return fs.OK

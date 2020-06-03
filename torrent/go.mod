@@ -25,6 +25,7 @@ require (
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/panjf2000/ants/v2 v2.3.1
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
+	github.com/stretchr/testify v1.4.0
 	github.com/tinylib/msgp v1.1.2 // indirect
 	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f // indirect
 	golang.org/x/sys v0.0.0-20200509044756-6aff5f38e54f // indirect
