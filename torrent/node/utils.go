@@ -10,12 +10,11 @@ import (
 
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
-	"github.com/panjf2000/ants/v2"
 )
 
 type ReaderFunc func() (io.ReaderAt, error)
 
-func LoadNodeByPath(ctx context.Context, pool *ants.Pool, fp string, reader ReaderFunc, parent *fs.Inode, fileLength int64, pieceLen int32, numPieces int64) {
+func LoadNodeByPath(ctx context.Context, fp string, reader ReaderFunc, parent *fs.Inode, fileLength int64, pieceLen int32, numPieces int64) {
 	p := parent
 	dir, base := filepath.Split(filepath.Clean(fp))
 	for i, component := range strings.Split(dir, "/") {

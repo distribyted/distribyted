@@ -11,7 +11,6 @@ import (
 	"github.com/anacrolix/torrent"
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
-	"github.com/panjf2000/ants/v2"
 )
 
 type Handler struct {
@@ -19,16 +18,14 @@ type Handler struct {
 	s    *stats.Torrent
 	opts *fs.Options
 
-	pool    *ants.Pool
 	servers map[string]*fuse.Server
 }
 
-func NewHandler(c *torrent.Client, pool *ants.Pool, s *stats.Torrent) *Handler {
+func NewHandler(c *torrent.Client, s *stats.Torrent) *Handler {
 	return &Handler{
 		c:       c,
 		s:       s,
 		opts:    &fs.Options{},
-		pool:    pool,
 		servers: make(map[string]*fuse.Server),
 	}
 }
@@ -69,7 +66,7 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 		return err
 	}
 
-	node := node.NewRoot(torrents, s.pool)
+	node := node.NewRoot(torrents)
 	server, err := fs.Mount(mpc.Path, node, s.opts)
 	if err != nil {
 		return err

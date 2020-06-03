@@ -1,6 +1,5 @@
 GeneralChart.init();
 var cacheChart = new SingleBarChart("chart-cache", "Cache disk");
-var workerChart = new SingleBarChart("chart-workers", "Workers");
 
 fetchData();
 setInterval(function () {
@@ -22,7 +21,6 @@ function fetchData() {
         GeneralChart.update(download, upload);
 
         cacheChart.update(stats.cacheFilled, stats.cacheCapacity - stats.cacheFilled);
-        workerChart.update(0, stats.poolFree - stats.poolCap);
         document.getElementById("down-speed-text").innerText =
             Humanize.bytes(download, 1024) + "/s";
 

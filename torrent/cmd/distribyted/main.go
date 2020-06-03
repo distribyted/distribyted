@@ -19,7 +19,6 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-yaml"
-	"github.com/panjf2000/ants/v2"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
 )
 
@@ -67,13 +66,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	pool, err := ants.NewPool(100)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	ss := stats.NewTorrent()
-	mountService := mount.NewHandler(c, pool, ss)
+	mountService := mount.NewHandler(c, ss)
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
@@ -82,8 +76,6 @@ func main() {
 		<-sigChan
 		log.Println("Closing torrent client...")
 		c.Close()
-		log.Println("Releasing execution pool...")
-		pool.Release()
 		log.Println("Unmounting fuse filesystem...")
 		mountService.Close()
 
@@ -123,8 +115,6 @@ func main() {
 			"cacheItems":    fc.Info().NumItems,
 			"cacheFilled":   fc.Info().Filled / 1024 / 1024,
 			"cacheCapacity": fc.Info().Capacity / 1024 / 1024,
-			"poolCap":       pool.Cap(),
-			"poolFree":      pool.Free(),
 			"torrentStats":  ss.GlobalStats(),
 		})
 	})

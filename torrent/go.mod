@@ -23,7 +23,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	github.com/panjf2000/ants/v2 v2.3.1
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
 	github.com/stretchr/testify v1.4.0
 	github.com/tinylib/msgp v1.1.2 // indirect

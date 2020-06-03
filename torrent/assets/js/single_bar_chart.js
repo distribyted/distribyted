@@ -3,7 +3,7 @@ function SingleBarChart(id, name) {
     this._used = [];
     this._free = [];
     this._chart = new Chart(ctx, {
-        type: 'bar',
+        type: 'horizontalBar',
         data: {
             labels:[name],
             datasets: [{

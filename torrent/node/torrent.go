@@ -9,7 +9,6 @@ import (
 	"github.com/anacrolix/torrent"
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
-	"github.com/panjf2000/ants/v2"
 )
 
 var _ fs.NodeOnAdder = &Torrent{}
@@ -18,8 +17,6 @@ var _ fs.NodeGetattrer = &Torrent{}
 type Torrent struct {
 	fs.Inode
 	t *torrent.Torrent
-
-	pool *ants.Pool
 }
 
 func (folder *Torrent) OnAdd(ctx context.Context) {
@@ -27,7 +24,6 @@ func (folder *Torrent) OnAdd(ctx context.Context) {
 		file := file
 		LoadNodeByPath(
 			ctx,
-			folder.pool,
 			file.Path(),
 			func() (io.ReaderAt, error) { return iio.NewReadAtWrapper(file.NewReader()), nil },
 			&folder.Inode,

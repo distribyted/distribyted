@@ -50,7 +50,6 @@ func (z *Zip) Opendir(ctx context.Context) syscall.Errno {
 			}
 			LoadNodeByPath(
 				ctx,
-				nil,
 				f.Name,
 				func() (io.ReaderAt, error) {
 					zfr, err := f.Open()
