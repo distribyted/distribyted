@@ -51,12 +51,15 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 			return err
 		}
 
-		log.Println("getting torrent info", t.Name())
-		<-t.GotInfo()
+		// only get info if name is not available
+		if t.Name() == "" {
+			log.Println("getting torrent info", t.InfoHash())
+			<-t.GotInfo()
+		}
 
 		s.s.Add(mpc.Path, t)
+		log.Println("torrent added", t.Name())
 
-		log.Println("torrent info obtained", t.Name())
 		torrents = append(torrents, t)
 	}
 

@@ -74,7 +74,7 @@ func (z *Zip) Opendir(ctx context.Context) syscall.Errno {
 }
 
 func (z *Zip) Getattr(ctx context.Context, f fs.FileHandle, out *fuse.AttrOut) syscall.Errno {
-	out.Mode = syscall.S_IFDIR & 07777
+	out.Mode = syscall.S_IFDIR & 0555
 	out.Size = uint64(z.size)
 
 	return fs.OK

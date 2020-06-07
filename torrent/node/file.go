@@ -7,6 +7,7 @@ import (
 	"math"
 	"syscall"
 
+	"github.com/ajnavarro/distribyted/iio"
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
 )
@@ -14,7 +15,7 @@ import (
 var _ fs.NodeGetattrer = &File{}
 var _ fs.NodeOpener = &File{}
 var _ fs.NodeReader = &File{}
-var _ fs.NodeReleaser = &File{}
+var _ fs.NodeFlusher = &File{}
 
 // File is a fuse node for files inside a torrent
 type File struct {
@@ -44,7 +45,7 @@ func NewFileWithBlocks(readerFunc ReaderFunc, len int64, pieceLen int32, numPiec
 }
 
 func (tr *File) Getattr(ctx context.Context, f fs.FileHandle, out *fuse.AttrOut) syscall.Errno {
-	out.Mode = syscall.S_IFREG & 07777
+	out.Mode = syscall.S_IFREG & 0555
 	out.Nlink = 1
 	out.Size = uint64(tr.len)
 	if tr.pieceLen != 0 {
@@ -56,7 +57,6 @@ func (tr *File) Getattr(ctx context.Context, f fs.FileHandle, out *fuse.AttrOut)
 }
 
 func (tr *File) Open(ctx context.Context, flags uint32) (fh fs.FileHandle, fuseFlags uint32, errno syscall.Errno) {
-	// TODO use filehandle
 	if tr.r == nil {
 		r, err := tr.f()
 		if err != nil {
@@ -89,18 +89,10 @@ func (tr *File) Read(ctx context.Context, f fs.FileHandle, dest []byte, off int6
 	return fuse.ReadResultData(buf), fs.OK
 }
 
-func (tr *File) Release(ctx context.Context, f fs.FileHandle) syscall.Errno {
-	log.Println("closing file...")
-	if tr.r != nil {
-		closer, ok := tr.r.(io.Closer)
-		if ok {
-			if err := closer.Close(); err != nil {
-				log.Println("error closing file", err)
-				return syscall.EIO
-			}
-		} else {
-			log.Println("file is not implementing close method")
-		}
+func (tr *File) Flush(ctx context.Context, f fs.FileHandle) syscall.Errno {
+	if err := iio.CloseIfCloseable(tr.r); err != nil {
+		log.Println("error closing file", err)
+		return syscall.EIO
 	}
 
 	return fs.OK

@@ -11,15 +11,17 @@ import (
 	"github.com/hanwen/go-fuse/v2/fuse"
 )
 
-var _ fs.NodeOnAdder = &Torrent{}
 var _ fs.NodeGetattrer = &Torrent{}
+var _ fs.NodeOpendirer = &Torrent{}
 
 type Torrent struct {
 	fs.Inode
 	t *torrent.Torrent
 }
 
-func (folder *Torrent) OnAdd(ctx context.Context) {
+func (folder *Torrent) Opendir(ctx context.Context) syscall.Errno {
+	<-folder.t.GotInfo()
+
 	for _, file := range folder.t.Files() {
 		file := file
 		LoadNodeByPath(
@@ -32,10 +34,11 @@ func (folder *Torrent) OnAdd(ctx context.Context) {
 			int64(file.Torrent().Info().NumPieces()),
 		)
 	}
+	return fs.OK
 }
 
 func (folder *Torrent) Getattr(ctx context.Context, f fs.FileHandle, out *fuse.AttrOut) syscall.Errno {
-	out.Mode = syscall.S_IFDIR & 07777
+	out.Mode = syscall.S_IFDIR & 0555
 
 	return fs.OK
 }

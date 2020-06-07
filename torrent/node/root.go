@@ -33,7 +33,7 @@ func (root *Root) OnAdd(ctx context.Context) {
 }
 
 func (root *Root) Getattr(ctx context.Context, f fs.FileHandle, out *fuse.AttrOut) syscall.Errno {
-	out.Mode = syscall.S_IFDIR & 07777
+	out.Mode = syscall.S_IFDIR & 0555
 
 	return fs.OK
 }
