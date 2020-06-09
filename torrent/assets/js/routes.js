@@ -20,12 +20,15 @@ function fetchData() {
 
                     var download = torrentStat.downloadedBytes / torrentStat.timePassed;
                     var upload = torrentStat.uploadedBytes / torrentStat.timePassed;
-                    var seeders = torrentStat.seeders
-                    var peers = torrentStat.peers
+                    var seeders = torrentStat.seeders;
+                    var peers = torrentStat.peers;
+                    var pieceSize = torrentStat.pieceSice;
+
                     document.getElementById("up-down-speed-text-" + torrentStat.hash).innerText =
-                        Humanize.bytes(download, 1024) + "/s down, " + Humanize.bytes(upload, 1024) + "/s up";
-                        document.getElementById("peers-seeders-" + torrentStat.hash).innerText = 
+                        Humanize.ibytes(download, 1024) + "/s down, " + Humanize.ibytes(upload, 1024) + "/s up";
+                    document.getElementById("peers-seeders-" + torrentStat.hash).innerText =
                         peers + " peers, " + seeders + " seeders."
+                    document.getElementById("piece-size-" + torrentStat.hash).innerText = "Piece size: " + Humanize.bytes(pieceSize, 1024)
 
                 });
             });

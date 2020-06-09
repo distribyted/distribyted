@@ -35,6 +35,7 @@ type TorrentStats struct {
 	TimePassed      float64       `json:"timePassed"`
 	PieceChunks     []*PieceChunk `json:"pieceChunks"`
 	TotalPieces     int           `json:"totalPieces"`
+	PieceSize       int64         `json:"pieceSice"`
 }
 
 type GlobalTorrentStats struct {
@@ -196,6 +197,11 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 	ts.Hash = t.InfoHash().String()
 	ts.Name = t.Name()
 	ts.TotalPieces = totalPieces
+
+	if t.Info() != nil {
+		ts.PieceSize = t.Info().PieceLength
+	}
+
 	return ts
 }
 

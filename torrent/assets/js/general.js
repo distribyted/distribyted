@@ -22,10 +22,10 @@ function fetchData() {
 
         cacheChart.update(stats.cacheFilled, stats.cacheCapacity - stats.cacheFilled);
         document.getElementById("down-speed-text").innerText =
-            Humanize.bytes(download, 1024) + "/s";
+            Humanize.ibytes(download, 1024) + "/s";
 
         document.getElementById("up-speed-text").innerText =
-            Humanize.bytes(upload, 1024) + " /s";
+            Humanize.ibytes(upload, 1024) + " /s";
     })
     .catch(function (error) {
         console.log('Error getting status info: ' + error.message);

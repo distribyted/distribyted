@@ -7,12 +7,12 @@ function SingleBarChart(id, name) {
         data: {
             labels:[name],
             datasets: [{
-                backgroundColor: "gray",
+                backgroundColor: "#839496",
                 label: "used",
                 data: this._used,
             },
             {
-                backgroundColor: "green",
+                backgroundColor: "#859900",
                 label: "free",
                 data: this._free,
             }],

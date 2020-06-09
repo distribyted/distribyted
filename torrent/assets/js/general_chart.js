@@ -27,16 +27,18 @@ var GeneralChart = {
                     {
                         label: 'Download Speed',
                         fill: false,
-                        backgroundColor: 'rgb(255, 99, 132)',
-                        borderColor: 'rgb(255, 99, 132)',
-                        borderWidth: 1,
+                        backgroundColor: '#859900',
+                        borderColor: '#859900',
+                        borderWidth: 2,
                         data: this._downloadData,
 
                     },
                     {
                         label: 'Upload Speed',
                         fill: false,
-                        borderWidth: 1,
+                        backgroundColor: '#839496',
+                        borderColor: '#839496',
+                        borderWidth: 2,
                         data: this._uploadData,
 
                     },
@@ -66,7 +68,7 @@ var GeneralChart = {
                         type: 'linear',
                         ticks: {
                             userCallback: function (tick) {
-                                return Humanize.bytes(tick, 1024) + "/s";
+                                return Humanize.ibytes(tick, 1024) + "/s";
                             },
                             beginAtZero: true
                         },
