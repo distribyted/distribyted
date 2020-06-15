@@ -35,7 +35,7 @@ type TorrentStats struct {
 	TimePassed      float64       `json:"timePassed"`
 	PieceChunks     []*PieceChunk `json:"pieceChunks"`
 	TotalPieces     int           `json:"totalPieces"`
-	PieceSize       int64         `json:"pieceSice"`
+	PieceSize       int64         `json:"pieceSize"`
 }
 
 type GlobalTorrentStats struct {
