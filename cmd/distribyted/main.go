@@ -2,7 +2,6 @@ package main
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,9 +19,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-yaml"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+
 	var configPath string
 	if len(os.Args) < 2 {
 		configPath = "./config.yaml"
@@ -30,25 +31,28 @@ func main() {
 		configPath = os.Args[1]
 	}
 
+	log.SetFormatter(&log.TextFormatter{})
+	log.SetLevel(log.DebugLevel)
+
 	f, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		log.Fatal(err)
+		log.WithError(err).Fatal("error reading configuration file")
 	}
 
 	conf := &config.Root{}
 	if err := yaml.Unmarshal(f, conf); err != nil {
-		log.Fatal(err)
+		log.WithError(err).Fatal("error parsing configuration file")
 	}
 
 	conf = config.AddDefaults(conf)
 
 	if err := os.MkdirAll(conf.MetadataFolder, 0770); err != nil {
-		log.Fatal(err)
+		log.WithError(err).Fatal("error creating metadata folder")
 	}
 
 	fc, err := filecache.NewCache(conf.MetadataFolder)
 	if err != nil {
-		log.Fatal(err)
+		log.WithError(err).Fatal("error creating cache")
 	}
 
 	fc.SetCapacity(conf.MaxCacheSize * 1024 * 1024)
@@ -63,7 +67,7 @@ func main() {
 
 	c, err := torrent.NewClient(torrentCfg)
 	if err != nil {
-		log.Fatal(err)
+		log.WithError(err).Fatal("error initializing torrent client")
 	}
 
 	ss := stats.NewTorrent()
@@ -74,28 +78,28 @@ func main() {
 
 	go func() {
 		<-sigChan
-		log.Println("Closing torrent client...")
+		log.Info("closing torrent client...")
 		c.Close()
-		log.Println("Unmounting fuse filesystem...")
+		log.Info("unmounting fuse filesystem...")
 		mountService.Close()
 
-		log.Println("Exiting...")
+		log.Info("exiting")
 		os.Exit(1)
 	}()
 
 	for _, mp := range conf.MountPoints {
 		if err := mountService.Mount(mp); err != nil {
-			log.Fatal(err)
+			log.WithError(err).WithField("path", mp).Fatal("error mounting folder")
 		}
 	}
 
 	r := gin.Default()
-	assets := distribyted.NewBinaryFileSystem(distribyted.Assets)
+	assets := distribyted.NewBinaryFileSystem(distribyted.HttpFS, "/assets")
 	r.Use(static.Serve("/assets", assets))
 
-	t, err := vfstemplate.ParseGlob(distribyted.Templates, nil, "*")
+	t, err := vfstemplate.ParseGlob(distribyted.HttpFS, nil, "/templates/*")
 	if err != nil {
-		log.Fatal(err)
+		log.WithError(err).Fatal("error parsing html template")
 	}
 
 	r.SetHTMLTemplate(t)
@@ -124,7 +128,8 @@ func main() {
 		ctx.JSON(200, stats)
 	})
 
+	//TODO add port from configuration
 	if err := r.Run(":4444"); err != nil {
-		log.Fatal(err)
+		log.WithError(err).Fatal("error initializing server")
 	}
 }

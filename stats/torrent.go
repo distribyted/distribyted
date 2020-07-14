@@ -2,7 +2,6 @@ package stats
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"github.com/anacrolix/torrent"
@@ -142,8 +141,6 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 	if s.returnPreviousMeasurements(now) {
 		ts.DownloadedBytes = prev.downloadBytes
 		ts.UploadedBytes = prev.uploadBytes
-
-		log.Println("Using previous stats")
 	} else {
 		st := t.Stats()
 		rd := st.BytesReadData.Int64()

@@ -2,7 +2,6 @@ package mount
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/ajnavarro/distribyted/config"
@@ -11,6 +10,7 @@ import (
 	"github.com/anacrolix/torrent"
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
+	log "github.com/sirupsen/logrus"
 )
 
 type Handler struct {
@@ -53,19 +53,18 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 
 		// only get info if name is not available
 		if t.Name() == "" {
-			log.Println("getting torrent info", t.InfoHash())
+			log.WithField("hash", t.InfoHash()).Info("getting torrent info")
 			<-t.GotInfo()
 		}
 
 		s.s.Add(mpc.Path, t)
-		log.Println("torrent added", t.Name())
+		log.WithField("name", t.Name()).Info("torrent added")
 
 		torrents = append(torrents, t)
 	}
 
 	// TODO change permissions
 	if err := os.MkdirAll(mpc.Path, 0770); err != nil && !os.IsExist(err) {
-		log.Println("UFFF", err)
 		return err
 	}
 
@@ -82,10 +81,11 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 
 func (s *Handler) Close() {
 	for path, server := range s.servers {
-		log.Println("unmounting", path)
+		log.WithField("path", path).Info("unmounting")
 		err := server.Unmount()
 		if err != nil {
-			log.Println("unmount failed", path, err)
+			//TODO try to force unmount if possible
+			log.WithError(err).WithField("path", path).Error("unmount failed")
 		}
 	}
 }

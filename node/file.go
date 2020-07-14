@@ -3,13 +3,13 @@ package node
 import (
 	"context"
 	"io"
-	"log"
 	"math"
 	"syscall"
 
 	"github.com/ajnavarro/distribyted/iio"
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
+	log "github.com/sirupsen/logrus"
 )
 
 var _ fs.NodeGetattrer = &File{}
@@ -60,7 +60,7 @@ func (tr *File) Open(ctx context.Context, flags uint32) (fh fs.FileHandle, fuseF
 	if tr.r == nil {
 		r, err := tr.f()
 		if err != nil {
-			log.Println("error opening reader for file", err)
+			log.WithError(err).Error("error opening reader for file")
 			return nil, 0, syscall.EIO
 		}
 
@@ -81,7 +81,7 @@ func (tr *File) Read(ctx context.Context, f fs.FileHandle, dest []byte, off int6
 	n, err := tr.r.ReadAt(buf, off)
 
 	if err != nil && err != io.EOF {
-		log.Println("error read data", err)
+		log.WithError(err).Error("error reading data")
 		return nil, syscall.EIO
 	}
 
@@ -91,7 +91,7 @@ func (tr *File) Read(ctx context.Context, f fs.FileHandle, dest []byte, off int6
 
 func (tr *File) Flush(ctx context.Context, f fs.FileHandle) syscall.Errno {
 	if err := iio.CloseIfCloseable(tr.r); err != nil {
-		log.Println("error closing file", err)
+		log.WithError(err).Error("error closing file")
 		return syscall.EIO
 	}
 

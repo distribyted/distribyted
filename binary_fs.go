@@ -2,15 +2,20 @@ package distribyted
 
 import (
 	"net/http"
+	"path"
 	"strings"
 )
 
 type binaryFileSystem struct {
-	http.FileSystem
+	fs   http.FileSystem
+	base string
 }
 
-func NewBinaryFileSystem(fs http.FileSystem) *binaryFileSystem {
-	return &binaryFileSystem{fs}
+func NewBinaryFileSystem(fs http.FileSystem, base string) *binaryFileSystem {
+	return &binaryFileSystem{
+		fs:   fs,
+		base: base,
+	}
 }
 
 func (fs *binaryFileSystem) Exists(prefix string, filepath string) bool {
@@ -21,4 +26,8 @@ func (fs *binaryFileSystem) Exists(prefix string, filepath string) bool {
 		return true
 	}
 	return false
+}
+
+func (fs *binaryFileSystem) Open(name string) (http.File, error) {
+	return fs.fs.Open(path.Join(fs.base, name))
 }

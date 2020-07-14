@@ -2,18 +2,19 @@ package iio
 
 import (
 	"io"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func CloseIfCloseable(r interface{}) error {
-	log.Println("closing file...")
+	log.Debug("closing file...")
 	if r == nil {
 		return nil
 	}
 
 	closer, ok := r.(io.Closer)
 	if !ok {
-		log.Println("file is not implementing close method")
+		log.Debug("file is not implementing close method")
 		return nil
 	}
 

@@ -4,12 +4,12 @@ import (
 	"archive/zip"
 	"context"
 	"io"
-	"log"
 	"syscall"
 
 	"github.com/ajnavarro/distribyted/iio"
 	"github.com/hanwen/go-fuse/v2/fs"
 	"github.com/hanwen/go-fuse/v2/fuse"
+	log "github.com/sirupsen/logrus"
 )
 
 var _ fs.NodeGetattrer = &Zip{}
@@ -34,12 +34,12 @@ func (z *Zip) Opendir(ctx context.Context) syscall.Errno {
 	if z.files == nil {
 		r, err := z.reader()
 		if err != nil {
-			log.Println("error opening reader for zip", err)
+			log.WithError(err).Error("error opening reader for zip")
 			return syscall.EIO
 		}
 		zr, err := zip.NewReader(r, z.size)
 		if err != nil {
-			log.Println("error getting zip reader from reader", err)
+			log.WithError(err).Error("error getting zip reader from reader")
 			return syscall.EIO
 		}
 
@@ -54,7 +54,7 @@ func (z *Zip) Opendir(ctx context.Context) syscall.Errno {
 				func() (io.ReaderAt, error) {
 					zfr, err := f.Open()
 					if err != nil {
-						log.Println("ERROR OPENING ZIP", err)
+						log.WithError(err).Error("error opening zip file")
 						return nil, err
 					}
 
