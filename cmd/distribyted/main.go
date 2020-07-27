@@ -19,7 +19,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-yaml"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
+	ginlogrus "github.com/toorop/gin-logrus"
 )
 
 func main() {
@@ -31,28 +32,33 @@ func main() {
 		configPath = os.Args[1]
 	}
 
-	log.SetFormatter(&log.TextFormatter{})
-	log.SetLevel(log.DebugLevel)
+	log := logrus.New()
+	log.SetFormatter(&logrus.TextFormatter{})
+	log.SetLevel(logrus.InfoLevel)
 
 	f, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		log.WithError(err).Fatal("error reading configuration file")
+		log.WithError(err).Error("error reading configuration file")
+		return
 	}
 
 	conf := &config.Root{}
 	if err := yaml.Unmarshal(f, conf); err != nil {
-		log.WithError(err).Fatal("error parsing configuration file")
+		log.WithError(err).Error("error parsing configuration file")
+		return
 	}
 
 	conf = config.AddDefaults(conf)
 
 	if err := os.MkdirAll(conf.MetadataFolder, 0770); err != nil {
-		log.WithError(err).Fatal("error creating metadata folder")
+		log.WithError(err).Error("error creating metadata folder")
+		return
 	}
 
 	fc, err := filecache.NewCache(conf.MetadataFolder)
 	if err != nil {
-		log.WithError(err).Fatal("error creating cache")
+		log.WithError(err).Error("error creating cache")
+		return
 	}
 
 	fc.SetCapacity(conf.MaxCacheSize * 1024 * 1024)
@@ -67,39 +73,41 @@ func main() {
 
 	c, err := torrent.NewClient(torrentCfg)
 	if err != nil {
-		log.WithError(err).Fatal("error initializing torrent client")
+		log.WithError(err).Error("error initializing torrent client")
+		return
 	}
 
 	ss := stats.NewTorrent()
 	mountService := mount.NewHandler(c, ss)
+
+	defer func() {
+		tryClose(log, c, mountService)
+	}()
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
 		<-sigChan
-		log.Info("closing torrent client...")
-		c.Close()
-		log.Info("unmounting fuse filesystem...")
-		mountService.Close()
-
-		log.Info("exiting")
-		os.Exit(1)
+		tryClose(log, c, mountService)
 	}()
 
 	for _, mp := range conf.MountPoints {
 		if err := mountService.Mount(mp); err != nil {
-			log.WithError(err).WithField("path", mp).Fatal("error mounting folder")
+			log.WithError(err).WithField("path", mp.Path).Error("error mounting folder")
+			return
 		}
 	}
 
-	r := gin.Default()
+	r := gin.New()
+
+	r.Use(ginlogrus.Logger(log), gin.Recovery())
+
 	assets := distribyted.NewBinaryFileSystem(distribyted.HttpFS, "/assets")
 	r.Use(static.Serve("/assets", assets))
-
 	t, err := vfstemplate.ParseGlob(distribyted.HttpFS, nil, "/templates/*")
 	if err != nil {
-		log.WithError(err).Fatal("error parsing html template")
+		log.WithError(err).Error("error parsing html template")
 	}
 
 	r.SetHTMLTemplate(t)
@@ -130,6 +138,17 @@ func main() {
 
 	//TODO add port from configuration
 	if err := r.Run(":4444"); err != nil {
-		log.WithError(err).Fatal("error initializing server")
+		log.WithError(err).Error("error initializing server")
+		return
 	}
+}
+
+func tryClose(log *logrus.Logger, c *torrent.Client, mountService *mount.Handler) {
+	log.Info("closing torrent client...")
+	c.Close()
+	log.Info("unmounting fuse filesystem...")
+	mountService.Close()
+
+	log.Info("exiting")
+	os.Exit(1)
 }
