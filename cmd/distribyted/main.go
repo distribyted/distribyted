@@ -99,6 +99,8 @@ func main() {
 		}
 	}
 
+	gin.SetMode(gin.ReleaseMode)
+
 	r := gin.New()
 
 	r.Use(ginlogrus.Logger(log), gin.Recovery())
@@ -111,8 +113,6 @@ func main() {
 	}
 
 	r.SetHTMLTemplate(t)
-
-	//	r.LoadHTMLGlob("templates/*")
 
 	r.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)

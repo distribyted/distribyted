@@ -1,2 +1,3 @@
 _DATA
 httpfs_vfsdata.go
+bin/
