@@ -66,7 +66,7 @@ func main() {
 
 	// TODO download and upload limits
 	torrentCfg := torrent.NewDefaultClientConfig()
-	torrentCfg.Logger = tlog.Default.WithDefaultLevel(tlog.Info).FilterLevel(tlog.Info)
+	torrentCfg.Logger = tlog.Discard
 	torrentCfg.Seed = true
 	torrentCfg.DisableTCP = true
 	torrentCfg.DefaultStorage = st
