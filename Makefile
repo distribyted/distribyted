@@ -39,17 +39,17 @@ go-compile:
 	# MacOS
 	#GOOS=darwin GOARCH=386 go build $(LDFLAGS) -o bin/main-darwin-386 -tags "release" cmd/distribyted/main.go
 	# Linux
-	GOOS=linux GOARCH=386 go build $(LDFLAGS) -o bin/main-linux-386 -tags "release" cmd/distribyted/main.go
+	GOOS=linux GOARCH=386 go build $(LDFLAGS) -o bin/distribyted-linux-386 -tags "release" cmd/distribyted/main.go
     # 64-Bit
 	# FreeBDS
 	#GOOS=freebsd GOARCH=amd64 go build $(LDFLAGS) -o bin/main-freebsd-amd64 -tags "release" cmd/distribyted/main.go
 	# MacOS
 	#GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o bin/main-darwin-amd64 -tags "release" cmd/distribyted/main.go
 	# Linux
-	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o bin/main-linux-amd64 -tags "release" cmd/distribyted/main.go
+	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o bin/distribyted-linux-amd64 -tags "release" cmd/distribyted/main.go
 	
 	# ARM
-	GOOS=linux GOARCH=arm GOARM=5 go build $(LDFLAGS) -o bin/main-linux-arm -tags "release" cmd/distribyted/main.go
+	GOOS=linux GOARCH=arm GOARM=5 go build $(LDFLAGS) -o bin/distribyted-linux-arm -tags "release" cmd/distribyted/main.go
 
 .PHONY: help
 all: help

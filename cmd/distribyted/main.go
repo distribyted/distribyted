@@ -136,11 +136,14 @@ func main() {
 		ctx.JSON(200, stats)
 	})
 
+	log.WithField("host", "0.0.0.0:4444").Info("starting webserver")
+
 	//TODO add port from configuration
 	if err := r.Run(":4444"); err != nil {
 		log.WithError(err).Error("error initializing server")
 		return
 	}
+
 }
 
 func tryClose(log *logrus.Logger, c *torrent.Client, mountService *mount.Handler) {

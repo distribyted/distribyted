@@ -58,7 +58,7 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 		}
 
 		s.s.Add(mpc.Path, t)
-		log.WithField("name", t.Name()).Info("torrent added")
+		log.WithField("name", t.Name()).WithField("path", mpc.Path).Info("torrent added to mountpoint")
 
 		torrents = append(torrents, t)
 	}
