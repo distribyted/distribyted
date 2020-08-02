@@ -2,11 +2,9 @@ name: Release
 
 on:
   push:
-    # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   release:
     name: Upload Release Assets
@@ -17,7 +15,7 @@ jobs:
       - name: Build project 
         run: make compile
       - name: Upload Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v0.1.5
         with:
           draft: true
           prerelease: false
