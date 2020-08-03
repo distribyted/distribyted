@@ -70,9 +70,9 @@ Distribyted can show some kind of files directly as folders, making it possible 
 
 ## Getting Started
 
-Get the latest release from [releases](releases-url) page or download the source code and execute `make build`.
+Get the latest release from [releases][releases-url] page or download the source code and execute `make build`.
 
-Use the [example config file](example-config) and modify it as needed.
+Use the [example config file][example-config] and modify it as needed.
 
 Run the program: `distribyted-binary path/to/config/file.yaml`
 
