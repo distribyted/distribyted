@@ -122,5 +122,5 @@ Distributed under the GPL3 license. See `LICENSE` for more information.
 [releases-url]: https://github.com/distribyted/distribyted/releases
 [license-shield]: https://img.shields.io/github/license/distribyted/distribyted.svg?style=flat-square
 [license-url]: https://github.com/distribyted/distribyted/blob/master/LICENSE
-[product-screenshot]: docs/images/routes_screenshot.png
+[product-screenshot]: docs/images/distribyted_demo.gif
 [example-config]: https://github.com/distribyted/distribyted/blob/master/examples/conf_example.yaml
