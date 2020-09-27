@@ -11,6 +11,8 @@ import (
 var testData []byte = []byte("Hello World")
 
 func TestReadData(t *testing.T) {
+	t.Parallel()
+
 	require := require.New(t)
 
 	br := bytes.NewReader(testData)
@@ -31,6 +33,8 @@ func TestReadData(t *testing.T) {
 }
 
 func TestReadDataEOF(t *testing.T) {
+	t.Parallel()
+
 	require := require.New(t)
 
 	br := bytes.NewReader(testData)
