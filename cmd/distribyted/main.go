@@ -9,7 +9,7 @@ import (
 
 	"github.com/ajnavarro/distribyted"
 	"github.com/ajnavarro/distribyted/config"
-	"github.com/ajnavarro/distribyted/mount"
+	"github.com/ajnavarro/distribyted/fuse"
 	"github.com/ajnavarro/distribyted/stats"
 	tlog "github.com/anacrolix/log"
 	"github.com/anacrolix/missinggo/v2/filecache"
@@ -20,7 +20,6 @@ import (
 	"github.com/goccy/go-yaml"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
 	"github.com/sirupsen/logrus"
-	ginlogrus "github.com/toorop/gin-logrus"
 )
 
 func main() {
@@ -78,7 +77,7 @@ func main() {
 	}
 
 	ss := stats.NewTorrent()
-	mountService := mount.NewHandler(c, ss)
+	mountService := fuse.NewHandler(c, ss)
 
 	defer func() {
 		tryClose(log, c, mountService)
@@ -103,7 +102,7 @@ func main() {
 
 	r := gin.New()
 
-	r.Use(ginlogrus.Logger(log), gin.Recovery())
+	r.Use(gin.Recovery())
 
 	assets := distribyted.NewBinaryFileSystem(distribyted.HttpFS, "/assets")
 	r.Use(static.Serve("/assets", assets))
@@ -146,7 +145,7 @@ func main() {
 
 }
 
-func tryClose(log *logrus.Logger, c *torrent.Client, mountService *mount.Handler) {
+func tryClose(log *logrus.Logger, c *torrent.Client, mountService *fuse.Handler) {
 	log.Info("closing torrent client...")
 	c.Close()
 	log.Info("unmounting fuse filesystem...")

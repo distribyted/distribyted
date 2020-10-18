@@ -20,7 +20,7 @@ type DiskTeeReader struct {
 	tr io.Reader
 }
 
-func NewDiskTeeReader(r io.Reader) (*DiskTeeReader, error) {
+func NewDiskTeeReader(r io.Reader) (Reader, error) {
 	fr, err := ioutil.TempFile("", "dtb_tmp")
 	if err != nil {
 		return nil, err

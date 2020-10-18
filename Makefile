@@ -5,10 +5,14 @@ BUILD := $(shell git rev-parse --short HEAD)
 PROJECTNAME := $(shell basename "$(PWD)")
 
 # Use linker flags to provide version/build settings
-LDFLAGS=-ldflags "-X=main.Version=$(VERSION) -X=main.Build=$(BUILD)"
+LDFLAGS=-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -linkmode external
 
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
+
+GOPATH=~/go
+ORGPATH=$(GOPATH)/src/github.com/distribyted
+REPOPATH=$(ORGPATH)/distribyted
 
 ## run: run from code.
 run:
@@ -19,13 +23,13 @@ build: go-generate go-build
 
 ## test: execute all tests.
 test:
-	go test -v ./...
+	go test -v --race -coverprofile=coverage.out ./...
 
 compile: go-generate go-compile
 
 go-build:
 	@echo "  >  Building binary..."
-	go build $(LDFLAGS) -o bin/distribyted -tags "release" cmd/distribyted/main.go
+	go build -o bin/distribyted -tags "release" cmd/distribyted/main.go
 
 go-generate:
 	@echo "  >  Generating code files..."
@@ -33,23 +37,17 @@ go-generate:
 
 go-compile:
 	@echo "  >  Compiling for several platforms..."
-	# 32-Bit Systems
-	# FreeBDS
-	#GOOS=freebsd GOARCH=386 go build $(LDFLAGS) -o bin/main-freebsd-386 -tags "release" cmd/distribyted/main.go
-	# MacOS
-	#GOOS=darwin GOARCH=386 go build $(LDFLAGS) -o bin/main-darwin-386 -tags "release" cmd/distribyted/main.go
-	# Linux
-	GOOS=linux GOARCH=386 go build $(LDFLAGS) -o bin/distribyted-linux-386 -tags "release" cmd/distribyted/main.go
-    # 64-Bit
-	# FreeBDS
-	#GOOS=freebsd GOARCH=amd64 go build $(LDFLAGS) -o bin/main-freebsd-amd64 -tags "release" cmd/distribyted/main.go
-	# MacOS
-	#GOOS=darwin GOARCH=amd64 go build $(LDFLAGS) -o bin/main-darwin-amd64 -tags "release" cmd/distribyted/main.go
-	# Linux
-	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o bin/distribyted-linux-amd64 -tags "release" cmd/distribyted/main.go
-	
-	# ARM
-	GOOS=linux GOARCH=arm GOARM=5 go build $(LDFLAGS) -o bin/distribyted-linux-arm -tags "release" cmd/distribyted/main.go
+	go get src.techknowlogick.com/xgo
+	docker build ./build_tools/ -t distribyted/xgo-cgofuse
+	mkdir -p $(ORGPATH)
+	ln -sfrnT . $(REPOPATH)
+
+	@echo "  >  Compiling for windows..."
+	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='-extldflags "-static" $(LDFLAGS)' -tags="release" -targets=windows/amd64 $(REPOPATH)/cmd/distribyted/
+	@echo "  >  Compiling for linux..."
+	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=linux/arm-7,linux/amd64 $(REPOPATH)/cmd/distribyted/
+#	@echo "  >  Compiling for darwin..."
+#	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=darwin/* $(REPOPATH)/cmd/distribyted/
 
 .PHONY: help
 all: help

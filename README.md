@@ -3,6 +3,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![GPL3 License][license-shield]][license-url]
+[![codecov](codecov-shield)](codecov-url)
 
 <!-- PROJECT LOGO -->
 <br />
@@ -26,14 +27,20 @@
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
 
-* [About the Project](#about-the-project)
-  * [Use Cases](#use-cases)
-  * [Supported _Expandable_ File Formats](#supported-expandable-file-formats)
-* [Getting Started](#getting-started)
-* [Usage](#usage)
-  * [Configuration File](#configuration-file)
-* [Contributing](#contributing)
-* [License](#license)
+- [Table of Contents](#table-of-contents)
+- [About The Project](#about-the-project)
+  - [Use Cases](#use-cases)
+  - [Supported _Expandable_ File Formats](#supported-_expandable_-file-formats)
+    - [Supported](#supported)
+    - [To Be Supported](#to-be-supported)
+    - [Not Supported](#not-supported)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+  - [Configuration File](#configuration-file)
+    - [root](#root)
+    - [mountpoints](#mountpoints)
+- [Contributing](#contributing)
+- [License](#license)
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -124,3 +131,5 @@ Distributed under the GPL3 license. See `LICENSE` for more information.
 [license-url]: https://github.com/distribyted/distribyted/blob/master/LICENSE
 [product-screenshot]: docs/images/distribyted_demo.gif
 [example-config]: https://github.com/distribyted/distribyted/blob/master/examples/conf_example.yaml
+[codecov-shield]: https://img.shields.io/codecov/c/github/distribyted/distribyted?style=flat-square
+[codecov-url]: https://codecov.io/gh/distribyted/distribyted

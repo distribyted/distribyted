@@ -10,9 +10,10 @@ type readAtWrapper struct {
 
 	io.ReadSeeker
 	io.ReaderAt
+	io.Closer
 }
 
-func NewReadAtWrapper(r io.ReadSeeker) io.ReaderAt {
+func NewReadAtWrapper(r io.ReadSeeker) Reader {
 	return &readAtWrapper{ReadSeeker: r}
 }
 
@@ -25,4 +26,13 @@ func (rw *readAtWrapper) ReadAt(p []byte, off int64) (int, error) {
 	}
 
 	return rw.Read(p)
+}
+
+func (rw *readAtWrapper) Close() error {
+	c, ok := rw.ReadSeeker.(io.Closer)
+	if !ok {
+		return nil
+	}
+
+	return c.Close()
 }

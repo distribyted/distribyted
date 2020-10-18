@@ -1,37 +1,33 @@
-package mount
+package fuse
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/ajnavarro/distribyted/config"
-	"github.com/ajnavarro/distribyted/node"
+	"github.com/ajnavarro/distribyted/fs"
 	"github.com/ajnavarro/distribyted/stats"
 	"github.com/anacrolix/torrent"
-	"github.com/hanwen/go-fuse/v2/fs"
-	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/billziss-gh/cgofuse/fuse"
 	log "github.com/sirupsen/logrus"
 )
 
 type Handler struct {
-	c    *torrent.Client
-	s    *stats.Torrent
-	opts *fs.Options
+	c *torrent.Client
+	s *stats.Torrent
 
-	servers map[string]*fuse.Server
+	hosts map[string]*fuse.FileSystemHost
 }
 
 func NewHandler(c *torrent.Client, s *stats.Torrent) *Handler {
 	return &Handler{
-		c:       c,
-		s:       s,
-		opts:    &fs.Options{},
-		servers: make(map[string]*fuse.Server),
+		c:     c,
+		s:     s,
+		hosts: make(map[string]*fuse.FileSystemHost),
 	}
 }
 
 func (s *Handler) Mount(mpc *config.MountPoint) error {
-	var torrents []*torrent.Torrent
+	var torrents []fs.Filesystem
 	for _, mpcTorrent := range mpc.Torrents {
 		var t *torrent.Torrent
 		var err error
@@ -58,34 +54,37 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 		}
 
 		s.s.Add(mpc.Path, t)
-		log.WithField("name", t.Name()).WithField("path", mpc.Path).Info("torrent added to mountpoint")
+		torrents = append(torrents, fs.NewTorrent(t))
 
-		torrents = append(torrents, t)
+		log.WithField("name", t.Name()).WithField("path", mpc.Path).Info("torrent added to mountpoint")
 	}
 
 	// TODO change permissions
-	if err := os.MkdirAll(mpc.Path, 0770); err != nil && !os.IsExist(err) {
-		return err
-	}
+	// if err := os.MkdirAll(mpc.Path, 0770); err != nil && !os.IsExist(err) {
+	// 	return err
+	// }
 
-	node := node.NewRoot(torrents)
-	server, err := fs.Mount(mpc.Path, node, s.opts)
-	if err != nil {
-		return err
-	}
+	host := fuse.NewFileSystemHost(&FS{FSS: torrents})
 
-	s.servers[mpc.Path] = server
+	go func() {
+		ok := host.Mount(mpc.Path, nil)
+		if !ok {
+			log.WithField("path", mpc.Path).Error("error trying to mount filesystem")
+		}
+	}()
+
+	s.hosts[mpc.Path] = host
 
 	return nil
 }
 
 func (s *Handler) Close() {
-	for path, server := range s.servers {
+	for path, server := range s.hosts {
 		log.WithField("path", path).Info("unmounting")
-		err := server.Unmount()
-		if err != nil {
+		ok := server.Unmount()
+		if !ok {
 			//TODO try to force unmount if possible
-			log.WithError(err).WithField("path", path).Error("unmount failed")
+			log.WithField("path", path).Error("unmount failed")
 		}
 	}
 }
