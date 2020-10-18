@@ -38,16 +38,16 @@ go-generate:
 go-compile:
 	@echo "  >  Compiling for several platforms..."
 	go get src.techknowlogick.com/xgo
-	docker pull billziss/xgo-cgofuse
+	docker build ./build_tools/ -t distribyted/xgo-cgofuse
 	mkdir -p $(ORGPATH)
 	ln -sfrnT . $(REPOPATH)
 
 	@echo "  >  Compiling for windows..."
-	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=billziss/xgo-cgofuse -ldflags='-extldflags "-static" $(LDFLAGS)' -tags="release" -targets=windows/* $(REPOPATH)/cmd/distribyted/
+	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='-extldflags "-static" $(LDFLAGS)' -tags="release" -targets=windows/amd64 $(REPOPATH)/cmd/distribyted/
 	@echo "  >  Compiling for linux..."
-	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=billziss/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=linux/arm-7,linux/amd64,linux/386 $(REPOPATH)/cmd/distribyted/
-	@echo "  >  Compiling for darwin..."
-	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=billziss/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=darwin/* $(REPOPATH)/cmd/distribyted/
+	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=linux/arm-7,linux/amd64 $(REPOPATH)/cmd/distribyted/
+#	@echo "  >  Compiling for darwin..."
+#	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=darwin/* $(REPOPATH)/cmd/distribyted/
 
 .PHONY: help
 all: help

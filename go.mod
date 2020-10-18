@@ -26,6 +26,7 @@ require (
 	github.com/pion/srtp v1.5.2 // indirect
 	github.com/pion/webrtc/v2 v2.2.26 // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
+	github.com/shurcooL/vfsgen v0.0.0-20200824052919-0d455de96546 // indirect
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.6.1
 	github.com/willf/bitset v1.1.11 // indirect
@@ -36,4 +37,5 @@ require (
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
+	src.techknowlogick.com/xgo v1.1.1-0.20201014223913-54d7d44a2ff6 // indirect
 )
