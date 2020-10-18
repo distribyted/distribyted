@@ -25,5 +25,3 @@ jobs:
         fail_ci_if_error: true
     - name: Build
       run: make build
-    - name: Compile
-      run: make compile
