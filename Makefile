@@ -37,7 +37,7 @@ go-generate:
 
 go-compile:
 	@echo "  >  Compiling for several platforms..."
-	go get src.techknowlogick.com/xgo
+	go install src.techknowlogick.com/xgo
 	docker build ./build_tools/ -t distribyted/xgo-cgofuse
 	mkdir -p $(ORGPATH)
 	ln -sfrnT . $(REPOPATH)
