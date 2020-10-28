@@ -10,10 +10,6 @@ LDFLAGS=-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -linkmode external
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-GOPATH=~/go
-ORGPATH=$(GOPATH)/src/github.com/distribyted
-REPOPATH=$(ORGPATH)/distribyted
-
 ## run: run from code.
 run:
 	go run cmd/distribyted/main.go examples/conf_example.yaml
@@ -36,6 +32,10 @@ go-generate:
 	go generate ./...
 
 go-compile:
+	GOPATH=~/go
+	ORGPATH=$(GOPATH)/src/github.com/distribyted
+	REPOPATH=$(ORGPATH)/distribyted
+
 	@echo "  >  Compiling for several platforms..."
 	go install src.techknowlogick.com/xgo
 	docker build ./build_tools/ -t distribyted/xgo-cgofuse
