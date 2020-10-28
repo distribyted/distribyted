@@ -3,7 +3,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![GPL3 License][license-shield]][license-url]
-[![codecov](codecov-shield)](codecov-url)
+[![Codecov][codecov-shield]][codecov-url]
 
 <!-- PROJECT LOGO -->
 <br />
