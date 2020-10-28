@@ -10,7 +10,6 @@ LDFLAGS=-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -linkmode external
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
 
-GOPATH=~/go
 ORGPATH=$(GOPATH)/src/github.com/distribyted
 REPOPATH=$(ORGPATH)/distribyted
 
