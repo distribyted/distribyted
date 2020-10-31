@@ -30,7 +30,7 @@ jobs:
           - job_name: windows_amd64
             os: windows-latest
             go: '1.15.x'
-
+            
     name: ${{ matrix.job_name }}
     runs-on: ${{ matrix.os }}
     steps:
