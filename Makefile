@@ -25,7 +25,7 @@ compile: go-generate go-compile
 
 go-build:
 	@echo "  >  Building binary..."
-	go build -o bin/distribyted -tags "release" cmd/distribyted/main.go
+	go build -o bin/distribyted-$(VERSION)-$(GOOS)-$(GOARCH) -tags "release" cmd/distribyted/main.go
 
 go-generate:
 	@echo "  >  Generating code files..."

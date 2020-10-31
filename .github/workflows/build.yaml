@@ -114,3 +114,9 @@ jobs:
         shell: bash
         run: |
           make test
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          name: binary-files
+          path: bin/*
