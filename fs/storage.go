@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const separator = "/"
+
 type FsFactory func(f File) (Filesystem, error)
 
 var SupportedFactories = map[string]FsFactory{
@@ -128,7 +130,7 @@ func (s *storage) Get(path string) (File, error) {
 func (s *storage) getFileFromFs(p string) (File, error) {
 	for fsp, fs := range s.filesystems {
 		if strings.HasPrefix(p, fsp) {
-			return fs.Open(string(os.PathSeparator) + strings.TrimPrefix(p, fsp))
+			return fs.Open(separator + strings.TrimPrefix(p, fsp))
 		}
 	}
 
@@ -147,5 +149,5 @@ func (s *storage) getDirFromFs(p string) (map[string]File, error) {
 }
 
 func clean(path string) string {
-	return filepath.Clean(string(os.PathSeparator) + filepath.FromSlash(path))
+	return filepath.Clean(separator + strings.ReplaceAll(path, "\\", "/"))
 }
