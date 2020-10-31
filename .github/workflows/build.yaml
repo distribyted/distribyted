@@ -109,17 +109,24 @@ jobs:
         shell: bash
         run: |
           make build
+      - name: Cross-compile
+        shell: bash
+        run: |
+          make cross-compile
+        if: matrix.os == 'ubuntu-latest'
 
       - name: Run tests
         shell: bash
         run: |
           make test
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: error
           name: build-${{ matrix.os }}
           path: bin/*
+
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
