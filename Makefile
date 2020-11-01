@@ -30,7 +30,7 @@ cross-compile: go-generate go-cross-compile
 
 go-build:
 	@echo "  >  Building binary..."
-	go build -o bin/distribyted-$(VERSION)-`go env GOOS`-`go env GOARCH``go env GOEXE` -tags "release" cmd/distribyted/main.go
+	go build -o bin/distribyted-$(VERSION)-`go env GOOS`-`go env GOARCH``go env GOEXE` -tags "release" -ldflags='$(LDFLAGS)' cmd/distribyted/main.go
 
 go-generate:
 	@echo "  >  Generating code files..."

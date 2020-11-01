@@ -30,6 +30,7 @@ jobs:
           - job_name: windows_amd64
             os: windows-latest
             go: '1.15.x'
+            cgo: '0'
             
     name: ${{ matrix.job_name }}
     runs-on: ${{ matrix.os }}
@@ -44,6 +45,11 @@ jobs:
         with:
           stable: 'false'
           go-version: ${{ matrix.go }}
+
+      - name: Set environment variables
+        shell: bash
+        run: |
+          if [[ "${{ matrix.cgo }}" != "" ]]; then echo 'CGO_ENABLED=${{ matrix.cgo }}' >> $GITHUB_ENV ; fi
 
       - name: Install Libraries on Linux
         shell: bash
