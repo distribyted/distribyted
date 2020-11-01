@@ -1,8 +1,5 @@
 #-include .env
 
-UID=$(id -u)
-GID=$(id -g)
-
 VERSION := $(shell git describe --tags)
 BUILD := $(shell git rev-parse --short HEAD)
 PROJECTNAME := $(shell basename "$(PWD)")
