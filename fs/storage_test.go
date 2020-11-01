@@ -83,6 +83,25 @@ func TestStorage(t *testing.T) {
 	require.Equal(&Dummy{}, file)
 }
 
+func TestStorageWindowsPath(t *testing.T) {
+	t.Parallel()
+
+	require := require.New(t)
+
+	s := newStorage(dummyFactories)
+
+	err := s.Add(&Dummy{}, "\\path\\to\\dummy\\file.txt")
+	require.NoError(err)
+
+	file, err := s.Get("\\path\\to\\dummy\\file.txt")
+	require.NoError(err)
+	require.Equal(&Dummy{}, file)
+
+	file, err = s.Get("/path/to/dummy/file.txt")
+	require.NoError(err)
+	require.Equal(&Dummy{}, file)
+}
+
 var _ Filesystem = &DummyFs{}
 
 type DummyFs struct {

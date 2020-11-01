@@ -4,6 +4,10 @@ VERSION := $(shell git describe --tags)
 BUILD := $(shell git rev-parse --short HEAD)
 PROJECTNAME := $(shell basename "$(PWD)")
 
+go-cross-compile: GOPATH=~/go
+go-cross-compile: ORGPATH=$(GOPATH)/src/github.com/distribyted
+go-cross-compile: REPOPATH=$(ORGPATH)/distribyted
+
 # Use linker flags to provide version/build settings
 LDFLAGS=-X=main.Version=$(VERSION) -X=main.Build=$(BUILD) -linkmode external
 
@@ -21,33 +25,25 @@ build: go-generate go-build
 test:
 	go test -v --race -coverprofile=coverage.out ./...
 
-compile: go-generate go-compile
+## cross-compile: compile for other platforms using xgo.
+cross-compile: go-generate go-cross-compile
 
 go-build:
 	@echo "  >  Building binary..."
-	go build -o bin/distribyted -tags "release" cmd/distribyted/main.go
+	go build -o bin/distribyted-$(VERSION)-`go env GOOS`-`go env GOARCH``go env GOEXE` -tags "release" cmd/distribyted/main.go
 
 go-generate:
 	@echo "  >  Generating code files..."
 	go generate ./...
 
-go-compile:
-	GOPATH=~/go
-	ORGPATH=$(GOPATH)/src/github.com/distribyted
-	REPOPATH=$(ORGPATH)/distribyted
-
+go-cross-compile:
 	@echo "  >  Compiling for several platforms..."
-	go install src.techknowlogick.com/xgo
+	GO111MODULE=off go get -u src.techknowlogick.com/xgo
 	docker build ./build_tools/ -t distribyted/xgo-cgofuse
 	mkdir -p $(ORGPATH)
 	ln -sfrnT . $(REPOPATH)
 
-	@echo "  >  Compiling for windows..."
-	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='-extldflags "-static" $(LDFLAGS)' -tags="release" -targets=windows/amd64 $(REPOPATH)/cmd/distribyted/
-	@echo "  >  Compiling for linux..."
-	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=linux/arm-7,linux/amd64 $(REPOPATH)/cmd/distribyted/
-#	@echo "  >  Compiling for darwin..."
-#	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=darwin/* $(REPOPATH)/cmd/distribyted/
+	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=linux/arm-7 $(REPOPATH)/cmd/distribyted/
 
 .PHONY: help
 all: help

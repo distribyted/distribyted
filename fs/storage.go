@@ -3,9 +3,10 @@ package fs
 import (
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 )
+
+const separator = "/"
 
 type FsFactory func(f File) (Filesystem, error)
 
@@ -76,8 +77,8 @@ func (s *storage) Add(f File, p string) error {
 	return nil
 }
 
-func (s *storage) createParent(path string, f File) error {
-	base, filename := filepath.Split(path)
+func (s *storage) createParent(p string, f File) error {
+	base, filename := path.Split(p)
 	base = clean(base)
 
 	if err := s.Add(&Dir{}, base); err != nil {
@@ -128,7 +129,7 @@ func (s *storage) Get(path string) (File, error) {
 func (s *storage) getFileFromFs(p string) (File, error) {
 	for fsp, fs := range s.filesystems {
 		if strings.HasPrefix(p, fsp) {
-			return fs.Open(string(os.PathSeparator) + strings.TrimPrefix(p, fsp))
+			return fs.Open(separator + strings.TrimPrefix(p, fsp))
 		}
 	}
 
@@ -146,6 +147,6 @@ func (s *storage) getDirFromFs(p string) (map[string]File, error) {
 	return nil, os.ErrNotExist
 }
 
-func clean(path string) string {
-	return filepath.Clean(string(os.PathSeparator) + filepath.FromSlash(path))
+func clean(p string) string {
+	return path.Clean(separator + strings.ReplaceAll(p, "\\", "/"))
 }
