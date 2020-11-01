@@ -45,14 +45,6 @@ jobs:
           stable: 'false'
           go-version: ${{ matrix.go }}
 
-      - name: Set environment variables
-        shell: bash
-        run: |
-          echo 'GOTAGS=${{ matrix.gotags }}' >> $GITHUB_ENV
-          echo 'BUILD_FLAGS=${{ matrix.build_flags }}' >> $GITHUB_ENV
-          if [[ "${{ matrix.goarch }}" != "" ]]; then echo 'GOARCH=${{ matrix.goarch }}' >> $GITHUB_ENV ; fi
-          if [[ "${{ matrix.cgo }}" != "" ]]; then echo 'CGO_ENABLED=${{ matrix.cgo }}' >> $GITHUB_ENV ; fi
-
       - name: Install Libraries on Linux
         shell: bash
         run: |
@@ -124,7 +116,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: error
-          name: build-${{ matrix.os }}
+          name: build-${{ matrix.job_name }}
           path: bin/*
 
       - name: Release
