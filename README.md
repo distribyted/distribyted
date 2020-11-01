@@ -35,6 +35,7 @@
     - [To Be Supported](#to-be-supported)
     - [Not Supported](#not-supported)
 - [Getting Started](#getting-started)
+  - [Prerequisites on windows](#prerequisites-on-windows)
 - [Usage](#usage)
   - [Configuration File](#configuration-file)
     - [root](#root)
@@ -83,6 +84,10 @@ Use the [example config file][example-config] and modify it as needed.
 
 Run the program: `distribyted-binary path/to/config/file.yaml`
 
+### Prerequisites on windows
+
+Download and install [WinFsp](http://www.secfs.net/winfsp/).
+
 ## Usage
 
 After executing and load all torrent or magnet files, a web interface will be available with information about the mounted routes and torrent files like download/upload speed, leechers, seeders...
@@ -101,7 +106,7 @@ After executing and load all torrent or magnet files, a web interface will be av
 
 |Config key|Description|
 |-|-|
-|path|Path where a new fuse mount will be initialized.|
+|path|Path where a new fuse mount will be initialized. On Windows you can use a drive letter (`X:` per example) or a folder path that **does not exist**.|
 |torrents|List of `magnetUri`s or/and `torrentPath`s to be loaded on this fuse mount.|
 
 ## Contributing
