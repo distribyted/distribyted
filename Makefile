@@ -23,7 +23,7 @@ build: go-generate go-build
 
 ## test: execute all tests.
 test:
-	go test -v --race -coverprofile=coverage.out ./...
+	CGO_ENABLED=1 go test -v --race -coverprofile=coverage.out ./...
 
 ## cross-compile: compile for other platforms using xgo.
 cross-compile: go-generate go-cross-compile
