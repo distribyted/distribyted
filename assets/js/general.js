@@ -12,7 +12,7 @@ function fetchData() {
         if (response.ok) {
             return response.json();
         } else {
-            console.log('Error getting data from server. Response: ' + response.status);
+            toastError('Error getting data from server. Response: ' + response.status)
         }
     }).then(function (stats) {
         var download = stats.torrentStats.downloadedBytes / stats.torrentStats.timePassed;
@@ -28,6 +28,6 @@ function fetchData() {
             Humanize.ibytes(upload, 1024) + " /s";
     })
     .catch(function (error) {
-        console.log('Error getting status info: ' + error.message);
+        toastError('Error getting status info: ' + error.message)
     });
 }

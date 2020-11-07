@@ -2,6 +2,9 @@ package fuse
 
 import (
 	"fmt"
+	"os"
+	"path"
+	"runtime"
 
 	"github.com/ajnavarro/distribyted/config"
 	"github.com/ajnavarro/distribyted/fs"
@@ -42,7 +45,6 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 		default:
 			err = fmt.Errorf("no magnet URI or torrent path provided")
 		}
-
 		if err != nil {
 			return err
 		}
@@ -59,13 +61,18 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 		log.WithField("name", t.Name()).WithField("path", mpc.Path).Info("torrent added to mountpoint")
 	}
 
-	// TODO change permissions
-	// if err := os.MkdirAll(mpc.Path, 0770); err != nil && !os.IsExist(err) {
-	// 	return err
-	// }
+	folder := mpc.Path
+	// On windows, the folder must don't exist
+	if runtime.GOOS == "Windows" {
+		folder = path.Dir(folder)
+	}
+	if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
+		return err
+	}
 
 	host := fuse.NewFileSystemHost(&FS{FSS: torrents})
 
+	// TODO improve error handling here
 	go func() {
 		ok := host.Mount(mpc.Path, nil)
 		if !ok {
@@ -78,7 +85,7 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 	return nil
 }
 
-func (s *Handler) Close() {
+func (s *Handler) UnmountAll() {
 	for path, server := range s.hosts {
 		log.WithField("path", path).Info("unmounting")
 		ok := server.Unmount()
@@ -87,4 +94,6 @@ func (s *Handler) Close() {
 			log.WithField("path", path).Error("unmount failed")
 		}
 	}
+	s.hosts = make(map[string]*fuse.FileSystemHost)
+	s.s.RemoveAll()
 }

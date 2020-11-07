@@ -13,7 +13,7 @@ function fetchData() {
             if (response.ok) {
                 return response.json();
             } else {
-                console.log('Error getting data from server. Response: ' + response.status);
+                toastError('Error getting data from server. Response: ' + response.status)
             }
         }).then(function (routes) {
             routes.forEach(route => {
@@ -57,6 +57,6 @@ function fetchData() {
             });
         })
         .catch(function (error) {
-            console.log('Error getting status info: ' + error.message);
+            toastError('Error getting status info: ' + error.message)
         });
 }
