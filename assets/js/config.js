@@ -68,6 +68,9 @@ function reload() {
   })
   .then(function (text) {
     toastInfo(text);
+  })
+  .catch(function (error) {
+    toastError("Error reloading server: " + error.message);
   });
 }
 

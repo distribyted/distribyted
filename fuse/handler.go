@@ -63,7 +63,7 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 
 	folder := mpc.Path
 	// On windows, the folder must don't exist
-	if runtime.GOOS == "Windows" {
+	if runtime.GOOS == "windows" {
 		folder = path.Dir(folder)
 	}
 	if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
