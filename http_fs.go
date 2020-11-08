@@ -2,7 +2,7 @@
 
 package distribyted
 
-//go:generate go run ./cmd/assets_generate/main.go
+//go:generate go run ./build_tools/assets_generate/main.go
 import (
 	"net/http"
 

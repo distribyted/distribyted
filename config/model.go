@@ -11,8 +11,8 @@ type Root struct {
 type MountPoint struct {
 	Path     string `yaml:"path"`
 	Torrents []struct {
-		MagnetURI   string `yaml:"magnetUri"`
-		TorrentPath string `yaml:"torrentPath"`
+		MagnetURI   string `yaml:"magnetUri,omitempty"`
+		TorrentPath string `yaml:"torrentPath,omitempty"`
 		FolderName  string `yaml:"folderName,omitempty"`
 	} `yaml:"torrents"`
 }
@@ -22,7 +22,7 @@ func AddDefaults(r *Root) *Root {
 		r.MaxCacheSize = 1024 // 1GB
 	}
 	if r.MetadataFolder == "" {
-		r.MetadataFolder = "./metadata"
+		r.MetadataFolder = "./distribyted-data/metadata"
 	}
 
 	return r

@@ -83,6 +83,13 @@ func (s *Torrent) Add(route string, t *torrent.Torrent) {
 	s.torrentsByRoute[route] = append(tbr, t)
 }
 
+func (s *Torrent) RemoveAll() {
+	// TODO lock
+	s.torrents = make(map[string]*torrent.Torrent)
+	s.previousStats = make(map[string]*stats)
+	s.torrentsByRoute = make(map[string][]*torrent.Torrent)
+}
+
 func (s *Torrent) Stats(hash string) (*TorrentStats, error) {
 	t, ok := s.torrents[hash]
 	if !(ok) {

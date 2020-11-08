@@ -80,9 +80,22 @@ Distribyted can show some kind of files directly as folders, making it possible 
 
 Get the latest release from [releases][releases-url] page or download the source code and execute `make build`.
 
-Use the [example config file][example-config] and modify it as needed.
+Run the program: `./distribyted-[VERSION]-[OS]-[ARCH]`
 
-Run the program: `distribyted-binary path/to/config/file.yaml`
+Defaults are good enough for starters, but you can change them. Here is the output of `./distribyted -help`:
+
+```
+NAME:
+   distribyted - Torrent client with on-demand file downloading as a filesystem.
+
+USAGE:
+   distribyted-v0.3.0-linux-amd64 [global options] [arguments...]
+
+GLOBAL OPTIONS:
+   --config value     YAML file containing distribyted configuration. (default: "./distribyted-data/config.yaml") [$DISTRIBYTED_CONFIG]
+   --http-port value  http port for web interface (default: 4444) [$DISTRIBYTED_HTTP_PORT]
+   --help, -h         show help (default: false)
+```
 
 ### Prerequisites on windows
 
@@ -90,7 +103,10 @@ Download and install [WinFsp](http://www.secfs.net/winfsp/).
 
 ## Usage
 
-After executing and load all torrent or magnet files, a web interface will be available with information about the mounted routes and torrent files like download/upload speed, leechers, seeders...
+After executing and load all torrent or magnet files, a web interface will be available here: `http://localhost:4444`
+It contains information about the mounted routes and torrent files like download/upload speed, leechers, seeders...
+
+You can also modify the configuration file and reload the server from here: `http://localhost:4444/config` .
 
 ### Configuration File
 

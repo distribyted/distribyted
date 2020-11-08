@@ -1,156 +1,135 @@
 package main
 
 import (
-	"io/ioutil"
-	"net/http"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/ajnavarro/distribyted"
 	"github.com/ajnavarro/distribyted/config"
 	"github.com/ajnavarro/distribyted/fuse"
+	"github.com/ajnavarro/distribyted/http"
 	"github.com/ajnavarro/distribyted/stats"
-	tlog "github.com/anacrolix/log"
+	"github.com/ajnavarro/distribyted/torrent"
 	"github.com/anacrolix/missinggo/v2/filecache"
-	"github.com/anacrolix/torrent"
+	t "github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/storage"
-	"github.com/gin-contrib/static"
-	"github.com/gin-gonic/gin"
-	"github.com/goccy/go-yaml"
-	"github.com/shurcooL/httpfs/html/vfstemplate"
 	"github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
+)
+
+const (
+	configFlag = "config"
+	portFlag   = "http-port"
 )
 
 func main() {
+	app := &cli.App{
+		Name:  "distribyted",
+		Usage: "Torrent client with on-demand file downloading as a filesystem.",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    configFlag,
+				Value:   "./distribyted-data/config.yaml",
+				EnvVars: []string{"DISTRIBYTED_CONFIG"},
+				Usage:   "YAML file containing distribyted configuration.",
+			},
+			&cli.IntFlag{
+				Name:    portFlag,
+				Value:   4444,
+				EnvVars: []string{"DISTRIBYTED_HTTP_PORT"},
+				Usage:   "http port for web interface",
+			},
+		},
 
-	var configPath string
-	if len(os.Args) < 2 {
-		configPath = "./config.yaml"
-	} else {
-		configPath = os.Args[1]
+		Action: func(c *cli.Context) error {
+			err := load(c.String(configFlag), c.Int(portFlag))
+			return err
+		},
+
+		HideHelpCommand: true,
 	}
 
-	log := logrus.New()
-	log.SetFormatter(&logrus.TextFormatter{})
-	log.SetLevel(logrus.InfoLevel)
+	if err := app.Run(os.Args); err != nil {
+		logrus.Fatal(err)
+	}
+}
 
-	f, err := ioutil.ReadFile(configPath)
+func newCache(folder string) (*filecache.Cache, error) {
+	if err := os.MkdirAll(folder, 0744); err != nil {
+		return nil, fmt.Errorf("error creating metadata folder: %w", err)
+	}
+
+	return filecache.NewCache(folder)
+}
+
+func load(configPath string, port int) error {
+	ch := config.NewHandler(configPath)
+
+	conf, err := ch.Get()
 	if err != nil {
-		log.WithError(err).Error("error reading configuration file")
-		return
+		return fmt.Errorf("error loading configuration: %w", err)
 	}
 
-	conf := &config.Root{}
-	if err := yaml.Unmarshal(f, conf); err != nil {
-		log.WithError(err).Error("error parsing configuration file")
-		return
-	}
-
-	conf = config.AddDefaults(conf)
-
-	if err := os.MkdirAll(conf.MetadataFolder, 0770); err != nil {
-		log.WithError(err).Error("error creating metadata folder")
-		return
-	}
-
-	fc, err := filecache.NewCache(conf.MetadataFolder)
+	fc, err := newCache(conf.MetadataFolder)
 	if err != nil {
-		log.WithError(err).Error("error creating cache")
-		return
+		return fmt.Errorf("error creating cache: %w", err)
 	}
 
-	fc.SetCapacity(conf.MaxCacheSize * 1024 * 1024)
 	st := storage.NewResourcePieces(fc.AsResourceProvider())
 
-	// TODO download and upload limits
-	torrentCfg := torrent.NewDefaultClientConfig()
-	torrentCfg.Logger = tlog.Discard
-	torrentCfg.Seed = true
-	torrentCfg.DisableTCP = true
-	torrentCfg.DefaultStorage = st
-
-	c, err := torrent.NewClient(torrentCfg)
+	c, err := torrent.NewClient(st)
 	if err != nil {
-		log.WithError(err).Error("error initializing torrent client")
-		return
+		return fmt.Errorf("error starting torrent client: %w", err)
 	}
 
 	ss := stats.NewTorrent()
 	mountService := fuse.NewHandler(c, ss)
-
-	defer func() {
-		tryClose(log, c, mountService)
-	}()
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
 		<-sigChan
-		tryClose(log, c, mountService)
+		tryClose(c, mountService)
 	}()
 
-	for _, mp := range conf.MountPoints {
-		if err := mountService.Mount(mp); err != nil {
-			log.WithError(err).WithField("path", mp.Path).Error("error mounting folder")
-			return
+	ch.OnReload(func(c *config.Root, ef config.EventFunc) error {
+		ef("unmounting filesystems")
+		mountService.UnmountAll()
+
+		ef(fmt.Sprintf("setting cache size to %d MB", c.MaxCacheSize))
+		fc.SetCapacity(c.MaxCacheSize * 1024 * 1024)
+
+		for _, mp := range c.MountPoints {
+			ef(fmt.Sprintf("mounting %v with %d torrents...", mp.Path, len(mp.Torrents)))
+			if err := mountService.Mount(mp); err != nil {
+				return fmt.Errorf("error mounting folder %v: %w", mp.Path, err)
+			}
 		}
+
+		ef("all OK")
+
+		return nil
+	})
+
+	if err := ch.Reload(nil); err != nil {
+		return fmt.Errorf("error reloading configuration: %w", err)
 	}
 
-	gin.SetMode(gin.ReleaseMode)
+	defer func() {
+		tryClose(c, mountService)
+	}()
 
-	r := gin.New()
-
-	r.Use(gin.Recovery())
-
-	assets := distribyted.NewBinaryFileSystem(distribyted.HttpFS, "/assets")
-	r.Use(static.Serve("/assets", assets))
-	t, err := vfstemplate.ParseGlob(distribyted.HttpFS, nil, "/templates/*")
-	if err != nil {
-		log.WithError(err).Error("error parsing html template")
-	}
-
-	r.SetHTMLTemplate(t)
-
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", nil)
-	})
-
-	r.GET("/routes", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "routes.html", ss.RoutesStats())
-	})
-
-	r.GET("/api/status", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"cacheItems":    fc.Info().NumItems,
-			"cacheFilled":   fc.Info().Filled / 1024 / 1024,
-			"cacheCapacity": fc.Info().Capacity / 1024 / 1024,
-			"torrentStats":  ss.GlobalStats(),
-		})
-	})
-
-	r.GET("/api/routes", func(ctx *gin.Context) {
-		stats := ss.RoutesStats()
-		ctx.JSON(200, stats)
-	})
-
-	log.WithField("host", "0.0.0.0:4444").Info("starting webserver")
-
-	//TODO add port from configuration
-	if err := r.Run(":4444"); err != nil {
-		log.WithError(err).Error("error initializing server")
-		return
-	}
-
+	return http.New(fc, ss, ch, port)
 }
 
-func tryClose(log *logrus.Logger, c *torrent.Client, mountService *fuse.Handler) {
-	log.Info("closing torrent client...")
+func tryClose(c *t.Client, mountService *fuse.Handler) {
+	logrus.Info("closing torrent client...")
 	c.Close()
-	log.Info("unmounting fuse filesystem...")
-	mountService.Close()
+	logrus.Info("unmounting fuse filesystem...")
+	mountService.UnmountAll()
 
-	log.Info("exiting")
+	logrus.Info("exiting")
 	os.Exit(1)
 }
