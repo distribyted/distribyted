@@ -72,7 +72,7 @@ func (s *Handler) Mount(mpc *config.MountPoint, ef config.EventFunc) error {
 		return err
 	}
 
-	host := fuse.NewFileSystemHost(&FS{FSS: torrents})
+	host := fuse.NewFileSystemHost(NewFS(torrents))
 
 	// TODO improve error handling here
 	go func() {
