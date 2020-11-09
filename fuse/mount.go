@@ -1,6 +1,7 @@
 package fuse
 
 import (
+	"errors"
 	"io"
 	"math"
 	"os"
@@ -13,37 +14,48 @@ import (
 
 type FS struct {
 	fuse.FileSystemBase
+	fh *fileHandler
+}
 
-	lock sync.Mutex
-	FSS  []fs.Filesystem
+func NewFS(fss []fs.Filesystem) fuse.FileSystemInterface {
+	return &FS{
+		fh: &fileHandler{fss: fss},
+	}
 }
 
 func (fs *FS) Open(path string, flags int) (errc int, fh uint64) {
-	return 0, 0
+	fh, err := fs.fh.OpenHolder(path)
+	if err == os.ErrNotExist {
+		logrus.WithField("path", path).Warn("file does not exists")
+		return -fuse.ENOENT, fhNone
+
+	}
+	if err != nil {
+		logrus.WithError(err).WithField("path", path).Error("error opening file")
+		return -fuse.EIO, fhNone
+	}
+
+	return 0, fh
 }
 
-func (fs *FS) Getattr(path string, stat *fuse.Stat_t, fh uint64) (errc int) {
-	defer fs.synchronize()()
+func (fs *FS) Opendir(path string) (errc int, fh uint64) {
+	return fs.Open(path, 0)
+}
 
+func (cfs *FS) Getattr(path string, stat *fuse.Stat_t, fh uint64) (errc int) {
 	if path == "/" {
 		stat.Mode = fuse.S_IFDIR | 0555
 		return 0
 	}
 
-	file, err := fs.findFile(path)
-	if err != nil {
-		logrus.WithField("path", path).WithError(err).Warn("error finding file")
-		return -fuse.EIO
-	}
-
+	file, err := cfs.fh.GetFile(path, fh)
 	if err == os.ErrNotExist {
 		logrus.WithField("path", path).Warn("file does not exists")
 		return -fuse.ENOENT
 
 	}
-
 	if err != nil {
-		logrus.WithField("path", path).WithError(err).Error("error reading file")
+		logrus.WithError(err).WithField("path", path).Error("error getting holder when reading file attributes")
 		return -fuse.EIO
 	}
 
@@ -58,16 +70,14 @@ func (fs *FS) Getattr(path string, stat *fuse.Stat_t, fh uint64) (errc int) {
 }
 
 func (fs *FS) Read(path string, dest []byte, off int64, fh uint64) int {
-	defer fs.synchronize()()
-
-	file, err := fs.findFile(path)
+	file, err := fs.fh.GetFile(path, fh)
 	if err == os.ErrNotExist {
-		logrus.WithField("path", path).Warn("file does not exists")
+		logrus.WithField("path", path).Error("file not found on READ operation")
 		return -fuse.ENOENT
 
 	}
 	if err != nil {
-		logrus.WithField("path", path).WithError(err).Warn("error finding file")
+		logrus.WithError(err).WithField("path", path).Error("error getting holder reading data from file")
 		return -fuse.EIO
 	}
 
@@ -80,7 +90,7 @@ func (fs *FS) Read(path string, dest []byte, off int64, fh uint64) int {
 
 	n, err := file.ReadAt(buf, off)
 	if err != nil && err != io.EOF {
-		logrus.WithError(err).Error("error reading data")
+		logrus.WithError(err).WithField("path", path).Error("error reading data")
 		return -fuse.EIO
 	}
 
@@ -90,37 +100,140 @@ func (fs *FS) Read(path string, dest []byte, off int64, fh uint64) int {
 }
 
 func (fs *FS) Release(path string, fh uint64) (errc int) {
-	defer fs.synchronize()()
+	if err := fs.fh.Remove(fh); err != nil {
+		logrus.WithError(err).WithField("path", path).Error("error getting holder when releasing file")
+		return -fuse.EIO
+	}
+
 	return 0
+}
+
+func (fs *FS) Releasedir(path string, fh uint64) int {
+	return fs.Release(path, fh)
 }
 
 func (fs *FS) Readdir(path string,
 	fill func(name string, stat *fuse.Stat_t, ofst int64) bool,
 	ofst int64,
 	fh uint64) (errc int) {
-	defer fs.synchronize()()
-
 	fill(".", nil, 0)
 	fill("..", nil, 0)
 
-	for _, ifs := range fs.FSS {
-		files, err := ifs.ReadDir(path)
-		if err != nil {
-			return -fuse.EIO
-		}
-		for p := range files {
-			if !fill(p, nil, 0) {
-				logrus.WithField("path", p).Error("error adding directory")
-				break
-			}
+	//TODO improve this function to make use of fh index if possible
+	paths, err := fs.fh.ListDir(path)
+	if err != nil {
+		logrus.WithField("path", path).Error("error reading directory")
+		return -fuse.EIO
+	}
+
+	for _, p := range paths {
+		if !fill(p, nil, 0) {
+			logrus.WithField("path", p).Error("error adding directory")
+			break
 		}
 	}
 
 	return 0
 }
 
-func (fs *FS) findFile(path string) (fs.File, error) {
-	for _, f := range fs.FSS {
+const fhNone = ^uint64(0)
+
+var ErrHolderEmpty = errors.New("file holder is empty")
+var ErrBadHolderIndex = errors.New("holder index too big")
+
+type fileHandler struct {
+	mu     sync.Mutex
+	opened []fs.File
+	fss    []fs.Filesystem
+}
+
+func (fh *fileHandler) GetFile(path string, fhi uint64) (fs.File, error) {
+	fh.mu.Lock()
+	defer fh.mu.Unlock()
+
+	if fhi == fhNone {
+		return fh.lookupFile(path)
+	}
+
+	return fh.get(fhi)
+}
+
+func (fh *fileHandler) ListDir(path string) ([]string, error) {
+	fh.mu.Lock()
+	defer fh.mu.Unlock()
+
+	var out []string
+	for _, ifs := range fh.fss {
+		files, err := ifs.ReadDir(path)
+		if err != nil {
+			return nil, err
+		}
+		for p := range files {
+			out = append(out, p)
+		}
+	}
+
+	return out, nil
+}
+
+func (fh *fileHandler) OpenHolder(path string) (uint64, error) {
+	fh.mu.Lock()
+	defer fh.mu.Unlock()
+
+	file, err := fh.lookupFile(path)
+	if err != nil {
+		return fhNone, err
+	}
+
+	for i, old := range fh.opened {
+		if old == nil {
+			fh.opened[i] = file
+			return uint64(i), nil
+		}
+	}
+	fh.opened = append(fh.opened, file)
+
+	return uint64(len(fh.opened) - 1), nil
+}
+
+func (fh *fileHandler) get(fhi uint64) (fs.File, error) {
+	if int(fhi) >= len(fh.opened) {
+		return nil, ErrBadHolderIndex
+	}
+	// TODO check opened slice to avoid panics
+	h := fh.opened[int(fhi)]
+	if h == nil {
+		return nil, ErrHolderEmpty
+	}
+
+	return h, nil
+}
+
+func (fh *fileHandler) Remove(fhi uint64) error {
+	fh.mu.Lock()
+	defer fh.mu.Unlock()
+
+	if fhi == fhNone {
+		return nil
+	}
+
+	// TODO check opened slice to avoid panics
+	f := fh.opened[int(fhi)]
+	if f == nil {
+		return ErrHolderEmpty
+	}
+
+	if err := f.Close(); err != nil {
+		return err
+	}
+
+	fh.opened[int(fhi)] = nil
+
+	return nil
+}
+
+func (fh *fileHandler) lookupFile(path string) (fs.File, error) {
+	for _, f := range fh.fss {
 		file, err := f.Open(path)
 		if err == os.ErrNotExist {
 			continue
@@ -129,18 +242,10 @@ func (fs *FS) findFile(path string) (fs.File, error) {
 			return nil, err
 		}
 
-		// TODO add file to list of opened files to be able to close it when not in use
 		if file != nil {
 			return file, nil
 		}
 	}
 
 	return nil, os.ErrNotExist
-}
-
-func (fs *FS) synchronize() func() {
-	fs.lock.Lock()
-	return func() {
-		fs.lock.Unlock()
-	}
 }
