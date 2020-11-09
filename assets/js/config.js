@@ -57,21 +57,22 @@ function bin2string(array) {
 function reload() {
   fetch("/api/reload", {
     method: "POST",
-  }).then(function (response) {
-    if (response.ok) {
-      return response.text();
-    } else {
-      toastError(
-        "Error saving configuration file. Response: " + response.status
-      );
-    }
   })
-  .then(function (text) {
-    toastInfo(text);
-  })
-  .catch(function (error) {
-    toastError("Error reloading server: " + error.message);
-  });
+    .then(function (response) {
+      if (response.ok) {
+        return response.json();
+      } else {
+        toastError(
+          "Error saving configuration file. Response: " + response.status
+        );
+      }
+    })
+    .then(function (json) {
+      toastInfo(json.message);
+    })
+    .catch(function (error) {
+      toastError("Error reloading server: " + error.message);
+    });
 }
 
 function save() {

@@ -32,14 +32,16 @@ func New(fc *filecache.Cache, ss *stats.Torrent, ch *config.Handler, port int) e
 	r.GET("/routes", routesHandler(ss))
 	r.GET("/config", configHandler)
 
+	eventChan := make(chan string)
+
 	api := r.Group("/api")
 	{
 		api.GET("/status", apiStatusHandler(fc, ss))
 		api.GET("/routes", apiRoutesHandler(ss))
 		api.GET("/config", apiGetConfigFile(ch))
 		api.POST("/config", apiSetConfigFile(ch))
-		api.POST("/reload", apiReloadServer(ch))
-
+		api.POST("/reload", apiReloadServer(ch, eventChan))
+		api.GET("/events", apiStreamEvents(eventChan))
 	}
 
 	logrus.WithField("host", fmt.Sprintf("0.0.0.0:%d", port)).Info("starting webserver")

@@ -103,12 +103,11 @@ func load(configPath string, port int) error {
 
 		for _, mp := range c.MountPoints {
 			ef(fmt.Sprintf("mounting %v with %d torrents...", mp.Path, len(mp.Torrents)))
-			if err := mountService.Mount(mp); err != nil {
+			if err := mountService.Mount(mp, ef); err != nil {
 				return fmt.Errorf("error mounting folder %v: %w", mp.Path, err)
 			}
+			ef(fmt.Sprintf("%v mounted", mp.Path))
 		}
-
-		ef("all OK")
 
 		return nil
 	})
