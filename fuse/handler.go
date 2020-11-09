@@ -29,7 +29,7 @@ func NewHandler(c *torrent.Client, s *stats.Torrent) *Handler {
 	}
 }
 
-func (s *Handler) Mount(mpc *config.MountPoint) error {
+func (s *Handler) Mount(mpc *config.MountPoint, ef config.EventFunc) error {
 	var torrents []fs.Filesystem
 	for _, mpcTorrent := range mpc.Torrents {
 		var t *torrent.Torrent
@@ -51,6 +51,7 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 
 		// only get info if name is not available
 		if t.Name() == "" {
+			ef(fmt.Sprintf("getting torrent info...: %v", t.InfoHash()))
 			log.WithField("hash", t.InfoHash()).Info("getting torrent info")
 			<-t.GotInfo()
 		}
@@ -58,6 +59,7 @@ func (s *Handler) Mount(mpc *config.MountPoint) error {
 		s.s.Add(mpc.Path, t)
 		torrents = append(torrents, fs.NewTorrent(t))
 
+		ef(fmt.Sprintf("torrent %v added to mountpoint", t.Name()))
 		log.WithField("name", t.Name()).WithField("path", mpc.Path).Info("torrent added to mountpoint")
 	}
 

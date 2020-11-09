@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/ajnavarro/distribyted/config"
 	"github.com/ajnavarro/distribyted/stats"
@@ -14,7 +15,7 @@ import (
 var apiStatusHandler = func(fc *filecache.Cache, ss *stats.Torrent) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// TODO move to a struct
-		ctx.JSON(200, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"cacheItems":    fc.Info().NumItems,
 			"cacheFilled":   fc.Info().Filled / 1024 / 1024,
 			"cacheCapacity": fc.Info().Capacity / 1024 / 1024,
@@ -26,7 +27,7 @@ var apiStatusHandler = func(fc *filecache.Cache, ss *stats.Torrent) gin.HandlerF
 var apiRoutesHandler = func(ss *stats.Torrent) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		stats := ss.RoutesStats()
-		ctx.JSON(200, stats)
+		ctx.JSON(http.StatusOK, stats)
 	}
 }
 
@@ -34,54 +35,69 @@ var apiGetConfigFile = func(ch *config.Handler) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		rc, err := ch.GetRaw()
 		if err != nil {
-			ctx.AbortWithError(500, err)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
-		ctx.Data(200, "text/x-yaml", rc)
+		ctx.Data(http.StatusOK, "text/x-yaml", rc)
 	}
 }
 
 var apiSetConfigFile = func(ch *config.Handler) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if ctx.Request.Body == nil {
-			ctx.AbortWithError(500, errors.New("no config file sent"))
+			ctx.AbortWithError(http.StatusInternalServerError, errors.New("no config file sent"))
 			return
 		}
 
 		c, err := ioutil.ReadAll(ctx.Request.Body)
 		if err != nil {
-			ctx.AbortWithError(500, err)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
 		if len(c) == 0 {
-			ctx.AbortWithError(500, errors.New("no config file sent"))
+			ctx.AbortWithError(http.StatusInternalServerError, errors.New("no config file sent"))
 			return
 		}
 
 		if err := ch.Set(c); err != nil {
-			ctx.AbortWithError(500, err)
+			ctx.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
 
-		// TODO return something?
-		ctx.JSON(200, nil)
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "config file saved",
+		})
 	}
 }
 
-var apiReloadServer = func(ch *config.Handler) gin.HandlerFunc {
+var apiStreamEvents = func(events chan string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Stream(func(w io.Writer) bool {
-			err := ch.Reload(
-				func(m string) {
-					ctx.SSEvent("reload", m)
-				})
-			if err != nil {
-				ctx.AbortWithError(500, err)
+			if msg, ok := <-events; ok {
+				ctx.SSEvent("event", msg)
+				return true
 			}
-
 			return false
+		})
+	}
+}
+
+var apiReloadServer = func(ch *config.Handler, events chan string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		events <- "starting reload configuration process..."
+
+		err := ch.Reload(
+			func(m string) {
+				events <- m
+			})
+		if err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, err)
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "reload process finished with no errors",
 		})
 	}
 }
