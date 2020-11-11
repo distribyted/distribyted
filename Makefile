@@ -2,6 +2,7 @@
 
 VERSION := $(shell git describe --tags)
 BUILD := $(shell git rev-parse --short HEAD)
+BIN_OUTPUT ?= bin/distribyted-$(VERSION)-`go env GOOS`-`go env GOARCH``go env GOEXE`
 PROJECTNAME := $(shell basename "$(PWD)")
 
 go-cross-compile: GOPATH=~/go
@@ -29,8 +30,8 @@ test:
 cross-compile: go-generate go-cross-compile
 
 go-build:
-	@echo "  >  Building binary..."
-	go build -o bin/distribyted-$(VERSION)-`go env GOOS`-`go env GOARCH``go env GOEXE` -tags "release" -ldflags='$(LDFLAGS)' cmd/distribyted/main.go
+	@echo "  >  Building binary on $(BIN_OUTPUT)..."
+	go build -o $(BIN_OUTPUT) -tags "release" -ldflags='$(LDFLAGS)' cmd/distribyted/main.go
 
 go-generate:
 	@echo "  >  Generating code files..."

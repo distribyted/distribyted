@@ -37,6 +37,7 @@
 - [Getting Started](#getting-started)
   - [Prerequisites on windows](#prerequisites-on-windows)
 - [Usage](#usage)
+  - [Docker](#docker)
   - [Configuration File](#configuration-file)
     - [root](#root)
     - [mountpoints](#mountpoints)
@@ -108,6 +109,43 @@ After executing and load all torrent or magnet files, a web interface will be av
 It contains information about the mounted routes and torrent files like download/upload speed, leechers, seeders...
 
 You can also modify the configuration file and reload the server from here: `http://localhost:4444/config` .
+
+### Docker
+
+Docker run example:
+
+```shell
+docker run \
+  --rm -p 4444:4444 \
+  --cap-add SYS_ADMIN \
+  --device /dev/fuse \
+  --security-opt apparmor:unconfined \
+  -v /tmp/mountpoints:/distribyted-data/mountpoints:shared \
+  -v /tmp/metadata:/distribyted-data/metadata \
+  -v /tmp/config:/distribyted-data/config \
+  distribyted/distribyted:latest
+```
+
+Docker compose example:
+
+```yaml
+distribyted:
+    container_name: distribyted
+    image: distribyted/distribyted:latest
+    restart: always
+    ports:
+      - "4444:4444/tcp"
+    volumes:
+      - /home/user/mountpoints:/distribyted-data/mountpoints:shared
+      - /home/user/metadata:/distribyted-data/metadata
+      - /home/user/config:/distribyted-data/config
+    security_opt:
+      - apparmor:unconfined
+    devices:
+      - /dev/fuse
+    cap_add:
+      - SYS_ADMIN
+```
 
 ### Configuration File
 

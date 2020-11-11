@@ -10,21 +10,24 @@ ENV BIN_PATH=$GOPATH/src/$BIN_REPO
 COPY . $BIN_PATH
 WORKDIR $BIN_PATH
 
-RUN apk add --update fuse-dev git gcc libc-dev g++
+RUN apk add fuse-dev git gcc libc-dev g++ make
 
-RUN go build -o /bin/distribyted -tags "release" cmd/distribyted/main.go
+RUN BIN_OUTPUT=/bin/distribyted make build
 
-RUN ls /bin
 #===============
 # Stage 2: Run
 #===============
 
 FROM alpine:3
 
-RUN apk add --update gcc libc-dev
+RUN apk add gcc libc-dev fuse-dev
 
 COPY --from=builder /bin/distribyted /bin/distribyted
-
 RUN chmod +x /bin/distribyted
+
+RUN mkdir /distribyted-data
+
+RUN echo "user_allow_other" >> /etc/fuse.conf
+ENV DISTRIBYTED_FUSE_ALLOW_OTHER=true
 
 ENTRYPOINT ["./bin/distribyted"]

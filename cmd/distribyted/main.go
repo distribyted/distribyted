@@ -31,7 +31,7 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    configFlag,
-				Value:   "./distribyted-data/config.yaml",
+				Value:   "./distribyted-data/config/config.yaml",
 				EnvVars: []string{"DISTRIBYTED_CONFIG"},
 				Usage:   "YAML file containing distribyted configuration.",
 			},
