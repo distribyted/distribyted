@@ -19,8 +19,9 @@ import (
 )
 
 const (
-	configFlag = "config"
-	portFlag   = "http-port"
+	configFlag     = "config"
+	fuseAllowOther = "fuse-allow-other"
+	portFlag       = "http-port"
 )
 
 func main() {
@@ -38,12 +39,18 @@ func main() {
 				Name:    portFlag,
 				Value:   4444,
 				EnvVars: []string{"DISTRIBYTED_HTTP_PORT"},
-				Usage:   "http port for web interface",
+				Usage:   "HTTP port for web interface",
+			},
+			&cli.BoolFlag{
+				Name:    fuseAllowOther,
+				Value:   false,
+				EnvVars: []string{"DISTRIBYTED_FUSE_ALLOW_OTHER"},
+				Usage:   "Allow other users to access all fuse mountpoints. You need to add user_allow_other flag to /etc/fuse.conf file.",
 			},
 		},
 
 		Action: func(c *cli.Context) error {
-			err := load(c.String(configFlag), c.Int(portFlag))
+			err := load(c.String(configFlag), c.Int(portFlag), c.Bool(fuseAllowOther))
 			return err
 		},
 
@@ -63,7 +70,7 @@ func newCache(folder string) (*filecache.Cache, error) {
 	return filecache.NewCache(folder)
 }
 
-func load(configPath string, port int) error {
+func load(configPath string, port int, fuseAllowOther bool) error {
 	ch := config.NewHandler(configPath)
 
 	conf, err := ch.Get()
@@ -84,7 +91,7 @@ func load(configPath string, port int) error {
 	}
 
 	ss := stats.NewTorrent()
-	mountService := fuse.NewHandler(c, ss)
+	mountService := fuse.NewHandler(c, ss, fuseAllowOther)
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)

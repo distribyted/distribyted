@@ -84,17 +84,18 @@ Run the program: `./distribyted-[VERSION]-[OS]-[ARCH]`
 
 Defaults are good enough for starters, but you can change them. Here is the output of `./distribyted -help`:
 
-```
+```text
 NAME:
    distribyted - Torrent client with on-demand file downloading as a filesystem.
 
 USAGE:
-   distribyted-v0.3.0-linux-amd64 [global options] [arguments...]
+   distribyted [global options] [arguments...]
 
 GLOBAL OPTIONS:
-   --config value     YAML file containing distribyted configuration. (default: "./distribyted-data/config.yaml") [$DISTRIBYTED_CONFIG]
-   --http-port value  http port for web interface (default: 4444) [$DISTRIBYTED_HTTP_PORT]
-   --help, -h         show help (default: false)
+   --config value      YAML file containing distribyted configuration. (default: "./distribyted-data/config.yaml") [$DISTRIBYTED_CONFIG]
+   --http-port value   HTTP port for web interface (default: 4444) [$DISTRIBYTED_HTTP_PORT]
+   --fuse-allow-other  Allow other users to acces to all fuse mountpoints. You need to add user_allow_other flag to /etc/fuse.conf file. (default: false) [$DISTRIBYTED_FUSE_ALLOW_OTHER]
+   --help, -h          show help (default: false)
 ```
 
 ### Prerequisites on windows

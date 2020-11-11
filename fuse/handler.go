@@ -18,14 +18,17 @@ type Handler struct {
 	c *torrent.Client
 	s *stats.Torrent
 
+	fuseAllowOther bool
+
 	hosts map[string]*fuse.FileSystemHost
 }
 
-func NewHandler(c *torrent.Client, s *stats.Torrent) *Handler {
+func NewHandler(c *torrent.Client, s *stats.Torrent, fuseAllowOther bool) *Handler {
 	return &Handler{
-		c:     c,
-		s:     s,
-		hosts: make(map[string]*fuse.FileSystemHost),
+		c:              c,
+		s:              s,
+		fuseAllowOther: fuseAllowOther,
+		hosts:          make(map[string]*fuse.FileSystemHost),
 	}
 }
 
@@ -76,7 +79,13 @@ func (s *Handler) Mount(mpc *config.MountPoint, ef config.EventFunc) error {
 
 	// TODO improve error handling here
 	go func() {
-		ok := host.Mount(mpc.Path, nil)
+		var config []string
+
+		if mpc.AllowOther || s.fuseAllowOther {
+			config = append(config, "-o", "allow_other")
+		}
+
+		ok := host.Mount(mpc.Path, config)
 		if !ok {
 			log.WithField("path", mpc.Path).Error("error trying to mount filesystem")
 		}
