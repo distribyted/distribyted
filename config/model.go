@@ -9,8 +9,9 @@ type Root struct {
 }
 
 type MountPoint struct {
-	Path     string `yaml:"path"`
-	Torrents []struct {
+	AllowOther bool   `yaml:"fuse-allow-other,omitempty"`
+	Path       string `yaml:"path"`
+	Torrents   []struct {
 		MagnetURI   string `yaml:"magnetUri,omitempty"`
 		TorrentPath string `yaml:"torrentPath,omitempty"`
 		FolderName  string `yaml:"folderName,omitempty"`
