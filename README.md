@@ -3,7 +3,7 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![GPL3 License][license-shield]][license-url]
-[![Codecov][codecov-shield]][codecov-url]
+[![Coveralls][coveralls-shield]][coveralls-url]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -153,5 +153,5 @@ Distributed under the GPL3 license. See `LICENSE` for more information.
 [license-url]: https://github.com/distribyted/distribyted/blob/master/LICENSE
 [product-screenshot]: docs/images/distribyted_demo.gif
 [example-config]: https://github.com/distribyted/distribyted/blob/master/examples/conf_example.yaml
-[codecov-shield]: https://img.shields.io/codecov/c/github/distribyted/distribyted?style=flat-square
-[codecov-url]: https://codecov.io/gh/distribyted/distribyted
+[coveralls-shield]: https://img.shields.io/coveralls/github/distribyted/distribyted?style=flat-square
+[coveralls-url]: https://coveralls.io/github/distribyted/distribyted
