@@ -26,7 +26,7 @@ func NewFS(fss []fs.Filesystem) fuse.FileSystemInterface {
 func (fs *FS) Open(path string, flags int) (errc int, fh uint64) {
 	fh, err := fs.fh.OpenHolder(path)
 	if err == os.ErrNotExist {
-		logrus.WithField("path", path).Warn("file does not exists")
+		logrus.WithField("path", path).Debug("file does not exists")
 		return -fuse.ENOENT, fhNone
 
 	}
@@ -50,7 +50,7 @@ func (cfs *FS) Getattr(path string, stat *fuse.Stat_t, fh uint64) (errc int) {
 
 	file, err := cfs.fh.GetFile(path, fh)
 	if err == os.ErrNotExist {
-		logrus.WithField("path", path).Warn("file does not exists")
+		logrus.WithField("path", path).Debug("file does not exists")
 		return -fuse.ENOENT
 
 	}
