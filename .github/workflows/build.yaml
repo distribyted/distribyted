@@ -103,6 +103,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
+      - name: Run tests
+        shell: bash
+        run: |
+          make test
+      - name: Convert coverage.out to coverage.lcov
+        uses: jandelgado/gcov2lcov-action@v1.0.7
+        if: matrix.os == 'ubuntu-latest'
+      - name: Coveralls
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage.lcov
+        if: matrix.os == 'ubuntu-latest'
+
       - name: Build
         shell: bash
         run: |
@@ -112,12 +126,7 @@ jobs:
         run: |
           make cross-compile
         if: matrix.os == 'ubuntu-latest'
-
-      - name: Run tests
-        shell: bash
-        run: |
-          make test
-
+      
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
