@@ -11,7 +11,6 @@ func NewClient(st storage.ClientImpl) (*torrent.Client, error) {
 	torrentCfg := torrent.NewDefaultClientConfig()
 	torrentCfg.Logger = log.Discard
 	torrentCfg.Seed = true
-	torrentCfg.DisableTCP = true
 	torrentCfg.DefaultStorage = st
 
 	return torrent.NewClient(torrentCfg)
