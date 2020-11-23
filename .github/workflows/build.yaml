@@ -108,7 +108,7 @@ jobs:
         run: |
           make test
       - name: Convert coverage.out to coverage.lcov
-        uses: jandelgado/gcov2lcov-action@v1.0.7
+        uses: jandelgado/gcov2lcov-action@v1.0.8
         if: matrix.os == 'ubuntu-latest'
       - name: Coveralls
         uses: coverallsapp/github-action@v1.1.2
