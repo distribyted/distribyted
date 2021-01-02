@@ -5,6 +5,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"sort"
 
 	"github.com/ajnavarro/distribyted/config"
 	"github.com/ajnavarro/distribyted/stats"
@@ -26,8 +27,9 @@ var apiStatusHandler = func(fc *filecache.Cache, ss *stats.Torrent) gin.HandlerF
 
 var apiRoutesHandler = func(ss *stats.Torrent) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		stats := ss.RoutesStats()
-		ctx.JSON(http.StatusOK, stats)
+		s := ss.RoutesStats()
+		sort.Sort(stats.ByName(s))
+		ctx.JSON(http.StatusOK, s)
 	}
 }
 

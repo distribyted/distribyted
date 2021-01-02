@@ -1,37 +1,105 @@
 <!DOCTYPE html>
-<html>
 
 <head>
-    {{template "common_header.html"}}
+    {{template "header.html" "Configuration"}}
     <style>
         #editor {
             /** Setting height is also important, otherwise editor wont showup**/
-            height: 300px;
+            height: 400px;
         }
     </style>
 </head>
 
-<body>
-    {{template "navbar.html"}}
-    <div class="container">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                 <button type="button" class="btn btn-light" onclick="javascript:save();">Save</button>
-                 <button type="button" class="btn btn-light" onclick="javascript:reload();">Reload server</button>
-               
-            </div>
-            <div class="panel-body">
-                <div id="editor"></div>
-            </div>
-        </div>
-    </div>
 
-    {{template "common_footer.html"}}
+<body class="header-fixed sidebar-fixed sidebar-dark header-light" id="body">
+    <div class="wrapper">
+        {{template "navbar.html" "config"}}
 
-    <script src="assets/js/js-yaml.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/config.js" type="text/javascript" charset="utf-8"></script>
+        <div class="page-wrapper">
+            <!-- Header -->
+            <header class="main-header " id="header">
+                <nav class="navbar navbar-static-top navbar-expand-lg">
+                    <!-- Sidebar toggle button -->
+                    <button id="sidebar-toggler" class="sidebar-toggle">
+                        <span class="sr-only">Toggle navigation</span>
+                    </button>
+                </nav>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="content">
+                    <div class="row">
+                        <!-- Large Modal -->
+                        <div class="modal fade" id="distribyted-reload-info-modal" tabindex="-1" role="dialog"
+                            aria-labelledby="distribyted-reload-info-modal" aria-hidden="true">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="distribyted-reload-info-modal-title">Reload status</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul id="distribyted-reload-info-text" class="list-group"></ul>
+                                        <div class="card-body d-flex align-items-center justify-content-center">
+                                            <div class="sk-wave" id="distribyted-reload-info-loading"
+                                                style="display:none">
+                                                <div class="rect1"></div>
+                                                <div class="rect2"></div>
+                                                <div class="rect3"></div>
+                                                <div class="rect4"></div>
+                                                <div class="rect5"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger btn-pill"
+                                            data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="card card-default">
+                                <div class="card-header card-header-border-bottom">
+                                    <h2>Yaml Editor</h2>
+                                </div>
+                                <div class="card-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <div id="editor"></div>
+                                        </div>
+                                        <div class="form-footer pt-4 pt-5 mt-4 border-top">
+                                            <button type="button" class="btn btn-primary btn-default"
+                                                onclick="javascript:Distribyted.config.save()">Save</button>
+                                            <button type="button" class="btn btn-secondary btn-default"
+                                                data-toggle="modal" data-target="#distribyted-reload-info-modal"
+                                                onclick="javascript:Distribyted.config.reload()">Reload server</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="footer mt-auto">
+                    <div class="copyright bg-white">
+                    </div>
+                </footer>
+            </div>
+            {{template "footer.html"}}
+
+            <script src="assets/plugins/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+            <script src="assets/plugins/ace/ext-language_tools.js" type="text/javascript" charset="utf-8"></script>
+            <script src="assets/plugins/js-yaml/js-yaml.min.js" type="text/javascript" charset="utf-8"></script>
+            <script src="assets/js/config.js" type="text/javascript" charset="utf-8"></script>
+
+            <script>
+                Distribyted.config.loadView();
+            </script>
+
 </body>
 
 </html>

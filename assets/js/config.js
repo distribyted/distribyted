@@ -1,129 +1,157 @@
-var langTools = ace.require("ace/ext/language_tools");
+Distribyted.config = {
+    _editor: null,
+    _infoDiv: document.getElementById("distribyted-reload-info-text"),
+    _loadingInfoDom: document.getElementById("distribyted-reload-info-loading"),
+    _valid: function () {
+        if (this._editor == null) {
+            return false
+        }
 
-var editor = ace.edit("editor");
-editor.setTheme("ace/theme/solarized_dark");
-editor.getSession().setMode("ace/mode/yaml");
-editor.setShowPrintMargin(false);
-editor.setOptions({
-  enableBasicAutocompletion: true,
-  enableSnippets: true,
-  enableLiveAutocompletion: false,
+        let getYamlCodeValidationErrors = (code) => {
+            var error = "";
+            try {
+                jsyaml.safeLoad(code);
+            } catch (e) {
+                error = e;
+            }
+            return error;
+        };
 
-  autoScrollEditorIntoView: true,
-  fontSize: "16px",
-  maxLines: 100,
-  wrap: true,
-});
+        let code = this._editor.getValue();
+        let error = getYamlCodeValidationErrors(code);
+        if (error) {
+            this._editor.getSession().setAnnotations([
+                {
+                    row: error.mark.line,
+                    column: error.mark.column,
+                    text: error.reason,
+                    type: "error",
+                },
+            ]);
 
-function valid() {
-  let getYamlCodeValidationErrors = (code) => {
-    var error = "";
-    try {
-      jsyaml.safeLoad(code);
-    } catch (e) {
-      error = e;
+            return false;
+        } else {
+            this._editor.getSession().setAnnotations([]);
+
+            return true;
+        }
+    },
+
+    save: function () {
+        fetch("/api/config", {
+            method: "POST",
+            body: this._editor.getValue(),
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    Distribyted.message.info("Configuration saved");
+                } else {
+                    Distribyted.message.error(
+                        "Error saving configuration file. Response: " + response.status
+                    );
+                }
+            })
+            .catch(function (error) {
+                Distribyted.message.error("Error saving configuration file: " + error.message);
+            });
+    },
+
+    reload: function () {
+        this.cleanInfo();
+        fetch("/api/reload", {
+            method: "POST",
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    Distribyted.config.showInfo("Error reloading server. Response: " + response.status, "ko");
+                }
+            })
+            .then(function (json) {
+                Distribyted.config.showInfo(json.message, "ok");
+            })
+            .catch(function (error) {
+                Distribyted.message.error("Error reloading server: " + error.message);
+            });
+    },
+
+    cleanInfo: function () {
+        this._loadingInfoDom.style.display = "block";
+        this._infoDiv.innerText = ""
+    },
+
+    showInfo: function (message, flag) {
+        const li = document.createElement("li");
+        li.innerText = message;
+        li.className = "list-group-item";
+        if (flag == "ok") {
+            li.className += " list-group-item-success";
+        } else if (flag == "ko") {
+            li.className += " list-group-item-danger";
+        }
+
+        if (flag) {
+            this._loadingInfoDom.style.display = "none";
+        }
+
+        this._infoDiv.appendChild(li);
+    },
+
+    loadView: function () {
+        this._editor = ace.edit("editor");
+        this._editor.getSession().setMode("ace/mode/yaml");
+        this._editor.setShowPrintMargin(false);
+        this._editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: false,
+
+            autoScrollEditorIntoView: true,
+            fontSize: "16px",
+            maxLines: 100,
+            wrap: true,
+        });
+
+        this._editor.commands.addCommand({
+            name: "save",
+            bindKey: { win: "Ctrl-S", mac: "Command-S" },
+            exec: function (editor) {
+                if (Distribyted.config._valid()) {
+                    Distribyted.config.save();
+                } else {
+                    Distribyted.message.error("Check file format errors before saving");
+                }
+            },
+            readOnly: false,
+        });
+
+        this._editor.on("change", () => {
+            Distribyted.config._valid();
+        });
+
+        fetch("/api/config")
+            .then(function (response) {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    Distribyted.message.error(
+                        "Error getting data from server. Response: " + response.status
+                    );
+                }
+            })
+            .then(function (yaml) {
+                Distribyted.config._editor.setValue(yaml);
+            })
+            .catch(function (error) {
+                Distribyted.message.error("Error getting yaml from server: " + error.message);
+            });
+
+        var stream = new EventSource("/api/events");
+        stream.addEventListener("event", function (e) {
+            Distribyted.config.showInfo(e.data);
+        });
     }
-    return error;
-  };
 
-  let code = editor.getValue();
-  let error = getYamlCodeValidationErrors(code);
-  if (error) {
-    editor.getSession().setAnnotations([
-      {
-        row: error.mark.line,
-        column: error.mark.column,
-        text: error.reason,
-        type: "error",
-      },
-    ]);
 
-    return false;
-  } else {
-    editor.getSession().setAnnotations([]);
-
-    return true;
-  }
 }
-
-function bin2string(array) {
-  var result = "";
-  for (var i = 0; i < array.length; ++i) {
-    result += String.fromCharCode(array[i]);
-  }
-  return result;
-}
-
-function reload() {
-  fetch("/api/reload", {
-    method: "POST",
-  })
-    .then(function (response) {
-      if (response.ok) {
-        return response.json();
-      } else {
-        toastError(
-          "Error saving configuration file. Response: " + response.status
-        );
-      }
-    })
-    .then(function (json) {
-      toastInfo(json.message);
-    })
-    .catch(function (error) {
-      toastError("Error reloading server: " + error.message);
-    });
-}
-
-function save() {
-  fetch("/api/config", {
-    method: "POST",
-    body: editor.getValue(),
-  })
-    .then(function (response) {
-      if (response.ok) {
-        toastInfo("Configuration saved");
-      } else {
-        toastError(
-          "Error saving configuration file. Response: " + response.status
-        );
-      }
-    })
-    .catch(function (error) {
-      toastError("Error saving configuration file: " + error.message);
-    });
-}
-
-editor.commands.addCommand({
-  name: "save",
-  bindKey: { win: "Ctrl-S", mac: "Command-S" },
-  exec: function (editor) {
-    if (valid()) {
-      save();
-    } else {
-      toastError("Check file format errors before saving");
-    }
-  },
-  readOnly: false,
-});
-
-editor.on("change", () => {
-  valid();
-});
-
-fetch("/api/config")
-  .then(function (response) {
-    if (response.ok) {
-      return response.text();
-    } else {
-      toastError(
-        "Error getting data from server. Response: " + response.status
-      );
-    }
-  })
-  .then(function (yaml) {
-    editor.setValue(yaml);
-  })
-  .catch(function (error) {
-    toastError("Error getting yaml from server: " + error.message);
-  });

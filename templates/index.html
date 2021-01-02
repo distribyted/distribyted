@@ -1,58 +1,106 @@
 <!DOCTYPE html>
-<html>
 
 <head>
-    {{template "common_header.html"}}
+  {{template "header.html" "Dashboard"}}
 </head>
 
-<body>
-    {{template "navbar.html"}}
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <canvas id="chart-general-network"  height="150"></canvas>
+
+<body class="header-fixed sidebar-fixed sidebar-dark header-light" id="body">
+  <div class="wrapper">
+    {{template "navbar.html" "dashboard"}}
+
+    <div class="page-wrapper">
+      <!-- Header -->
+      <header class="main-header " id="header">
+        <nav class="navbar navbar-static-top navbar-expand-lg">
+          <!-- Sidebar toggle button -->
+          <button id="sidebar-toggler" class="sidebar-toggle">
+            <span class="sr-only">Toggle navigation</span>
+          </button>
+        </nav>
+      </header>
+
+
+      <div class="content-wrapper">
+        <div class="content">
+          <div class="row">
+            <div class="col-xl-12 col-md-12">
+              <!-- Sales Graph -->
+              <div class="card card-default" data-scroll-height="675">
+                <div class="card-header">
+                  <h2>Download/Upload speed</h2>
+                </div>
+                <div class="card-body">
+                  <canvas id="chart-general-network" class="chartjs"></canvas>
+                </div>
+                <div class="card-footer d-flex flex-wrap bg-white p-0">
+                  <div class="col-6 px-0">
+                    <div class="text-center p-4">
+                      <h4 id="general-download-speed">...</h4>
+                      <p class="mt-2">Download Speed</p>
+                    </div>
+                  </div>
+                  <div class="col-6 px-0">
+                    <div class="text-center p-4 border-left">
+                      <h4 id="general-upload-speed">...</h4>
+                      <p class="mt-2">Upload Speed</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-4 col-md-12">
+              <!-- Doughnut Chart -->
+              <div class="card card-default" data-scroll-height="675">
+                <div class="card-header justify-content-center">
+                  <h2>Main cache</h2>
+                </div>
+                <div class="card-body">
+                  <canvas id="main-cache-chart"></canvas>
+                </div>
+                <div class="card-footer d-flex flex-wrap bg-white p-0">
+                  <div class="col-6">
+                    <div class="py-4 px-4">
+                      <ul class="d-flex flex-column justify-content-between">
+                        <li class="mb-2"><i class="mdi mdi-checkbox-blank-circle-outline mr-2"
+                            style="color: #4c84ff"></i>Used</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="col-6 border-left">
+                    <div class="py-4 px-4 ">
+                      <ul class="d-flex flex-column justify-content-between">
+                        <li class="mb-2"><i class="mdi mdi-checkbox-blank-circle-outline mr-2"
+                            style="color: #8061ef"></i>Free</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="row">
-            <div class="col-sm">
-                <canvas id="chart-cache" height="20"></canvas>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm">
-                <h3>
-                    <svg class="bi bi-arrow-down" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M4.646 9.646a.5.5 0 01.708 0L8 12.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z"
-                            clip-rule="evenodd" />
-                        <path fill-rule="evenodd" d="M8 2.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V3a.5.5 0 01.5-.5z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <span id="down-speed-text"></span>
-                </h3>
-            </div>
-            <div class="col-sm">
-                <h3>
-                    <svg class="bi bi-arrow-up" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M8 3.5a.5.5 0 01.5.5v9a.5.5 0 01-1 0V4a.5.5 0 01.5-.5z"
-                            clip-rule="evenodd" />
-                        <path fill-rule="evenodd"
-                            d="M7.646 2.646a.5.5 0 01.708 0l3 3a.5.5 0 01-.708.708L8 3.707 5.354 6.354a.5.5 0 11-.708-.708l3-3z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <span id="up-speed-text"></span>
-                </h3>
-            </div>
-        </div>
+
+        <footer class="footer mt-auto">
+          <div class="copyright bg-white">
+          </div>
+        </footer>
+
+      </div>
     </div>
-    {{template "common_footer.html"}}
-    <script src="assets/js/Chart.bundle.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/humanize.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/general_chart.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/single_bar_chart.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/general.js" type="text/javascript" charset="utf-8"></script>
+
+    {{template "footer.html"}}
+    <script src="assets/js/general_chart.js"></script>
+    <script src="assets/js/cache_chart.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+    <script>
+      Distribyted.dashboard.loadView();
+      setInterval(function () {
+        Distribyted.dashboard.loadView();
+      }, 2000)
+    </script>
 </body>
 
 </html>
