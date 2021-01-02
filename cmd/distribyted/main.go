@@ -127,7 +127,11 @@ func load(configPath string, port int, fuseAllowOther bool) error {
 		tryClose(c, mountService)
 	}()
 
-	return http.New(fc, ss, ch, port)
+	err = http.New(fc, ss, ch, port)
+
+	logrus.WithError(err).Error("error initializing HTTP server")
+
+	return err
 }
 
 func tryClose(c *t.Client, mountService *fuse.Handler) {

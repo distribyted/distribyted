@@ -1,0 +1,39 @@
+{{#.}}
+<div class="row">
+    <div class="col-12">
+        <!-- Recent Order Table -->
+        <div class="card card-table-border-none">
+            <div class="card-header justify-content-between">
+                <h2>{{name}}</h2>
+            </div>
+            <div class="card-body pt-0 pb-5">
+                <table class="table card-table table-responsive table-responsive-large" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%">Name</th>
+                            <th style="width: 15%"><i class="mdi mdi-arrow-down"></i> / <i class="mdi mdi-arrow-up"></i>
+                            </th>
+                            <th style="width: 15%">Peers/Seeders</th>
+                            <th style="width: 35%" class="d-none d-lg-table-cell">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#torrentStats}}
+                        <tr>
+                            <td>{{name}}</td>
+                            <td>{{ibytes downloadedBytes timePassed}} / {{ibytes
+                                uploadedBytes timePassed}}</td>
+                            <td>{{{torrent_info peers seeders pieceSize}}}</td>
+                            <td class="d-none d-lg-table-cell">
+                                {{{torrent_status pieceChunks totalPieces}}}
+                            </td>
+                        </tr>
+                        {{/torrentStats}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{/.}}

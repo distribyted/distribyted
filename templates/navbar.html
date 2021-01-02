@@ -1,20 +1,72 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Distribyted</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/">General</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/routes">Routes</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/config">Config</a>
-            </li>
-        </ul>
+<!--
+          ====================================
+          ——— LEFT SIDEBAR WITH FOOTER
+          =====================================
+        -->
+<aside class="left-sidebar bg-sidebar">
+  <div id="sidebar" class="sidebar sidebar-with-footer">
+    <!-- Aplication Brand -->
+    <div class="app-brand">
+      <a href="/" title="Distribyted">
+        <img src="/assets/img/favicon.png" />
+        <span class="brand-name text-truncate">Distribyted</span>
+      </a>
     </div>
-</nav>
+    <!-- begin sidebar scrollbar -->
+    <div class="sidebar-scrollbar">
+
+      <!-- sidebar menu -->
+      <ul class="nav sidebar-inner" id="sidebar-menu">
+        {{if eq . "dashboard"}}
+        <li class="active">
+          {{else}}
+        <li>
+          {{end}}
+          <a class="sidenav-item-link" href="/">
+            <i class="mdi mdi-view-dashboard-outline"></i>
+            <span class="nav-text">Dashboard</span>
+          </a>
+        </li>
+        {{if eq . "routes"}}
+        <li class="active">
+          {{else}}
+        <li>
+          {{end}}
+          <a class="sidenav-item-link" href="/routes">
+            <i class="mdi mdi-folder-multiple-outline"></i>
+            <span class="nav-text">Routes</span>
+          </a>
+        </li>
+        {{if eq . "config"}}
+        <li class="active">
+          {{else}}
+        <li>
+          {{end}}
+          <a class="sidenav-item-link" href="/config">
+            <i class="mdi mdi-book-open-page-variant"></i>
+            <span class="nav-text">Yaml Config</span>
+          </a>
+        </li>
+      </ul>
+
+    </div>
+
+    <!-- <div class="sidebar-footer">
+          <hr class="separator mb-0" />
+          <div class="sidebar-footer-content">
+            <h6 class="text-uppercase">
+              Main cache <span class="float-right">40%</span>
+            </h6>
+            <div class="progress progress-xs">
+              <div class="progress-bar active" style="width: 40%;" role="progressbar"></div>
+            </div>
+            <h6 class="text-uppercase">
+              /path/pepe cache <span class="float-right">65%</span>
+            </h6>
+            <div class="progress progress-xs">
+              <div class="progress-bar active" style="width: 65%;" role="progressbar"></div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+</aside>

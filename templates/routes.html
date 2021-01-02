@@ -1,53 +1,44 @@
 <!DOCTYPE html>
-<html>
 
 <head>
-    {{template "common_header.html"}}
+    {{template "header.html" "Routes"}}
 </head>
 
-<body>
-    {{template "navbar.html"}}
 
-    <div class="container">
-        {{if not .}}
-        <div class="alert alert-warning" role="alert">
-            No routes found.
-        </div>
-        {{end}}
+<body class="header-fixed sidebar-fixed sidebar-dark header-light" id="body">
+    <div class="wrapper">
+        {{template "navbar.html" "routes"}}
 
-        {{range .}}
-        <div class="card shadow">
-            <div class="card-body">
-                <h5 class="card-title">{{.Name}}</h5>
-                {{range .TorrentStats}}
-                <div class="card shadow">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <h5>{{.Name}}</h5>
-                            </div>
-                            <div class="col">
-                                <p id="up-down-speed-text-{{.Hash}}">...</p>
-                                <p id="peers-seeders-{{.Hash}}">...</p>
-                                <p id="piece-size-{{.Hash}}">...</p>
-                            </div>
-                            <div class="col">
-                                <div id="file-chunks-{{.Hash}}" class="progress">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="page-wrapper">
+            <!-- Header -->
+            <header class="main-header " id="header">
+                <nav class="navbar navbar-static-top navbar-expand-lg">
+                    <!-- Sidebar toggle button -->
+                    <button id="sidebar-toggler" class="sidebar-toggle">
+                        <span class="sr-only">Toggle navigation</span>
+                    </button>
+                </nav>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="content" id="template_target">
                 </div>
-                {{end}}
+                <footer class="footer mt-auto">
+                    <div class="copyright bg-white">
+                    </div>
+                </footer>
             </div>
-        </div>
-        {{end}}
-    </div>
-    {{template "common_footer.html"}}
-    <script src="assets/js/humanize.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/file_chunks.js" type="text/javascript" charset="utf-8"></script>
-    <script src="assets/js/routes.js" type="text/javascript" charset="utf-8"></script>
-</body>
+
+            {{template "footer.html"}}
+
+            <script src="assets/js/routes.js"></script>
+            <script>
+                Distribyted.routes.loadView();
+                setInterval(function () {
+                    Distribyted.routes.loadView();
+                }, 2000)
+
+            </script>
 </body>
 
 </html>
