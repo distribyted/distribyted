@@ -94,7 +94,7 @@ func load(configPath string, port int, fuseAllowOther bool) error {
 	mountService := fuse.NewHandler(c, ss, fuseAllowOther)
 
 	sigChan := make(chan os.Signal)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		<-sigChan
