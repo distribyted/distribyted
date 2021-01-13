@@ -37,6 +37,9 @@ function CacheChart(id, name) {
     this.update = function (used, free) {
         this._chart.data.datasets.forEach((dataset) => {
             dataset.data[0] = used;
+            if (free < 0) {
+                free = 0;
+            }
             dataset.data[1] = free;
         });
 

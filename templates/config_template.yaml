@@ -1,7 +1,9 @@
 # This is a configuration file example. You can edit it and add and remove torrents and magnet URIs. Read the following comments for more info.
 
 # Size in MB for the cache. This is the maximum space used by distribyted to store torrent data. Less used torrent data will be discarded if this value is reached.
+# max-cache-size: -1 #No limit
 max-cache-size: 1024
+
 # Folder where distribyted metadata will be stored.
 metadata-folder-name: ./distribyted-data/metadata
 # List of folders where torrents will be mounted as a filesystem.
