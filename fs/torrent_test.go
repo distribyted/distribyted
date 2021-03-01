@@ -44,4 +44,5 @@ func TestTorrentFilesystem(t *testing.T) {
 	require.NoError(err)
 	require.NotNil(f)
 	require.Equal(f.Size(), int64(1964275))
+	require.NoError(f.Close())
 }

@@ -1,97 +1,58 @@
 package fuse
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"runtime"
 
-	"github.com/anacrolix/torrent"
 	"github.com/billziss-gh/cgofuse/fuse"
 	"github.com/distribyted/distribyted/config"
 	"github.com/distribyted/distribyted/fs"
-	"github.com/distribyted/distribyted/stats"
 	log "github.com/sirupsen/logrus"
 )
 
 type Handler struct {
-	c *torrent.Client
-	s *stats.Torrent
-
 	fuseAllowOther bool
 
 	hosts map[string]*fuse.FileSystemHost
 }
 
-func NewHandler(c *torrent.Client, s *stats.Torrent, fuseAllowOther bool) *Handler {
+func NewHandler(fuseAllowOther bool) *Handler {
 	return &Handler{
-		c:              c,
-		s:              s,
 		fuseAllowOther: fuseAllowOther,
 		hosts:          make(map[string]*fuse.FileSystemHost),
 	}
 }
 
-func (s *Handler) Mount(mpc *config.MountPoint, ef config.EventFunc) error {
-	var torrents []fs.Filesystem
-	for _, mpcTorrent := range mpc.Torrents {
-		var t *torrent.Torrent
-		var err error
-
-		switch {
-		case mpcTorrent.MagnetURI != "":
-			t, err = s.c.AddMagnet(mpcTorrent.MagnetURI)
-			break
-		case mpcTorrent.TorrentPath != "":
-			t, err = s.c.AddTorrentFromFile(mpcTorrent.TorrentPath)
-			break
-		default:
-			err = fmt.Errorf("no magnet URI or torrent path provided")
+func (s *Handler) MountAll(fss map[string][]fs.Filesystem, ef config.EventFunc) error {
+	for p, fss := range fss {
+		folder := p
+		// On windows, the folder must don't exist
+		if runtime.GOOS == "windows" {
+			folder = path.Dir(folder)
 		}
-		if err != nil {
+		if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
 			return err
 		}
 
-		// only get info if name is not available
-		if t.Name() == "" {
-			ef(fmt.Sprintf("getting torrent info...: %v", t.InfoHash()))
-			log.WithField("hash", t.InfoHash()).Info("getting torrent info")
-			<-t.GotInfo()
-		}
+		host := fuse.NewFileSystemHost(NewFS(fss))
 
-		s.s.Add(mpc.Path, t)
-		torrents = append(torrents, fs.NewTorrent(t))
+		// TODO improve error handling here
+		go func() {
+			var config []string
 
-		ef(fmt.Sprintf("torrent %v added to mountpoint", t.Name()))
-		log.WithField("name", t.Name()).WithField("path", mpc.Path).Info("torrent added to mountpoint")
+			if s.fuseAllowOther {
+				config = append(config, "-o", "allow_other")
+			}
+
+			ok := host.Mount(p, config)
+			if !ok {
+				log.WithField("path", p).Error("error trying to mount filesystem")
+			}
+		}()
+
+		s.hosts[p] = host
 	}
-
-	folder := mpc.Path
-	// On windows, the folder must don't exist
-	if runtime.GOOS == "windows" {
-		folder = path.Dir(folder)
-	}
-	if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
-		return err
-	}
-
-	host := fuse.NewFileSystemHost(NewFS(torrents))
-
-	// TODO improve error handling here
-	go func() {
-		var config []string
-
-		if mpc.AllowOther || s.fuseAllowOther {
-			config = append(config, "-o", "allow_other")
-		}
-
-		ok := host.Mount(mpc.Path, config)
-		if !ok {
-			log.WithField("path", mpc.Path).Error("error trying to mount filesystem")
-		}
-	}()
-
-	s.hosts[mpc.Path] = host
 
 	return nil
 }
@@ -105,6 +66,6 @@ func (s *Handler) UnmountAll() {
 			log.WithField("path", path).Error("unmount failed")
 		}
 	}
+
 	s.hosts = make(map[string]*fuse.FileSystemHost)
-	s.s.RemoveAll()
 }
