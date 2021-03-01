@@ -1,8 +1,8 @@
 package fs
 
 import (
-	"github.com/ajnavarro/distribyted/iio"
 	"github.com/anacrolix/torrent"
+	"github.com/distribyted/distribyted/iio"
 )
 
 var _ Filesystem = &Torrent{}

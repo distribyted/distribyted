@@ -6,11 +6,11 @@ import (
 	"path"
 	"runtime"
 
-	"github.com/ajnavarro/distribyted/config"
-	"github.com/ajnavarro/distribyted/fs"
-	"github.com/ajnavarro/distribyted/stats"
 	"github.com/anacrolix/torrent"
 	"github.com/billziss-gh/cgofuse/fuse"
+	"github.com/distribyted/distribyted/config"
+	"github.com/distribyted/distribyted/fs"
+	"github.com/distribyted/distribyted/stats"
 	log "github.com/sirupsen/logrus"
 )
 
