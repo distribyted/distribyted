@@ -14,6 +14,7 @@ import (
 	"github.com/distribyted/distribyted/http"
 	"github.com/distribyted/distribyted/stats"
 	"github.com/distribyted/distribyted/torrent"
+	"github.com/distribyted/distribyted/webdav"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -22,6 +23,7 @@ const (
 	configFlag     = "config"
 	fuseAllowOther = "fuse-allow-other"
 	portFlag       = "http-port"
+	webDAVPortFlag = "webdav-port"
 )
 
 func main() {
@@ -39,7 +41,13 @@ func main() {
 				Name:    portFlag,
 				Value:   4444,
 				EnvVars: []string{"DISTRIBYTED_HTTP_PORT"},
-				Usage:   "HTTP port for web interface",
+				Usage:   "HTTP port for web interface.",
+			},
+			&cli.IntFlag{
+				Name:    webDAVPortFlag,
+				Value:   36911,
+				EnvVars: []string{"DISTRIBYTED_WEBDAV_PORT"},
+				Usage:   "Port used for WebDAV interface.",
 			},
 			&cli.BoolFlag{
 				Name:    fuseAllowOther,
@@ -50,7 +58,7 @@ func main() {
 		},
 
 		Action: func(c *cli.Context) error {
-			err := load(c.String(configFlag), c.Int(portFlag), c.Bool(fuseAllowOther))
+			err := load(c.String(configFlag), c.Int(portFlag), c.Int(webDAVPortFlag), c.Bool(fuseAllowOther))
 			return err
 		},
 
@@ -70,7 +78,7 @@ func newCache(folder string) (*filecache.Cache, error) {
 	return filecache.NewCache(folder)
 }
 
-func load(configPath string, port int, fuseAllowOther bool) error {
+func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	ch := config.NewHandler(configPath)
 
 	conf, err := ch.Get()
@@ -91,32 +99,37 @@ func load(configPath string, port int, fuseAllowOther bool) error {
 	}
 
 	ss := stats.NewTorrent()
-	mountService := fuse.NewHandler(c, ss, fuseAllowOther)
+
+	th := torrent.NewHandler(c, ss)
+
+	mh := fuse.NewHandler(fuseAllowOther || conf.AllowOther)
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		<-sigChan
-		tryClose(c, mountService)
+		tryClose(c, mh)
 	}()
 
 	ch.OnReload(func(c *config.Root, ef config.EventFunc) error {
 		ef("unmounting filesystems")
-		mountService.UnmountAll()
+		mh.UnmountAll()
+		th.RemoveAll()
 
 		ef(fmt.Sprintf("setting cache size to %d MB", c.MaxCacheSize))
 		fc.SetCapacity(c.MaxCacheSize * 1024 * 1024)
 
 		for _, mp := range c.MountPoints {
-			ef(fmt.Sprintf("mounting %v with %d torrents...", mp.Path, len(mp.Torrents)))
-			if err := mountService.Mount(mp, ef); err != nil {
-				return fmt.Errorf("error mounting folder %v: %w", mp.Path, err)
+			ef(fmt.Sprintf("loading %v with %d torrents...", mp.Path, len(mp.Torrents)))
+			if err := th.Load(mp.Path, mp.Torrents); err != nil {
+				return fmt.Errorf("error loading folder %v: %w", mp.Path, err)
 			}
-			ef(fmt.Sprintf("%v mounted", mp.Path))
+			ef(fmt.Sprintf("%v loaded", mp.Path))
 		}
 
-		return nil
+		return mh.MountAll(th.Fileststems(), ef)
+
 	})
 
 	if err := ch.Reload(nil); err != nil {
@@ -124,7 +137,20 @@ func load(configPath string, port int, fuseAllowOther bool) error {
 	}
 
 	defer func() {
-		tryClose(c, mountService)
+		tryClose(c, mh)
+	}()
+
+	go func() {
+		if conf.WebDAV != nil {
+			wdth := torrent.NewHandler(c, ss)
+			if err := wdth.Load("::/webDAV", conf.WebDAV.Torrents); err != nil {
+				logrus.WithError(err).Error("error loading torrents for webDAV")
+			}
+
+			if err := webdav.NewWebDAVServer(wdth.Fileststems(), webDAVPort); err != nil {
+				logrus.WithError(err).Error("error starting webDAV")
+			}
+		}
 	}()
 
 	err = http.New(fc, ss, ch, port)

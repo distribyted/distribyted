@@ -61,8 +61,13 @@ func (d *torrentFile) IsDir() bool {
 }
 
 func (d *torrentFile) Close() error {
-	err := d.reader.Close()
+	var err error
+	if d.reader != nil {
+		err = d.reader.Close()
+	}
+
 	d.reader = nil
+
 	return err
 }
 
