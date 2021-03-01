@@ -7,8 +7,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/ajnavarro/distribyted/fs"
 	"github.com/billziss-gh/cgofuse/fuse"
+	"github.com/distribyted/distribyted/fs"
 	"github.com/sirupsen/logrus"
 )
 

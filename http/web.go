@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/ajnavarro/distribyted/stats"
+	"github.com/distribyted/distribyted/stats"
 	"github.com/gin-gonic/gin"
 )
 

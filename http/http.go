@@ -3,10 +3,10 @@ package http
 import (
 	"fmt"
 
-	"github.com/ajnavarro/distribyted"
-	"github.com/ajnavarro/distribyted/config"
-	"github.com/ajnavarro/distribyted/stats"
 	"github.com/anacrolix/missinggo/v2/filecache"
+	"github.com/distribyted/distribyted"
+	"github.com/distribyted/distribyted/config"
+	"github.com/distribyted/distribyted/stats"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/shurcooL/httpfs/html/vfstemplate"

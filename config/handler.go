@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/ajnavarro/distribyted"
+	"github.com/distribyted/distribyted"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )

@@ -1,7 +1,7 @@
 package fs
 
 import (
-	"github.com/ajnavarro/distribyted/iio"
+	"github.com/distribyted/distribyted/iio"
 )
 
 type File interface {

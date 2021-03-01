@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/ajnavarro/distribyted/config"
-	"github.com/ajnavarro/distribyted/stats"
 	"github.com/anacrolix/missinggo/v2/filecache"
+	"github.com/distribyted/distribyted/config"
+	"github.com/distribyted/distribyted/stats"
 	"github.com/gin-gonic/gin"
 )
 

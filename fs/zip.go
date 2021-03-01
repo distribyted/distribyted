@@ -4,7 +4,7 @@ import (
 	"archive/zip"
 	"os"
 
-	"github.com/ajnavarro/distribyted/iio"
+	"github.com/distribyted/distribyted/iio"
 )
 
 var _ Filesystem = &Zip{}

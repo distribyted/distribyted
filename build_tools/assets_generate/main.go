@@ -3,7 +3,7 @@
 package main
 
 import (
-	"github.com/ajnavarro/distribyted"
+	"github.com/distribyted/distribyted"
 	"github.com/shurcooL/vfsgen"
 	log "github.com/sirupsen/logrus"
 )
