@@ -17,9 +17,9 @@ type FS struct {
 	fh *fileHandler
 }
 
-func NewFS(fss []fs.Filesystem) fuse.FileSystemInterface {
+func NewFS(fs fs.Filesystem) fuse.FileSystemInterface {
 	return &FS{
-		fh: &fileHandler{fss: fss},
+		fh: &fileHandler{fs: fs},
 	}
 }
 
@@ -144,7 +144,7 @@ var ErrBadHolderIndex = errors.New("holder index too big")
 type fileHandler struct {
 	mu     sync.Mutex
 	opened []fs.File
-	fss    []fs.Filesystem
+	fs     fs.Filesystem
 }
 
 func (fh *fileHandler) GetFile(path string, fhi uint64) (fs.File, error) {
@@ -163,14 +163,12 @@ func (fh *fileHandler) ListDir(path string) ([]string, error) {
 	defer fh.mu.Unlock()
 
 	var out []string
-	for _, ifs := range fh.fss {
-		files, err := ifs.ReadDir(path)
-		if err != nil {
-			return nil, err
-		}
-		for p := range files {
-			out = append(out, p)
-		}
+	files, err := fh.fs.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+	for p := range files {
+		out = append(out, p)
 	}
 
 	return out, nil
@@ -233,18 +231,13 @@ func (fh *fileHandler) Remove(fhi uint64) error {
 }
 
 func (fh *fileHandler) lookupFile(path string) (fs.File, error) {
-	for _, f := range fh.fss {
-		file, err := f.Open(path)
-		if err == os.ErrNotExist {
-			continue
-		}
-		if err != nil {
-			return nil, err
-		}
+	file, err := fh.fs.Open(path)
+	if err != nil {
+		return nil, err
+	}
 
-		if file != nil {
-			return file, nil
-		}
+	if file != nil {
+		return file, nil
 	}
 
 	return nil, os.ErrNotExist

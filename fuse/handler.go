@@ -24,7 +24,7 @@ func NewHandler(fuseAllowOther bool) *Handler {
 	}
 }
 
-func (s *Handler) MountAll(fss map[string][]fs.Filesystem, ef config.EventFunc) error {
+func (s *Handler) MountAll(fss map[string]fs.Filesystem, ef config.EventFunc) error {
 	for p, fss := range fss {
 		folder := p
 		// On windows, the folder must don't exist

@@ -22,10 +22,10 @@ func TestTorrentFilesystem(t *testing.T) {
 	client, err := torrent.NewClient(cfg)
 	require.NoError(err)
 
-	torrent, err := client.AddMagnet(testMagnet)
+	to, err := client.AddMagnet(testMagnet)
 	require.NoError(err)
 
-	tfs := NewTorrent(torrent)
+	tfs := NewTorrent([]*torrent.Torrent{to})
 
 	files, err := tfs.ReadDir("/")
 	require.NoError(err)
