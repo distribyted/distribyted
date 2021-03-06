@@ -16,19 +16,19 @@ type Handler struct {
 	s *stats.Torrent
 
 	fssMu sync.Mutex
-	fss   map[string][]fs.Filesystem
+	fss   map[string]fs.Filesystem
 }
 
 func NewHandler(c *torrent.Client, s *stats.Torrent) *Handler {
 	return &Handler{
 		c:   c,
 		s:   s,
-		fss: make(map[string][]fs.Filesystem),
+		fss: make(map[string]fs.Filesystem),
 	}
 }
 
 func (s *Handler) Load(path string, ts []*config.Torrent) error {
-	var torrents []fs.Filesystem
+	var torrents []*torrent.Torrent
 	for _, mpcTorrent := range ts {
 		var t *torrent.Torrent
 		var err error
@@ -54,7 +54,7 @@ func (s *Handler) Load(path string, ts []*config.Torrent) error {
 		}
 
 		s.s.Add(path, t)
-		torrents = append(torrents, fs.NewTorrent(t))
+		torrents = append(torrents, t)
 
 		log.WithField("name", t.Name()).WithField("path", path).Info("torrent added to mountpoint")
 	}
@@ -63,12 +63,12 @@ func (s *Handler) Load(path string, ts []*config.Torrent) error {
 
 	s.fssMu.Lock()
 	defer s.fssMu.Unlock()
-	s.fss[folder] = torrents
+	s.fss[folder] = fs.NewTorrent(torrents)
 
 	return nil
 }
 
-func (s *Handler) Fileststems() map[string][]fs.Filesystem {
+func (s *Handler) Fileststems() map[string]fs.Filesystem {
 	return s.fss
 }
 
@@ -76,7 +76,7 @@ func (s *Handler) RemoveAll() error {
 	s.fssMu.Lock()
 	defer s.fssMu.Unlock()
 
-	s.fss = make(map[string][]fs.Filesystem)
+	s.fss = make(map[string]fs.Filesystem)
 	s.s.RemoveAll()
 	return nil
 }

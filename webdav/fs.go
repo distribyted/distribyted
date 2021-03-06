@@ -19,12 +19,13 @@ type WebDAV struct {
 	fss []fs.Filesystem
 }
 
-func newFS(mFss map[string][]fs.Filesystem) *WebDAV {
-	for _, fss := range mFss {
-		return &WebDAV{fss: fss}
+func newFS(mFss map[string]fs.Filesystem) *WebDAV {
+	var fss []fs.Filesystem
+	for _, fs := range mFss {
+		fss = append(fss, fs)
 	}
 
-	return nil
+	return &WebDAV{fss: fss}
 }
 
 func (wd *WebDAV) OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (webdav.File, error) {

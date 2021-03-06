@@ -8,22 +8,25 @@ import (
 var _ Filesystem = &Torrent{}
 
 type Torrent struct {
-	t *torrent.Torrent
-	s *storage
+	ts []*torrent.Torrent
+	s  *storage
 }
 
-func NewTorrent(t *torrent.Torrent) *Torrent {
+func NewTorrent(ts []*torrent.Torrent) *Torrent {
 	return &Torrent{
-		t: t,
-		s: newStorage(SupportedFactories),
+		ts: ts,
+		s:  newStorage(SupportedFactories),
 	}
 }
 
 func (fs *Torrent) load() {
-	<-fs.t.GotInfo()
-	for _, file := range fs.t.Files() {
-		fs.s.Add(&torrentFile{readerFunc: file.NewReader, len: file.Length()}, file.Path())
+	for _, t := range fs.ts {
+		<-t.GotInfo()
+		for _, file := range t.Files() {
+			fs.s.Add(&torrentFile{readerFunc: file.NewReader, len: file.Length()}, file.Path())
+		}
 	}
+
 }
 
 func (fs *Torrent) Open(filename string) (File, error) {
