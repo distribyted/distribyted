@@ -9,7 +9,7 @@ import (
 
 	"github.com/billziss-gh/cgofuse/fuse"
 	"github.com/distribyted/distribyted/fs"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 type FS struct {
@@ -26,12 +26,12 @@ func NewFS(fs fs.Filesystem) fuse.FileSystemInterface {
 func (fs *FS) Open(path string, flags int) (errc int, fh uint64) {
 	fh, err := fs.fh.OpenHolder(path)
 	if err == os.ErrNotExist {
-		logrus.WithField("path", path).Debug("file does not exists")
+		log.Debug().Str("path", path).Msg("file does not exists")
 		return -fuse.ENOENT, fhNone
 
 	}
 	if err != nil {
-		logrus.WithError(err).WithField("path", path).Error("error opening file")
+		log.Error().Err(err).Str("path", path).Msg("error opening file")
 		return -fuse.EIO, fhNone
 	}
 
@@ -50,12 +50,12 @@ func (cfs *FS) Getattr(path string, stat *fuse.Stat_t, fh uint64) (errc int) {
 
 	file, err := cfs.fh.GetFile(path, fh)
 	if err == os.ErrNotExist {
-		logrus.WithField("path", path).Debug("file does not exists")
+		log.Debug().Str("path", path).Msg("file does not exists")
 		return -fuse.ENOENT
 
 	}
 	if err != nil {
-		logrus.WithError(err).WithField("path", path).Error("error getting holder when reading file attributes")
+		log.Error().Err(err).Str("path", path).Msg("error getting holder when reading file attributes")
 		return -fuse.EIO
 	}
 
@@ -72,12 +72,12 @@ func (cfs *FS) Getattr(path string, stat *fuse.Stat_t, fh uint64) (errc int) {
 func (fs *FS) Read(path string, dest []byte, off int64, fh uint64) int {
 	file, err := fs.fh.GetFile(path, fh)
 	if err == os.ErrNotExist {
-		logrus.WithField("path", path).Error("file not found on READ operation")
+		log.Error().Str("path", path).Msg("file not found on READ operation")
 		return -fuse.ENOENT
 
 	}
 	if err != nil {
-		logrus.WithError(err).WithField("path", path).Error("error getting holder reading data from file")
+		log.Error().Err(err).Str("path", path).Msg("error getting holder reading data from file")
 		return -fuse.EIO
 	}
 
@@ -90,7 +90,7 @@ func (fs *FS) Read(path string, dest []byte, off int64, fh uint64) int {
 
 	n, err := file.ReadAt(buf, off)
 	if err != nil && err != io.EOF {
-		logrus.WithError(err).WithField("path", path).Error("error reading data")
+		log.Error().Err(err).Str("path", path).Msg("error reading data")
 		return -fuse.EIO
 	}
 
@@ -101,7 +101,7 @@ func (fs *FS) Read(path string, dest []byte, off int64, fh uint64) int {
 
 func (fs *FS) Release(path string, fh uint64) (errc int) {
 	if err := fs.fh.Remove(fh); err != nil {
-		logrus.WithError(err).WithField("path", path).Error("error getting holder when releasing file")
+		log.Error().Err(err).Str("path", path).Msg("error getting holder when releasing file")
 		return -fuse.EIO
 	}
 
@@ -122,13 +122,13 @@ func (fs *FS) Readdir(path string,
 	//TODO improve this function to make use of fh index if possible
 	paths, err := fs.fh.ListDir(path)
 	if err != nil {
-		logrus.WithField("path", path).Error("error reading directory")
+		log.Error().Str("path", path).Msg("error reading directory")
 		return -fuse.EIO
 	}
 
 	for _, p := range paths {
 		if !fill(p, nil, 0) {
-			logrus.WithField("path", p).Error("error adding directory")
+			log.Error().Str("path", path).Msg("error adding directory")
 			break
 		}
 	}

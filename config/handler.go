@@ -7,7 +7,7 @@ import (
 	"path"
 
 	"github.com/distribyted/distribyted"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
 
@@ -44,7 +44,7 @@ func (c *Handler) createFromTemplateFile() ([]byte, error) {
 func (c *Handler) GetRaw() ([]byte, error) {
 	f, err := ioutil.ReadFile(c.p)
 	if os.IsNotExist(err) {
-		logrus.WithField("file", c.p).Info("configuration file does not exist, creating from template file")
+		log.Info().Str("file", c.p).Msg("configuration file does not exist, creating from template file")
 		return c.createFromTemplateFile()
 	}
 

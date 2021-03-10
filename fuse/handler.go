@@ -8,7 +8,7 @@ import (
 	"github.com/billziss-gh/cgofuse/fuse"
 	"github.com/distribyted/distribyted/config"
 	"github.com/distribyted/distribyted/fs"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 type Handler struct {
@@ -47,7 +47,7 @@ func (s *Handler) MountAll(fss map[string]fs.Filesystem, ef config.EventFunc) er
 
 			ok := host.Mount(p, config)
 			if !ok {
-				log.WithField("path", p).Error("error trying to mount filesystem")
+				log.Error().Str("path", p).Msg("error trying to mount filesystem")
 			}
 		}()
 
@@ -59,11 +59,11 @@ func (s *Handler) MountAll(fss map[string]fs.Filesystem, ef config.EventFunc) er
 
 func (s *Handler) UnmountAll() {
 	for path, server := range s.hosts {
-		log.WithField("path", path).Info("unmounting")
+		log.Info().Str("path", path).Msg("unmounting")
 		ok := server.Unmount()
 		if !ok {
 			//TODO try to force unmount if possible
-			log.WithField("path", path).Error("unmount failed")
+			log.Error().Str("path", path).Msg("unmount failed")
 		}
 	}
 
