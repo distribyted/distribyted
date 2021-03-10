@@ -15,9 +15,16 @@ import (
 	"github.com/distribyted/distribyted/stats"
 	"github.com/distribyted/distribyted/torrent"
 	"github.com/distribyted/distribyted/webdav"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
+
+func init() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+}
 
 const (
 	configFlag     = "config"
@@ -66,7 +73,7 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		logrus.Fatal(err)
+		log.Fatal().Err(err).Msg("problem starting application")
 	}
 }
 
@@ -144,28 +151,28 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		if conf.WebDAV != nil {
 			wdth := torrent.NewHandler(c, ss)
 			if err := wdth.Load("::/webDAV", conf.WebDAV.Torrents); err != nil {
-				logrus.WithError(err).Error("error loading torrents for webDAV")
+				log.Error().Err(err).Msg("error loading torrents for webDAV")
 			}
 
 			if err := webdav.NewWebDAVServer(wdth.Fileststems(), webDAVPort); err != nil {
-				logrus.WithError(err).Error("error starting webDAV")
+				log.Error().Err(err).Msg("error starting webDAV")
 			}
 		}
 	}()
 
 	err = http.New(fc, ss, ch, port)
 
-	logrus.WithError(err).Error("error initializing HTTP server")
+	log.Error().Err(err).Msg("error initializing HTTP server")
 
 	return err
 }
 
 func tryClose(c *t.Client, mountService *fuse.Handler) {
-	logrus.Info("closing torrent client...")
+	log.Info().Msg("closing torrent client...")
 	c.Close()
-	logrus.Info("unmounting fuse filesystem...")
+	log.Info().Msg("unmounting fuse filesystem...")
 	mountService.UnmountAll()
 
-	logrus.Info("exiting")
+	log.Info().Msg("exiting")
 	os.Exit(1)
 }

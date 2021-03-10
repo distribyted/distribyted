@@ -8,7 +8,7 @@ import (
 	"github.com/distribyted/distribyted/config"
 	"github.com/distribyted/distribyted/fs"
 	"github.com/distribyted/distribyted/stats"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 type Handler struct {
@@ -49,14 +49,14 @@ func (s *Handler) Load(path string, ts []*config.Torrent) error {
 
 		// only get info if name is not available
 		if t.Name() == "" {
-			log.WithField("hash", t.InfoHash()).Info("getting torrent info")
+			log.Info().Str("hash", t.InfoHash().String()).Msg("getting torrent info")
 			<-t.GotInfo()
 		}
 
 		s.s.Add(path, t)
 		torrents = append(torrents, t)
 
-		log.WithField("name", t.Name()).WithField("path", path).Info("torrent added to mountpoint")
+		log.Info().Str("name", t.Name()).Str("path", path).Msg("torrent added to mountpoint")
 	}
 
 	folder := path

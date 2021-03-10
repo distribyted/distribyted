@@ -4,8 +4,8 @@ package main
 
 import (
 	"github.com/distribyted/distribyted"
+	"github.com/rs/zerolog/log"
 	"github.com/shurcooL/vfsgen"
-	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -15,6 +15,6 @@ func main() {
 		PackageName:  "distribyted",
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal().Err(err).Msg("problem generating static files")
 	}
 }

@@ -9,8 +9,8 @@ import (
 	"github.com/distribyted/distribyted/stats"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
-	"github.com/sirupsen/logrus"
 )
 
 func New(fc *filecache.Cache, ss *stats.Torrent, ch *config.Handler, port int) error {
@@ -44,7 +44,7 @@ func New(fc *filecache.Cache, ss *stats.Torrent, ch *config.Handler, port int) e
 		api.GET("/events", apiStreamEvents(eventChan))
 	}
 
-	logrus.WithField("host", fmt.Sprintf("0.0.0.0:%d", port)).Info("starting webserver")
+	log.Info().Str("host", fmt.Sprintf("0.0.0.0:%d", port)).Msg("starting webserver")
 
 	if err := r.Run(fmt.Sprintf(":%d", port)); err != nil {
 		return fmt.Errorf("error initializing server: %w", err)
