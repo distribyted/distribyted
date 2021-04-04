@@ -27,7 +27,7 @@ func NewHandler(c *torrent.Client, s *stats.Torrent) *Handler {
 	}
 }
 
-func (s *Handler) Load(path string, ts []*config.Torrent) error {
+func (s *Handler) Load(route string, ts []*config.Torrent) error {
 	var torrents []*torrent.Torrent
 	for _, mpcTorrent := range ts {
 		var t *torrent.Torrent
@@ -36,10 +36,8 @@ func (s *Handler) Load(path string, ts []*config.Torrent) error {
 		switch {
 		case mpcTorrent.MagnetURI != "":
 			t, err = s.c.AddMagnet(mpcTorrent.MagnetURI)
-			break
 		case mpcTorrent.TorrentPath != "":
 			t, err = s.c.AddTorrentFromFile(mpcTorrent.TorrentPath)
-			break
 		default:
 			err = fmt.Errorf("no magnet URI or torrent path provided")
 		}
@@ -53,13 +51,13 @@ func (s *Handler) Load(path string, ts []*config.Torrent) error {
 			<-t.GotInfo()
 		}
 
-		s.s.Add(path, t)
+		s.s.Add(route, t)
 		torrents = append(torrents, t)
 
-		log.Info().Str("name", t.Name()).Str("path", path).Msg("torrent added to mountpoint")
+		log.Info().Str("name", t.Name()).Str("route", route).Msg("torrent added to mountpoint")
 	}
 
-	folder := path
+	folder := "/" + route
 
 	s.fssMu.Lock()
 	defer s.fssMu.Unlock()

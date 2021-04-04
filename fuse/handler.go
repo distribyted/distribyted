@@ -13,59 +13,62 @@ import (
 
 type Handler struct {
 	fuseAllowOther bool
+	path           string
 
-	hosts map[string]*fuse.FileSystemHost
+	host *fuse.FileSystemHost
 }
 
-func NewHandler(fuseAllowOther bool) *Handler {
+func NewHandler(fuseAllowOther bool, path string) *Handler {
 	return &Handler{
 		fuseAllowOther: fuseAllowOther,
-		hosts:          make(map[string]*fuse.FileSystemHost),
+		path:           path,
 	}
 }
 
-func (s *Handler) MountAll(fss map[string]fs.Filesystem, ef config.EventFunc) error {
-	for p, fss := range fss {
-		folder := p
-		// On windows, the folder must don't exist
-		if runtime.GOOS == "windows" {
-			folder = path.Dir(folder)
-		}
-		if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
-			return err
-		}
-
-		host := fuse.NewFileSystemHost(NewFS(fss))
-
-		// TODO improve error handling here
-		go func() {
-			var config []string
-
-			if s.fuseAllowOther {
-				config = append(config, "-o", "allow_other")
-			}
-
-			ok := host.Mount(p, config)
-			if !ok {
-				log.Error().Str("path", p).Msg("error trying to mount filesystem")
-			}
-		}()
-
-		s.hosts[p] = host
+func (s *Handler) Mount(fss map[string]fs.Filesystem, ef config.EventFunc) error {
+	folder := s.path
+	// On windows, the folder must don't exist
+	if runtime.GOOS == "windows" {
+		folder = path.Dir(s.path)
 	}
+	if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
+		return err
+	}
+
+	cfs, err := fs.NewContainerFs(fss)
+	if err != nil {
+		return err
+	}
+
+	host := fuse.NewFileSystemHost(NewFS(cfs))
+
+	// TODO improve error handling here
+	go func() {
+		var config []string
+
+		if s.fuseAllowOther {
+			config = append(config, "-o", "allow_other")
+		}
+
+		ok := host.Mount(s.path, config)
+		if !ok {
+			log.Error().Str("path", s.path).Msg("error trying to mount filesystem")
+		}
+	}()
+
+	s.host = host
 
 	return nil
 }
 
-func (s *Handler) UnmountAll() {
-	for path, server := range s.hosts {
-		log.Info().Str("path", path).Msg("unmounting")
-		ok := server.Unmount()
-		if !ok {
-			//TODO try to force unmount if possible
-			log.Error().Str("path", path).Msg("unmount failed")
-		}
+func (s *Handler) Unmount() {
+	if s.host == nil {
+		return
 	}
 
-	s.hosts = make(map[string]*fuse.FileSystemHost)
+	ok := s.host.Unmount()
+	if !ok {
+		//TODO try to force unmount if possible
+		log.Error().Str("path", s.path).Msg("unmount failed")
+	}
 }

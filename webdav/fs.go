@@ -16,16 +16,11 @@ import (
 var _ webdav.FileSystem = &WebDAV{}
 
 type WebDAV struct {
-	fss []fs.Filesystem
+	fs fs.Filesystem
 }
 
-func newFS(mFss map[string]fs.Filesystem) *WebDAV {
-	var fss []fs.Filesystem
-	for _, fs := range mFss {
-		fss = append(fss, fs)
-	}
-
-	return &WebDAV{fss: fss}
+func newFS(fs fs.Filesystem) *WebDAV {
+	return &WebDAV{fs: fs}
 }
 
 func (wd *WebDAV) OpenFile(ctx context.Context, name string, flag int, perm os.FileMode) (webdav.File, error) {
@@ -73,34 +68,18 @@ func (wd *WebDAV) Rename(ctx context.Context, oldName, newName string) error {
 }
 
 func (wd *WebDAV) lookupFile(path string) (fs.File, error) {
-	for _, f := range wd.fss {
-		file, err := f.Open(path)
-		if err == os.ErrNotExist {
-			continue
-		}
-		if err != nil {
-			return nil, err
-		}
-
-		if file != nil {
-			return file, nil
-		}
-	}
-
-	return nil, os.ErrNotExist
+	return wd.fs.Open(path)
 }
 
 func (wd *WebDAV) listDir(path string) ([]os.FileInfo, error) {
-	var out []os.FileInfo
-	for _, ifs := range wd.fss {
-		files, err := ifs.ReadDir(path)
-		if err != nil {
-			return nil, err
-		}
+	files, err := wd.fs.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
 
-		for n, f := range files {
-			out = append(out, newFileInfo(n, f.Size(), f.IsDir()))
-		}
+	var out []os.FileInfo
+	for n, f := range files {
+		out = append(out, newFileInfo(n, f.Size(), f.IsDir()))
 	}
 
 	return out, nil

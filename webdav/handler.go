@@ -5,10 +5,10 @@ import (
 	"golang.org/x/net/webdav"
 )
 
-func newHandler(fss map[string]fs.Filesystem) *webdav.Handler {
+func newHandler(fs fs.Filesystem) *webdav.Handler {
 	return &webdav.Handler{
 		Prefix:     "/",
-		FileSystem: newFS(fss),
+		FileSystem: newFS(fs),
 		LockSystem: webdav.NewMemLS(),
 	}
 }
