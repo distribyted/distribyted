@@ -7,6 +7,8 @@ import (
 )
 
 func TestContainer(t *testing.T) {
+	t.Parallel()
+
 	require := require.New(t)
 
 	fss := map[string]Filesystem{

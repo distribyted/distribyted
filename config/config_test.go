@@ -10,6 +10,8 @@ import (
 )
 
 func TestTemplateConfig(t *testing.T) {
+	t.Parallel()
+
 	require := require.New(t)
 	f, err := os.Open("../templates/config_template.yaml")
 	require.NoError(err)
