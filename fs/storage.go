@@ -48,6 +48,22 @@ func (s *storage) Has(path string) bool {
 	return false
 }
 
+func (s *storage) AddFS(fs Filesystem, p string) error {
+	p = clean(p)
+	if s.Has(p) {
+		if dir, err := s.Get(p); err == nil {
+			if !dir.IsDir() {
+				return os.ErrExist
+			}
+		}
+
+		return nil
+	}
+
+	s.filesystems[p] = fs
+	return s.createParent(p, &Dir{})
+}
+
 func (s *storage) Add(f File, p string) error {
 	p = clean(p)
 	if s.Has(p) {
@@ -72,9 +88,7 @@ func (s *storage) Add(f File, p string) error {
 		s.files[p] = f
 	}
 
-	s.createParent(p, f)
-
-	return nil
+	return s.createParent(p, f)
 }
 
 func (s *storage) createParent(p string, f File) error {
