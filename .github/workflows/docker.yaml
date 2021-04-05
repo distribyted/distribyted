@@ -16,7 +16,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: crazy-max/ghaction-docker-meta@v2.1.1
+        uses: crazy-max/ghaction-docker-meta@v2.2.0
         with:
           images: distribyted/distribyted
           tags: |
