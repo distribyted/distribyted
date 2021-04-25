@@ -25,10 +25,12 @@ func (rw *readAtWrapper) ReadAt(p []byte, off int64) (int, error) {
 		return 0, err
 	}
 
-	return rw.Read(p)
+	return io.ReadAtLeast(rw, p, len(p))
 }
 
 func (rw *readAtWrapper) Close() error {
+	rw.mu.Lock()
+	defer rw.mu.Unlock()
 	c, ok := rw.ReadSeeker.(io.Closer)
 	if !ok {
 		return nil

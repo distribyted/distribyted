@@ -44,5 +44,21 @@ func TestTorrentFilesystem(t *testing.T) {
 	require.NoError(err)
 	require.NotNil(f)
 	require.Equal(f.Size(), int64(1964275))
+
+	b := make([]byte, 10)
+
+	n, err := f.Read(b)
+	require.NoError(err)
+	require.Equal(10, n)
+	require.Equal([]byte{0x49, 0x44, 0x33, 0x3, 0x0, 0x0, 0x0, 0x0, 0x1f, 0x76}, b)
+
+	n, err = f.ReadAt(b, 10)
+	require.NoError(err)
+	require.Equal(10, n)
+
+	n, err = f.ReadAt(b, 10000)
+	require.NoError(err)
+	require.Equal(10, n)
+
 	require.NoError(f.Close())
 }
