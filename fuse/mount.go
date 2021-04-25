@@ -95,11 +95,10 @@ func (fs *FS) Read(path string, dest []byte, off int64, fh uint64) int {
 	}
 
 	dest = buf[:n]
-
 	return n
 }
 
-func (fs *FS) Release(path string, fh uint64) (errc int) {
+func (fs *FS) Release(path string, fh uint64) int {
 	if err := fs.fh.Remove(fh); err != nil {
 		log.Error().Err(err).Str("path", path).Msg("error getting holder when releasing file")
 		return -fuse.EIO
