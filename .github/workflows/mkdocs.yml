@@ -61,7 +61,8 @@ jobs:
           echo "${CUSTOM_DOMAIN}" > "${GITHUB_WORKSPACE}/mkdocs/docs/CNAME"
           echo -e "User-agent: *\nDisallow: /v*.*/\nSitemap: https://${CUSTOM_DOMAIN}/sitemap.xml" > "${GITHUB_WORKSPACE}/mkdocs/docs/robots.txt"
           git fetch origin gh-pages --verbose
-          mike deploy latest -t "Cloud (Latest)" --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
+          mike delete dev
+          mike deploy dev -t "master" --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
         env:
           CUSTOM_DOMAIN: distribyted.com
 
