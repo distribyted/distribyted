@@ -29,16 +29,17 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-      - name: Go to mkdocs folder
-        run: cd mkdocs
       - name: Install dependencies
+        working-directory: ./mkdocs
         run: |
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install -r requirements.txt
       - name: Build docs
+        working-directory: ./mkdocs
         run: |
           mkdocs build
       - name: Validate generated HTML files
+        working-directory: ./mkdocs
         run: |
           docker run -v $(pwd):/test --rm wjdp/htmltest --conf .htmltest.yml
       # On push to master or release branch, deploy docs
@@ -59,7 +60,7 @@ jobs:
           echo "${CUSTOM_DOMAIN}" > "${GITHUB_WORKSPACE}/mkdocs/docs/CNAME"
           echo -e "User-agent: *\nDisallow: /v*.*/\nSitemap: https://${CUSTOM_DOMAIN}/sitemap.xml" > "${GITHUB_WORKSPACE}/docs/robots.txt"
           git fetch origin gh-pages --verbose
-          mike deploy . -t "Cloud (Latest)" --config-file "${GITHUB_WORKSPACE}/mkdocs.yml" --push --rebase
+          mike deploy . -t "Cloud (Latest)" --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
         env:
           CUSTOM_DOMAIN: docs.codacy.com
 
