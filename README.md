@@ -61,7 +61,7 @@ Distribyted can show some kind of files directly as folders, making it possible 
 
 Check [here][main-url] or [here][doc-folder-url] for further documentation.
 
-[doc-folder-url]: https://github.com/distribyted/distribyted/mkdocs/docs
+[doc-folder-url]: https://github.com/distribyted/distribyted/blob/master/mkdocs/docs/index.md
 [main-url]: https://distribyted.com
 [releases-shield]: https://img.shields.io/github/v/release/distribyted/distribyted.svg?style=flat-square
 [releases-url]: https://github.com/distribyted/distribyted/releases
