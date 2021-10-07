@@ -56,16 +56,17 @@ jobs:
 
       - name: Deploy docs (Latest)
         if: github.ref == 'refs/heads/master'
+        working-directory: ./mkdocs
         run: |
           echo "${CUSTOM_DOMAIN}" > "${GITHUB_WORKSPACE}/mkdocs/docs/CNAME"
           echo -e "User-agent: *\nDisallow: /v*.*/\nSitemap: https://${CUSTOM_DOMAIN}/sitemap.xml" > "${GITHUB_WORKSPACE}/mkdocs/docs/robots.txt"
           git fetch origin gh-pages --verbose
-          mike deploy . -t "Cloud (Latest)" --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
+          mike deploy latest -t "Cloud (Latest)" --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
         env:
-          CUSTOM_DOMAIN: docs.codacy.com
+          CUSTOM_DOMAIN: distribyted.com
 
       - name: Deploy docs (Self-hosted)
         if: startsWith(github.ref, 'refs/heads/release/v')        
         run: |
           git fetch origin gh-pages --verbose
-          mike deploy ${GITHUB_REF##*/release/} -t "Self-hosted ${GITHUB_REF##*/release/}" --config-file "${GITHUB_WORKSPACE}/mkdocs.yml" --push --rebase
+          mike deploy ${GITHUB_REF##*/release/} -t "Self-hosted ${GITHUB_REF##*/release/}" --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
