@@ -39,12 +39,12 @@ go-generate:
 
 go-cross-compile:
 	@echo "  >  Compiling for several platforms..."
-	GO111MODULE=off go get -u src.techknowlogick.com/xgo
+	go install src.techknowlogick.com/xgo@latest
 	docker build ./build_tools/ -t distribyted/xgo-cgofuse
 	mkdir -p $(ORGPATH)
 	ln -sfrnT . $(REPOPATH)
 
-	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=linux/arm-7 $(REPOPATH)/cmd/distribyted/
+	GOPATH=$(GOPATH) xgo -out bin/distribyted-$(VERSION) -image=distribyted/xgo-cgofuse -ldflags='$(LDFLAGS)' -tags="release" -targets=linux/arm-7 $(REPOPATH)
 
 .PHONY: help
 all: help

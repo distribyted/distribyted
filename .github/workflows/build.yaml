@@ -21,15 +21,15 @@ jobs:
         include:
           - job_name: linux
             os: ubuntu-latest
-            go: '1.15.x'
+            go: '1.17.x'
 
           - job_name: mac
             os: macOS-latest
-            go: '1.15.x'
+            go: '1.17.x'
 
           - job_name: windows_amd64
             os: windows-latest
-            go: '1.15.x'
+            go: '1.17.x'
             cgo: '0'
             
     name: ${{ matrix.job_name }}
