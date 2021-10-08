@@ -69,4 +69,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')        
         run: |
           git fetch origin gh-pages --verbose
-          mike deploy ${GITHUB_REF##*/release/} latest -t "Self-hosted ${GITHUB_REF##*/release/}" --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
+          mike deploy ${GITHUB_REF##*/} --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
+
