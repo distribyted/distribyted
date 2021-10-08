@@ -1,18 +1,28 @@
-site_name: Distribyted Documentation
+site_name: Distribyted
 site_url: https://distribyted.com/
 repo_url: https://github.com/distribyted/distribyted
 repo_name: distribyted/distribyted
+
+nav:
+    - Home: index.md
+    - Getting Started: getting-started.md
+    - Tutorials: tutorials.md
+    - API Reference: api-reference.md
+
 theme:
+  logo: images/distribyted_icon.png
   icon:
     repo: fontawesome/brands/github
   name: material
   palette:
-    primary: blue
+    primary: white
   features:
+    - navigation.tabs
     - navigation.instant
     - navigation.tracking
     - navigation.expand
     - navigation.indexes
+    - navigation.top
     - toc.integrate
 
 edit_uri: edit/master/mkdocs/docs/
@@ -24,3 +34,7 @@ extra:
   version:
     default: latest
     provider: mike
+
+markdown_extensions:
+  - toc:
+      permalink: true
