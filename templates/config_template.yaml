@@ -7,6 +7,8 @@ http:
 # WebDAV specific configuration. Remove this to disable WebDAV.
 webdav:
   port: 36911
+  user: admin
+  pass: admin
 
 # Specific configuration for torrent backend.
 torrent:

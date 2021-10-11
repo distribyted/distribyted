@@ -17,7 +17,9 @@ type TorrentGlobal struct {
 }
 
 type WebDAVGlobal struct {
-	Port int `yaml:"port"`
+	Port int    `yaml:"port"`
+	User string `yaml:"user"`
+	Pass string `yaml:"pass"`
 }
 
 type HTTPGlobal struct {
