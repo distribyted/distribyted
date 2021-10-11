@@ -161,7 +161,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 				return
 			}
 
-			if err := webdav.NewWebDAVServer(cfs, port); err != nil {
+			if err := webdav.NewWebDAVServer(cfs, port, conf.WebDAV.User, conf.WebDAV.Pass); err != nil {
 				log.Error().Err(err).Msg("error starting webDAV")
 			}
 		}

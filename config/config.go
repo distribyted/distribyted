@@ -20,6 +20,8 @@ func DefaultConfig() *Root {
 		},
 		WebDAV: &WebDAVGlobal{
 			Port: 36911,
+			User: "admin",
+			Pass: "admin",
 		},
 		Torrent: &TorrentGlobal{
 			GlobalCacheSize: 1024,
