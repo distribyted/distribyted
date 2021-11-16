@@ -1,6 +1,8 @@
 package fs
 
 import (
+	"sync"
+
 	"github.com/anacrolix/torrent"
 	"github.com/distribyted/distribyted/iio"
 )
@@ -8,18 +10,45 @@ import (
 var _ Filesystem = &Torrent{}
 
 type Torrent struct {
-	ts []*torrent.Torrent
-	s  *storage
+	mu     sync.Mutex
+	ts     map[string]*torrent.Torrent
+	s      *storage
+	loaded bool
 }
 
-func NewTorrent(ts []*torrent.Torrent) *Torrent {
+func NewTorrent() *Torrent {
 	return &Torrent{
-		ts: ts,
 		s:  newStorage(SupportedFactories),
+		ts: make(map[string]*torrent.Torrent),
 	}
 }
 
+func (fs *Torrent) AddTorrent(t *torrent.Torrent) {
+	fs.mu.Lock()
+	defer fs.mu.Unlock()
+	fs.loaded = false
+	fs.ts[t.InfoHash().HexString()] = t
+}
+
+func (fs *Torrent) RemoveTorrent(h string) {
+	fs.mu.Lock()
+	defer fs.mu.Unlock()
+
+	fs.s.Clear()
+
+	fs.loaded = false
+
+	delete(fs.ts, h)
+}
+
 func (fs *Torrent) load() {
+	if fs.loaded {
+		return
+	}
+
+	fs.mu.Lock()
+	defer fs.mu.Unlock()
+
 	for _, t := range fs.ts {
 		<-t.GotInfo()
 		for _, file := range t.Files() {
@@ -27,6 +56,7 @@ func (fs *Torrent) load() {
 		}
 	}
 
+	fs.loaded = true
 }
 
 func (fs *Torrent) Open(filename string) (File, error) {

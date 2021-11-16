@@ -1,19 +1,15 @@
 package http
 
 import (
-	"errors"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"sort"
 
 	"github.com/anacrolix/missinggo/v2/filecache"
-	"github.com/distribyted/distribyted/config"
-	"github.com/distribyted/distribyted/stats"
+	"github.com/distribyted/distribyted/torrent"
 	"github.com/gin-gonic/gin"
 )
 
-var apiStatusHandler = func(fc *filecache.Cache, ss *stats.Torrent) gin.HandlerFunc {
+var apiStatusHandler = func(fc *filecache.Cache, ss *torrent.Stats) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// TODO move to a struct
 		ctx.JSON(http.StatusOK, gin.H{
@@ -25,81 +21,43 @@ var apiStatusHandler = func(fc *filecache.Cache, ss *stats.Torrent) gin.HandlerF
 	}
 }
 
-var apiRoutesHandler = func(ss *stats.Torrent) gin.HandlerFunc {
+var apiRoutesHandler = func(ss *torrent.Stats) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		s := ss.RoutesStats()
-		sort.Sort(stats.ByName(s))
+		sort.Sort(torrent.ByName(s))
 		ctx.JSON(http.StatusOK, s)
 	}
 }
 
-var apiGetConfigFile = func(ch *config.Handler) gin.HandlerFunc {
+var apiAddTorrentHandler = func(s *torrent.Service) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		rc, err := ch.GetRaw()
-		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
+		route := ctx.Param("route")
+
+		var json RouteAdd
+		if err := ctx.ShouldBindJSON(&json); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		ctx.Data(http.StatusOK, "text/x-yaml", rc)
+		if err := s.AddMagnet(route, json.Magnet); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		ctx.JSON(http.StatusOK, nil)
 	}
 }
 
-var apiSetConfigFile = func(ch *config.Handler) gin.HandlerFunc {
+var apiDelTorrentHandler = func(s *torrent.Service) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if ctx.Request.Body == nil {
-			ctx.AbortWithError(http.StatusInternalServerError, errors.New("no config file sent"))
+		route := ctx.Param("route")
+		hash := ctx.Param("torrent_hash")
+
+		if err := s.RemoveFromHash(route, hash); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		c, err := ioutil.ReadAll(ctx.Request.Body)
-		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		if len(c) == 0 {
-			ctx.AbortWithError(http.StatusInternalServerError, errors.New("no config file sent"))
-			return
-		}
-
-		if err := ch.Set(c); err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "config file saved",
-		})
-	}
-}
-
-var apiStreamEvents = func(events chan string) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		ctx.Stream(func(w io.Writer) bool {
-			if msg, ok := <-events; ok {
-				ctx.SSEvent("event", msg)
-				return true
-			}
-			return false
-		})
-	}
-}
-
-var apiReloadServer = func(ch *config.Handler, events chan string) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		events <- "starting reload configuration process..."
-
-		err := ch.Reload(
-			func(m string) {
-				events <- m
-			})
-		if err != nil {
-			ctx.AbortWithError(http.StatusInternalServerError, err)
-		}
-
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "reload process finished with no errors",
-		})
+		ctx.JSON(http.StatusOK, nil)
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"runtime"
 
 	"github.com/billziss-gh/cgofuse/fuse"
-	"github.com/distribyted/distribyted/config"
 	"github.com/distribyted/distribyted/fs"
 	"github.com/rs/zerolog/log"
 )
@@ -25,7 +24,7 @@ func NewHandler(fuseAllowOther bool, path string) *Handler {
 	}
 }
 
-func (s *Handler) Mount(fss map[string]fs.Filesystem, ef config.EventFunc) error {
+func (s *Handler) Mount(fss map[string]fs.Filesystem) error {
 	folder := s.path
 	// On windows, the folder must don't exist
 	if runtime.GOOS == "windows" {

@@ -21,8 +21,36 @@
             </header>
 
             <div class="content-wrapper">
-                <div class="content" id="template_target">
+                <div class="content">
+                    <div id="template_target"></div>
+
+                    <div class="card card-default">
+                        <div class="card-header card-header-border-bottom">
+                            <h2>Add New Magnet to a Route</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="new-magnet">
+                                <div class="form-group">
+                                    <label>Magnet Link</label>
+                                    <input type="text" id="magnet-url" class="form-control"
+                                        placeholder="Enter Valid Magnet Link">
+                                </div>
+                                <div class="form-group">
+                                    <label>Route</label>
+                                    <select class="form-control" id="route-string">
+                                        {{range .}}
+                                        <option value="{{.Name}}">{{.Name}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
+                                <div class="form-footer pt-4 pt-5 mt-4 border-top">
+                                    <button type="submit" class="btn btn-primary btn-default">Add</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
+
                 <footer class="footer mt-auto">
                     <div class="copyright bg-white">
                     </div>
