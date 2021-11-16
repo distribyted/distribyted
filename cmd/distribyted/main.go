@@ -149,7 +149,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 
 	go func() {
 		if err := mh.Mount(fss); err != nil {
-			log.Info().Msg(fmt.Sprintf("error mounting filesystems: %w", err))
+			log.Info().Err(err).Msg("error mounting filesystems")
 		}
 	}()
 
