@@ -57,6 +57,8 @@ func (s *Handler) Mount(fss map[string]fs.Filesystem) error {
 
 	s.host = host
 
+	log.Info().Str("path", folder).Msg("starting FUSE mount")
+
 	return nil
 }
 

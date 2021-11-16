@@ -123,6 +123,7 @@ func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	// Add to filesystems
 	folder := path.Join("/", r)
 	s.mu.Lock()
+	defer s.mu.Unlock()
 	_, ok := s.fss[folder]
 	if !ok {
 		s.fss[folder] = fs.NewTorrent()
@@ -134,9 +135,6 @@ func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	}
 
 	tfs.AddTorrent(t)
-
-	s.mu.Unlock()
-
 	s.log.Info().Str("name", t.Info().Name).Str("route", r).Msg("torrent added")
 
 	return nil
