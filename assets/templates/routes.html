@@ -10,11 +10,12 @@
                 <table class="table card-table table-responsive table-responsive-large" style="width:100%">
                     <thead>
                         <tr>
-                            <th style="width: 35%">Name</th>
+                            <th style="width: 30%">Name</th>
                             <th style="width: 15%"><i class="mdi mdi-arrow-down"></i> / <i class="mdi mdi-arrow-up"></i>
                             </th>
                             <th style="width: 15%">Peers/Seeders</th>
                             <th style="width: 35%" class="d-none d-lg-table-cell">Status</th>
+                            <th style="width: 5%" >Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,6 +28,7 @@
                             <td class="d-none d-lg-table-cell">
                                 {{{torrent_status pieceChunks totalPieces}}}
                             </td>
+                            <td><i class="mdi mdi-delete-forever" title="delete torrent" onclick='Distribyted.routes.deleteTorrent("{{../name}}","{{hash}}")'></i></td>
                         </tr>
                         {{/torrentStats}}
                     </tbody>

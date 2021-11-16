@@ -6,14 +6,14 @@ import (
 	"github.com/anacrolix/missinggo/v2/filecache"
 	"github.com/distribyted/distribyted"
 	"github.com/distribyted/distribyted/config"
-	"github.com/distribyted/distribyted/stats"
+	"github.com/distribyted/distribyted/torrent"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
 )
 
-func New(fc *filecache.Cache, ss *stats.Torrent, ch *config.Handler, port int) error {
+func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.Handler, port int) error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
@@ -30,18 +30,14 @@ func New(fc *filecache.Cache, ss *stats.Torrent, ch *config.Handler, port int) e
 
 	r.GET("/", indexHandler)
 	r.GET("/routes", routesHandler(ss))
-	r.GET("/config", configHandler)
-
-	eventChan := make(chan string)
 
 	api := r.Group("/api")
 	{
 		api.GET("/status", apiStatusHandler(fc, ss))
 		api.GET("/routes", apiRoutesHandler(ss))
-		api.GET("/config", apiGetConfigFile(ch))
-		api.POST("/config", apiSetConfigFile(ch))
-		api.POST("/reload", apiReloadServer(ch, eventChan))
-		api.GET("/events", apiStreamEvents(eventChan))
+		api.POST("/routes/:route/torrent", apiAddTorrentHandler(s))
+		api.DELETE("/routes/:route/torrent/:torrent_hash", apiDelTorrentHandler(s))
+
 	}
 
 	log.Info().Str("host", fmt.Sprintf("0.0.0.0:%d", port)).Msg("starting webserver")

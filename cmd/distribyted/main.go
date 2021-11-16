@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path"
 	"syscall"
+	"time"
 
 	"github.com/anacrolix/missinggo/v2/filecache"
-	t "github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/storage"
 	"github.com/distribyted/distribyted/config"
 	"github.com/distribyted/distribyted/fs"
 	"github.com/distribyted/distribyted/fuse"
 	"github.com/distribyted/distribyted/http"
-	"github.com/distribyted/distribyted/stats"
 	"github.com/distribyted/distribyted/torrent"
+	"github.com/distribyted/distribyted/torrent/loader"
 	"github.com/distribyted/distribyted/webdav"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -78,14 +79,6 @@ func main() {
 	}
 }
 
-func newCache(folder string) (*filecache.Cache, error) {
-	if err := os.MkdirAll(folder, 0744); err != nil {
-		return nil, fmt.Errorf("error creating metadata folder: %w", err)
-	}
-
-	return filecache.NewCache(folder)
-}
-
 func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	ch := config.NewHandler(configPath)
 
@@ -94,21 +87,36 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error loading configuration: %w", err)
 	}
 
-	fc, err := newCache(conf.Torrent.MetadataFolder)
+	if err := os.MkdirAll(conf.Torrent.MetadataFolder, 0744); err != nil {
+		return fmt.Errorf("error creating metadata folder: %w", err)
+	}
+
+	fc, err := filecache.NewCache(path.Join(conf.Torrent.MetadataFolder, "cache"))
 	if err != nil {
 		return fmt.Errorf("error creating cache: %w", err)
 	}
 
 	st := storage.NewResourcePieces(fc.AsResourceProvider())
 
-	c, err := torrent.NewClient(st, conf.Torrent)
+	fis, err := torrent.NewFileItemStore(path.Join(conf.Torrent.MetadataFolder, "items"), 2*time.Hour)
+	if err != nil {
+		return fmt.Errorf("error starting item store: %w", err)
+	}
+
+	c, err := torrent.NewClient(st, fis, conf.Torrent)
 	if err != nil {
 		return fmt.Errorf("error starting torrent client: %w", err)
 	}
 
-	ss := stats.NewTorrent()
+	cl := loader.NewConfig(conf.Routes)
+	ss := torrent.NewStats()
 
-	th := torrent.NewHandler(c, ss)
+	dbl, err := loader.NewDB(path.Join(conf.Torrent.MetadataFolder, "magnetdb"))
+	if err != nil {
+		return fmt.Errorf("error starting magnet database: %w", err)
+	}
+
+	ts := torrent.NewService(cl, dbl, ss, c)
 
 	mh := fuse.NewHandler(fuseAllowOther || conf.Fuse.AllowOther, conf.Fuse.Path)
 
@@ -116,36 +124,33 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
+
 		<-sigChan
-		tryClose(c, mh)
+		log.Info().Msg("closing items database...")
+		fis.Close()
+		log.Info().Msg("closing magnet database...")
+		dbl.Close()
+		log.Info().Msg("closing torrent client...")
+		c.Close()
+		log.Info().Msg("unmounting fuse filesystem...")
+		mh.Unmount()
+
+		log.Info().Msg("exiting")
+		os.Exit(1)
 	}()
 
-	ch.OnReload(func(c *config.Root, ef config.EventFunc) error {
-		ef("unmounting filesystems")
-		mh.Unmount()
-		th.RemoveAll()
+	log.Info().Msg(fmt.Sprintf("setting cache size to %d MB", conf.Torrent.GlobalCacheSize))
+	fc.SetCapacity(conf.Torrent.GlobalCacheSize * 1024 * 1024)
 
-		ef(fmt.Sprintf("setting cache size to %d MB", c.Torrent.GlobalCacheSize))
-		fc.SetCapacity(c.Torrent.GlobalCacheSize * 1024 * 1024)
-
-		for _, mp := range c.Routes {
-			ef(fmt.Sprintf("loading %v with %d torrents...", mp.Name, len(mp.Torrents)))
-			if err := th.Load(mp.Name, mp.Torrents); err != nil {
-				return fmt.Errorf("error loading route %v: %w", mp.Name, err)
-			}
-			ef(fmt.Sprintf("%v loaded", mp.Name))
-		}
-
-		return mh.Mount(th.Fileststems(), ef)
-
-	})
-
-	if err := ch.Reload(nil); err != nil {
-		return fmt.Errorf("error reloading configuration: %w", err)
+	fss, err := ts.Load()
+	if err != nil {
+		return fmt.Errorf("error when loading torrents: %w", err)
 	}
 
-	defer func() {
-		tryClose(c, mh)
+	go func() {
+		if err := mh.Mount(fss); err != nil {
+			log.Info().Err(err).Msg("error mounting filesystems")
+		}
 	}()
 
 	go func() {
@@ -155,7 +160,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 				port = conf.WebDAV.Port
 			}
 
-			cfs, err := fs.NewContainerFs(th.Fileststems())
+			cfs, err := fs.NewContainerFs(fss)
 			if err != nil {
 				log.Error().Err(err).Msg("error adding files to webDAV")
 				return
@@ -169,19 +174,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		log.Warn().Msg("webDAV configuration not found!")
 	}()
 
-	err = http.New(fc, ss, ch, port)
-
+	err = http.New(fc, ss, ts, ch, port)
 	log.Error().Err(err).Msg("error initializing HTTP server")
-
 	return err
-}
-
-func tryClose(c *t.Client, mountService *fuse.Handler) {
-	log.Info().Msg("closing torrent client...")
-	c.Close()
-	log.Info().Msg("unmounting fuse filesystem...")
-	mountService.Unmount()
-
-	log.Info().Msg("exiting")
-	os.Exit(1)
 }

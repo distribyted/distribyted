@@ -15,8 +15,7 @@ type EventFunc func(event string)
 type ReloadFunc func(*Root, EventFunc) error
 
 type Handler struct {
-	p          string
-	reloadFunc ReloadFunc
+	p string
 }
 
 func NewHandler(path string) *Handler {
@@ -69,27 +68,6 @@ func (c *Handler) Get() (*Root, error) {
 	conf = AddDefaults(conf)
 
 	return conf, nil
-}
-
-func (c *Handler) OnReload(reloadFunc ReloadFunc) {
-	c.reloadFunc = reloadFunc
-}
-
-func (c *Handler) Reload(ef EventFunc) error {
-	if ef == nil {
-		ef = func(string) {}
-	}
-
-	conf, err := c.Get()
-	if err != nil {
-		return err
-	}
-
-	if c.reloadFunc != nil {
-		return c.reloadFunc(conf, ef)
-	}
-
-	return nil
 }
 
 func (c *Handler) Set(b []byte) error {

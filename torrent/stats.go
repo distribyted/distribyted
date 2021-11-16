@@ -1,7 +1,9 @@
-package stats
+package torrent
 
 import (
 	"errors"
+	"sort"
+	"sync"
 	"time"
 
 	"github.com/anacrolix/torrent"
@@ -37,6 +39,12 @@ type TorrentStats struct {
 	PieceSize       int64         `json:"pieceSize"`
 }
 
+type byName []*TorrentStats
+
+func (a byName) Len() int           { return len(a) }
+func (a byName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
 type GlobalTorrentStats struct {
 	DownloadedBytes int64   `json:"downloadedBytes"`
 	UploadedBytes   int64   `json:"uploadedBytes"`
@@ -54,7 +62,7 @@ func (a ByName) Len() int           { return len(a) }
 func (a ByName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
-type stats struct {
+type stat struct {
 	totalDownloadBytes int64
 	downloadBytes      int64
 	totalUploadBytes   int64
@@ -64,39 +72,58 @@ type stats struct {
 	time               time.Time
 }
 
-type Torrent struct {
+type Stats struct {
+	mut             sync.Mutex
 	torrents        map[string]*torrent.Torrent
-	torrentsByRoute map[string][]*torrent.Torrent
-	previousStats   map[string]*stats
+	torrentsByRoute map[string]map[string]*torrent.Torrent
+	previousStats   map[string]*stat
 
 	gTime time.Time
 }
 
-func NewTorrent() *Torrent {
-	return &Torrent{
+func NewStats() *Stats {
+	return &Stats{
 		gTime:           time.Now(),
 		torrents:        make(map[string]*torrent.Torrent),
-		torrentsByRoute: make(map[string][]*torrent.Torrent),
-		previousStats:   make(map[string]*stats),
+		torrentsByRoute: make(map[string]map[string]*torrent.Torrent),
+		previousStats:   make(map[string]*stat),
 	}
 }
 
-func (s *Torrent) Add(route string, t *torrent.Torrent) {
-	s.torrents[t.InfoHash().String()] = t
-	s.previousStats[t.InfoHash().String()] = &stats{}
+func (s *Stats) Add(route string, t *torrent.Torrent) {
+	s.mut.Lock()
+	defer s.mut.Unlock()
 
-	tbr := s.torrentsByRoute[route]
-	s.torrentsByRoute[route] = append(tbr, t)
+	h := t.InfoHash().String()
+
+	s.torrents[h] = t
+	s.previousStats[h] = &stat{}
+
+	_, ok := s.torrentsByRoute[route]
+	if !ok {
+		s.torrentsByRoute[route] = make(map[string]*torrent.Torrent)
+	}
+
+	s.torrentsByRoute[route][h] = t
 }
 
-func (s *Torrent) RemoveAll() {
-	// TODO lock
-	s.torrents = make(map[string]*torrent.Torrent)
-	s.previousStats = make(map[string]*stats)
-	s.torrentsByRoute = make(map[string][]*torrent.Torrent)
+func (s *Stats) Del(route, hash string) {
+	s.mut.Lock()
+	defer s.mut.Unlock()
+	delete(s.torrents, hash)
+	delete(s.previousStats, hash)
+	ts, ok := s.torrentsByRoute[route]
+	if !ok {
+		return
+	}
+
+	delete(ts, hash)
 }
 
-func (s *Torrent) Stats(hash string) (*TorrentStats, error) {
+func (s *Stats) Stats(hash string) (*TorrentStats, error) {
+	s.mut.Lock()
+	defer s.mut.Unlock()
+
 	t, ok := s.torrents[hash]
 	if !(ok) {
 		return nil, ErrTorrentNotFound
@@ -107,7 +134,10 @@ func (s *Torrent) Stats(hash string) (*TorrentStats, error) {
 	return s.stats(now, t, true), nil
 }
 
-func (s *Torrent) RoutesStats() []*RouteStats {
+func (s *Stats) RoutesStats() []*RouteStats {
+	s.mut.Lock()
+	defer s.mut.Unlock()
+
 	now := time.Now()
 
 	var out []*RouteStats
@@ -117,6 +147,9 @@ func (s *Torrent) RoutesStats() []*RouteStats {
 			ts := s.stats(now, t, true)
 			tStats = append(tStats, ts)
 		}
+
+		sort.Sort(byName(tStats))
+
 		rs := &RouteStats{
 			Name:         r,
 			TorrentStats: tStats,
@@ -127,7 +160,10 @@ func (s *Torrent) RoutesStats() []*RouteStats {
 	return out
 }
 
-func (s *Torrent) GlobalStats() *GlobalTorrentStats {
+func (s *Stats) GlobalStats() *GlobalTorrentStats {
+	s.mut.Lock()
+	defer s.mut.Unlock()
+
 	now := time.Now()
 
 	var totalDownload int64
@@ -148,9 +184,12 @@ func (s *Torrent) GlobalStats() *GlobalTorrentStats {
 	}
 }
 
-func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *TorrentStats {
+func (s *Stats) stats(now time.Time, t *torrent.Torrent, chunks bool) *TorrentStats {
 	ts := &TorrentStats{}
-	prev := s.previousStats[t.InfoHash().String()]
+	prev, ok := s.previousStats[t.InfoHash().String()]
+	if !ok {
+		return &TorrentStats{}
+	}
 	if s.returnPreviousMeasurements(now) {
 		ts.DownloadedBytes = prev.downloadBytes
 		ts.UploadedBytes = prev.uploadBytes
@@ -158,7 +197,7 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 		st := t.Stats()
 		rd := st.BytesReadData.Int64()
 		wd := st.BytesWrittenData.Int64()
-		ist := &stats{
+		ist := &stat{
 			downloadBytes:      rd - prev.totalDownloadBytes,
 			uploadBytes:        wd - prev.totalUploadBytes,
 			totalDownloadBytes: rd,
@@ -217,6 +256,6 @@ func (s *Torrent) stats(now time.Time, t *torrent.Torrent, chunks bool) *Torrent
 
 const gap time.Duration = 2 * time.Second
 
-func (s *Torrent) returnPreviousMeasurements(now time.Time) bool {
+func (s *Stats) returnPreviousMeasurements(now time.Time) bool {
 	return now.Sub(s.gTime) < gap
 }

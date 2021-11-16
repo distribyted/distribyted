@@ -26,11 +26,17 @@ type storage struct {
 
 func newStorage(factories map[string]FsFactory) *storage {
 	return &storage{
-		files:       make(map[string]File, 0),
-		children:    make(map[string]map[string]File, 0),
-		filesystems: make(map[string]Filesystem, 0),
+		files:       make(map[string]File),
+		children:    make(map[string]map[string]File),
+		filesystems: make(map[string]Filesystem),
 		factories:   factories,
 	}
+}
+
+func (s *storage) Clear() {
+	s.files = make(map[string]File)
+	s.children = make(map[string]map[string]File)
+	s.filesystems = make(map[string]Filesystem)
 }
 
 func (s *storage) Has(path string) bool {
@@ -100,7 +106,7 @@ func (s *storage) createParent(p string, f File) error {
 	}
 
 	if _, ok := s.children[base]; !ok {
-		s.children[base] = make(map[string]File, 0)
+		s.children[base] = make(map[string]File)
 	}
 
 	if filename != "" {
@@ -118,7 +124,7 @@ func (s *storage) Children(path string) map[string]File {
 		return out
 	}
 
-	l := make(map[string]File, 0)
+	l := make(map[string]File)
 	for n, f := range s.children[path] {
 		l[n] = f
 	}
