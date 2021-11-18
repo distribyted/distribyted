@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/distribyted/distribyted"
 	"github.com/rs/zerolog/log"
@@ -34,7 +34,7 @@ func (c *Handler) createFromTemplateFile() ([]byte, error) {
 		return nil, err
 	}
 
-	if err := os.MkdirAll(path.Dir(c.p), 0744); err != nil {
+	if err := os.MkdirAll(filepath.Dir(c.p), 0744); err != nil {
 		return nil, fmt.Errorf("error creating path for configuration file: %s, %w", c.p, err)
 	}
 	return tb, ioutil.WriteFile(c.p, tb, 0644)

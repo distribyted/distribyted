@@ -2,7 +2,7 @@ package fuse
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"runtime"
 
 	"github.com/billziss-gh/cgofuse/fuse"
@@ -28,7 +28,7 @@ func (s *Handler) Mount(fss map[string]fs.Filesystem) error {
 	folder := s.path
 	// On windows, the folder must don't exist
 	if runtime.GOOS == "windows" {
-		folder = path.Dir(s.path)
+		folder = filepath.Dir(s.path)
 	}
 	if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
 		return err

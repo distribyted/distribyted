@@ -2,7 +2,7 @@ package distribyted
 
 import (
 	"net/http"
-	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -29,5 +29,5 @@ func (fs *binaryFileSystem) Exists(prefix string, filepath string) bool {
 }
 
 func (fs *binaryFileSystem) Open(name string) (http.File, error) {
-	return fs.fs.Open(path.Join(fs.base, name))
+	return fs.fs.Open(filepath.Join(fs.base, name))
 }

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/signal"
-	"path"
+	"path/filepath"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -12,20 +14,19 @@ import (
 	"github.com/anacrolix/torrent/storage"
 	"github.com/distribyted/distribyted/config"
 	"github.com/distribyted/distribyted/fs"
+	"github.com/rs/zerolog/log"
+	"github.com/urfave/cli/v2"
+
 	"github.com/distribyted/distribyted/fuse"
 	"github.com/distribyted/distribyted/http"
+	dlog "github.com/distribyted/distribyted/log"
 	"github.com/distribyted/distribyted/torrent"
 	"github.com/distribyted/distribyted/torrent/loader"
 	"github.com/distribyted/distribyted/webdav"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-	"github.com/urfave/cli/v2"
 )
 
 func init() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	dlog.Load()
 }
 
 const (
@@ -68,6 +69,14 @@ func main() {
 
 		Action: func(c *cli.Context) error {
 			err := load(c.String(configFlag), c.Int(portFlag), c.Int(webDAVPortFlag), c.Bool(fuseAllowOther))
+
+			// stop program execution on errors to avoid flashing consoles
+			if err != nil && runtime.GOOS == "windows" {
+				log.Error().Err(err).Msg("problem starting application")
+				fmt.Print("Press 'Enter' to continue...")
+				bufio.NewReader(os.Stdin).ReadBytes('\n')
+			}
+
 			return err
 		},
 
@@ -91,14 +100,20 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error creating metadata folder: %w", err)
 	}
 
-	fc, err := filecache.NewCache(path.Join(conf.Torrent.MetadataFolder, "cache"))
+	cf := filepath.Join(conf.Torrent.MetadataFolder, "cache")
+	fc, err := filecache.NewCache(cf)
 	if err != nil {
 		return fmt.Errorf("error creating cache: %w", err)
 	}
 
 	st := storage.NewResourcePieces(fc.AsResourceProvider())
 
-	fis, err := torrent.NewFileItemStore(path.Join(conf.Torrent.MetadataFolder, "items"), 2*time.Hour)
+	// cache is not working with windows
+	if runtime.GOOS == "windows" {
+		st = storage.NewFile(cf)
+	}
+
+	fis, err := torrent.NewFileItemStore(filepath.Join(conf.Torrent.MetadataFolder, "items"), 2*time.Hour)
 	if err != nil {
 		return fmt.Errorf("error starting item store: %w", err)
 	}
@@ -111,7 +126,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	cl := loader.NewConfig(conf.Routes)
 	ss := torrent.NewStats()
 
-	dbl, err := loader.NewDB(path.Join(conf.Torrent.MetadataFolder, "magnetdb"))
+	dbl, err := loader.NewDB(filepath.Join(conf.Torrent.MetadataFolder, "magnetdb"))
 	if err != nil {
 		return fmt.Errorf("error starting magnet database: %w", err)
 	}
