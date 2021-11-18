@@ -23,7 +23,7 @@ require (
 	github.com/pion/mdns v0.0.5 // indirect
 	github.com/pion/rtp v1.7.4 // indirect
 	github.com/pion/sctp v1.8.0 // indirect
-	github.com/rs/zerolog v1.25.0
+	github.com/rs/zerolog v1.26.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
 	github.com/stretchr/testify v1.7.0
@@ -72,7 +72,8 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/klauspost/compress v1.12.3 // indirect
-	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/mattn/go-colorable v0.1.11 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect

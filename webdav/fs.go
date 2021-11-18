@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -41,7 +41,7 @@ func (wd *WebDAV) OpenFile(ctx context.Context, name string, flag int, perm os.F
 		dirContent = dir
 	}
 
-	wdf := newFile(path.Base(p), f, dirContent)
+	wdf := newFile(filepath.Base(p), f, dirContent)
 	return wdf, nil
 }
 
@@ -158,13 +158,10 @@ func (wdf *webDAVFile) Seek(offset int64, whence int) (int64, error) {
 	switch whence {
 	case io.SeekStart:
 		wdf.pos = offset
-		break
 	case io.SeekCurrent:
 		wdf.pos = wdf.pos + offset
-		break
 	case io.SeekEnd:
 		wdf.pos = wdf.fi.Size() + offset
-		break
 	}
 
 	return wdf.pos, nil

@@ -50,11 +50,9 @@ Check [here][main-url] or [here][doc-folder-url] for further documentation.
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Any contribution is welcome, but some areas need more care than others:
+- Windows and macOS tests and compatibility. I don't have any easy way to test distribyted on these operating systems.
+- Web interface. Web development is not my _forte_. 
 
 ## License
 
