@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -75,6 +77,12 @@ func main() {
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal().Err(err).Msg("problem starting application")
+
+		// stop program execution on errors to avoid flashing consoles
+		if runtime.GOOS == "windows" {
+			fmt.Print("Press 'Enter' to continue...")
+			bufio.NewReader(os.Stdin).ReadBytes('\n')
+		}
 	}
 }
 
