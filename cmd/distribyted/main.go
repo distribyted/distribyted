@@ -69,6 +69,14 @@ func main() {
 
 		Action: func(c *cli.Context) error {
 			err := load(c.String(configFlag), c.Int(portFlag), c.Int(webDAVPortFlag), c.Bool(fuseAllowOther))
+
+			// stop program execution on errors to avoid flashing consoles
+			if err != nil && runtime.GOOS == "windows" {
+				log.Error().Err(err).Msg("problem starting application")
+				fmt.Print("Press 'Enter' to continue...")
+				bufio.NewReader(os.Stdin).ReadBytes('\n')
+			}
+
 			return err
 		},
 
@@ -77,12 +85,6 @@ func main() {
 
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal().Err(err).Msg("problem starting application")
-
-		// stop program execution on errors to avoid flashing consoles
-		if runtime.GOOS == "windows" {
-			fmt.Print("Press 'Enter' to continue...")
-			bufio.NewReader(os.Stdin).ReadBytes('\n')
-		}
 	}
 }
 
