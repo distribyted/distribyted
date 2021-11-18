@@ -1,0 +1,45 @@
+{{#.}}
+
+<div class="card card-default">
+    <div class="card-header justify-content-between align-items-center card-header-border-bottom">
+        <h2>{{name}}</h2>
+    </div>
+    <div class="bg-white border rounded">
+        <div class="row no-gutters">
+            <div class="col-lg-4 col-xl-3">
+                <div class="profile-content-left pt-5 pb-3 px-3 px-xl-5">
+                    <div class="contact-info pt-4">
+                        <h5 class="text-dark mb-1">Server Info:</h5>
+                        <p class="text-dark font-weight-medium pt-4 mb-2">State</p>
+                        <p>{{state}}</p>
+                        <p class="text-dark font-weight-medium pt-4 mb-2">Updated At</p>
+                        <p>{{to_date updatedAt}}</p>
+                        <p class="text-dark font-weight-medium pt-4 mb-2">Seeds: {{seeds}}</p>
+                        <p class="text-dark font-weight-medium pt-4 mb-2">Peers: {{peers}}</p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-xl-9">
+                <div class="profile-content-right py-5">
+                    <div class="tab-content px-3 px-xl-5">
+                        <div class="mt-5">
+                            <div class="form-group mb-4">
+                                <label for="magnetUri">Magnet URI</label>
+                                <input type="text" class="form-control" id="magnetUri" value="{{magnetUri}}">
+                                <span class="d-block mt-1">Magnet URI pointing to the actual folder content. If content
+                                    changes, this URI will change too.</span>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="folder">Folder</label>
+                                <input type="folder" class="form-control" id="folder" value="{{folder}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{/.}}

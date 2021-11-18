@@ -72,3 +72,36 @@ routes:
   #      - magnet_uri: "magnet:?xt=urn:btih:9dea07ba660a722ae1008c4c8afdd303b6f6e53b&tr=http%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969"
   #      - magnet_uri: "magnet:?xt=urn:btih:d8b3a315172c8d804528762f37fa67db14577cdb&tr=http%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969"
   #      - magnet_uri: "magnet:?xt=urn:btih:1e0a00b9c606cf87c03e676f75929463c7756fb5&tr=http%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969"
+
+# List of folders where the content will be transformed to a magnet link. You can share any content sending that magnet link to others.
+servers:
+  - name: server
+    path: ./distribyted-data/served-folders/server
+
+    # Get trackers from web text file. The file will be loaded every time a magnet uri is generated,
+    # so all trackers will be up to date.
+    # tracker_url: "https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best.txt"
+
+    # Trackers to be used to announce the served content. If tracker_url is set and it fails, 
+    # this list will be used instead.
+    trackers: 
+      - "http://p4p.arenabg.com:1337/announce"
+      - "udp://tracker.opentrackr.org:1337/announce"
+      - "udp://9.rarbg.com:2810/announce"
+      - "udp://open.tracker.cl:1337/announce"
+      - "udp://open.stealth.si:80/announce"
+      - "udp://exodus.desync.com:6969/announce"
+      - "http://openbittorrent.com:80/announce"
+      - "udp://www.torrent.eu.org:451/announce"
+      - "udp://vibe.sleepyinternetfun.xyz:1738/announce"
+      - "udp://udp-tracker.shittyurl.org:6969/announce"
+      - "udp://tracker1.bt.moack.co.kr:80/announce"
+      - "udp://tracker0.ufibox.com:6969/announce"
+      - "udp://tracker.zerobytes.xyz:1337/announce"
+      - "udp://tracker.torrent.eu.org:451/announce"
+      - "udp://tracker.tiny-vps.com:6969/announce"
+      - "udp://tracker.theoks.net:6969/announce"
+      - "udp://tracker.pomf.se:80/announce"
+      - "udp://tracker.moeking.me:6969/announce"
+      - "udp://tracker.leech.ie:1337/announce"
+      - "udp://tracker.altrosky.nl:6969/announce"

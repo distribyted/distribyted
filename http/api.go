@@ -25,6 +25,16 @@ var apiStatusHandler = func(fc *filecache.Cache, ss *torrent.Stats) gin.HandlerF
 	}
 }
 
+var apiServersHandler = func(ss []*torrent.Server) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		var infos []*torrent.ServerInfo
+		for _, s := range ss {
+			infos = append(infos, s.Info())
+		}
+		ctx.JSON(http.StatusOK, infos)
+	}
+}
+
 var apiRoutesHandler = func(ss *torrent.Stats) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		s := ss.RoutesStats()

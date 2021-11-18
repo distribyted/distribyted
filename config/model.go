@@ -8,7 +8,8 @@ type Root struct {
 	Fuse       *FuseGlobal    `yaml:"fuse"`
 	Log        *Log           `yaml:"log"`
 
-	Routes []*Route `yaml:"routes"`
+	Routes  []*Route  `yaml:"routes"`
+	Servers []*Server `yaml:"servers"`
 }
 
 type Log struct {
@@ -44,6 +45,13 @@ type FuseGlobal struct {
 type Route struct {
 	Name     string     `yaml:"name"`
 	Torrents []*Torrent `yaml:"torrents"`
+}
+
+type Server struct {
+	Name       string   `yaml:"name"`
+	Path       string   `yaml:"path"`
+	Trackers   []string `yaml:"trackers"`
+	TrackerURL string   `yaml:"tracker_url"`
 }
 
 type Torrent struct {
