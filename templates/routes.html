@@ -27,6 +27,7 @@
                     <div class="card card-default">
                         <div class="card-header card-header-border-bottom">
                             <h2>Add New Magnet to a Route</h2>
+
                         </div>
                         <div class="card-body">
                             <form id="new-magnet">
@@ -43,9 +44,16 @@
                                         {{end}}
                                     </select>
                                 </div>
-                                <div class="form-footer pt-4 pt-5 mt-4 border-top">
+                                <div class="form-group">
                                     <button type="submit" class="btn btn-primary btn-default">Add</button>
                                 </div>
+                                <div class="form-footer pt-4 pt-5 mt-4 border-top">
+                                    <div class="sk-double-bounce" id="submit_magnet_loading" style="display: none;">
+                                        <div class="double-bounce1"></div>
+                                        <div class="double-bounce2"></div>
+                                    </div>
+                                </div>
+                             
                             </form>
                         </div>
                     </div>

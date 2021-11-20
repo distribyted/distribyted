@@ -1,7 +1,11 @@
 package http
 
 import (
+	"bytes"
+	"io"
+	"math"
 	"net/http"
+	"os"
 	"sort"
 
 	"github.com/anacrolix/missinggo/v2/filecache"
@@ -59,5 +63,50 @@ var apiDelTorrentHandler = func(s *torrent.Service) gin.HandlerFunc {
 		}
 
 		ctx.JSON(http.StatusOK, nil)
+	}
+}
+
+var apiLogHandler = func(path string) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		f, err := os.Open(path)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		fi, err := f.Stat()
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		max := math.Max(float64(-fi.Size()), -1024*8*8)
+		_, err = f.Seek(int64(max), os.SEEK_END)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		var b bytes.Buffer
+		ctx.Stream(func(w io.Writer) bool {
+			_, err := b.ReadFrom(f)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return false
+			}
+
+			_, err = b.WriteTo(w)
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return false
+			}
+
+			return true
+		})
+
+		if err := f.Close(); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 	}
 }

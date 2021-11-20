@@ -25,10 +25,6 @@ import (
 	"github.com/distribyted/distribyted/webdav"
 )
 
-func init() {
-	dlog.Load()
-}
-
 const (
 	configFlag     = "config"
 	fuseAllowOther = "fuse-allow-other"
@@ -96,6 +92,8 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error loading configuration: %w", err)
 	}
 
+	dlog.Load(conf.Log)
+
 	if err := os.MkdirAll(conf.Torrent.MetadataFolder, 0744); err != nil {
 		return fmt.Errorf("error creating metadata folder: %w", err)
 	}
@@ -131,7 +129,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error starting magnet database: %w", err)
 	}
 
-	ts := torrent.NewService(cl, dbl, ss, c)
+	ts := torrent.NewService(cl, dbl, ss, c, conf.Torrent.AddTimeout)
 
 	mh := fuse.NewHandler(fuseAllowOther || conf.Fuse.AllowOther, conf.Fuse.Path)
 
@@ -189,7 +187,9 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		log.Warn().Msg("webDAV configuration not found!")
 	}()
 
-	err = http.New(fc, ss, ts, ch, port)
+	logFilename := filepath.Join(conf.Log.Path, dlog.FileName)
+
+	err = http.New(fc, ss, ts, ch, port, logFilename)
 	log.Error().Err(err).Msg("error initializing HTTP server")
 	return err
 }

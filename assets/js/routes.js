@@ -129,6 +129,7 @@ Distribyted.routes = {
             .then(function (response) {
                 if (response.ok) {
                     Distribyted.message.info('Torrent deleted.')
+                    Distribyted.routes.loadView();
                 } else {
                     response.json().then(json => {
                         Distribyted.message.error('Error deletting torrent. Response: ' + json.error)
@@ -159,7 +160,8 @@ $("#new-magnet").submit(function (event) {
     let url = '/api/routes/' + route + '/torrent'
     let body = JSON.stringify({ magnet: magnet })
 
-    console.log("LOG", url, body)
+    document.getElementById("submit_magnet_loading").style = "display:block"
+
     fetch(url, {
         method: 'POST',
         body: body
@@ -167,6 +169,7 @@ $("#new-magnet").submit(function (event) {
         .then(function (response) {
             if (response.ok) {
                 Distribyted.message.info('New magnet added.')
+                Distribyted.routes.loadView();
             } else {
                 response.json().then(json => {
                     Distribyted.message.error('Error adding new magnet. Response: ' + json.error)
@@ -176,6 +179,8 @@ $("#new-magnet").submit(function (event) {
             }
         })
         .catch(function (error) {
-            Distribyted.message.error('Error deletting torrent: ' + error.message)
+            Distribyted.message.error('Error adding torrent: ' + error.message)
+        }).then(function () {
+            document.getElementById("submit_magnet_loading").style = "display:none"
         });
 });
