@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path"
 	"sync"
+	"time"
 
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
@@ -25,11 +26,16 @@ type Service struct {
 	cfgLoader loader.Loader
 	db        loader.LoaderAdder
 
-	log zerolog.Logger
+	log     zerolog.Logger
+	timeout int
 }
 
-func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client) *Service {
+func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, timeout int) *Service {
 	l := log.Logger.With().Str("component", "torrent-service").Logger()
+
+	if timeout == 0 {
+		timeout = 60
+	}
 	return &Service{
 		log:       l,
 		s:         stats,
@@ -37,6 +43,7 @@ func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torre
 		fss:       make(map[string]fs.Filesystem),
 		cfgLoader: cfg,
 		db:        db,
+		timeout:   timeout,
 	}
 }
 
@@ -114,7 +121,14 @@ func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	// only get info if name is not available
 	if t.Info() == nil {
 		s.log.Info().Str("hash", t.InfoHash().String()).Msg("getting torrent info")
-		<-t.GotInfo()
+		select {
+		case <-time.After(time.Duration(s.timeout) * time.Second):
+			s.log.Error().Str("hash", t.InfoHash().String()).Msg("timeout getting torrent info")
+			return errors.New("timeout getting torrent info")
+		case <-t.GotInfo():
+			s.log.Info().Str("hash", t.InfoHash().String()).Msg("obtained torrent info")
+		}
+
 	}
 
 	// Add to stats

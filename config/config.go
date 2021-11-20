@@ -11,6 +11,7 @@ const (
 const (
 	metadataFolder = "./distribyted-data/metadata"
 	mountFolder    = "./distribyted-data/mount"
+	logsFolder     = "./distribyted-data/logs"
 )
 
 func DefaultConfig() *Root {
@@ -24,12 +25,18 @@ func DefaultConfig() *Root {
 			Pass: "admin",
 		},
 		Torrent: &TorrentGlobal{
-			GlobalCacheSize: 1024,
+			GlobalCacheSize: 2048,
 			MetadataFolder:  metadataFolder,
+			AddTimeout:      60,
 		},
 		Fuse: &FuseGlobal{
 			AllowOther: false,
 			Path:       mountFolder,
+		},
+		Log: &Log{
+			Path:       logsFolder,
+			MaxBackups: 2,
+			MaxSize:    50,
 		},
 		Routes: []*Route{
 			{

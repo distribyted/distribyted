@@ -6,11 +6,21 @@ type Root struct {
 	WebDAV     *WebDAVGlobal  `yaml:"webdav"`
 	Torrent    *TorrentGlobal `yaml:"torrent"`
 	Fuse       *FuseGlobal    `yaml:"fuse"`
+	Log        *Log           `yaml:"log"`
 
 	Routes []*Route `yaml:"routes"`
 }
 
+type Log struct {
+	Debug      bool   `yaml:"debug"`
+	MaxBackups int    `yaml:"max_backups"`
+	MaxSize    int    `yaml:"max_size"`
+	MaxAge     int    `yaml:"max_age"`
+	Path       string `yaml:"path"`
+}
+
 type TorrentGlobal struct {
+	AddTimeout      int    `yaml:"add_timeout,omitempty"`
 	GlobalCacheSize int64  `yaml:"global_cache_size,omitempty"`
 	MetadataFolder  string `yaml:"metadata_folder,omitempty"`
 	DisableIPv6     bool   `yaml:"disable_ipv6,omitempty"`

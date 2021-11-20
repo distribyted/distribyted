@@ -37,6 +37,16 @@
             <span class="nav-text">Routes</span>
           </a>
         </li>
+        {{if eq . "logs"}}
+        <li class="active">
+          {{else}}
+        <li>
+          {{end}}
+          <a class="sidenav-item-link" href="/logs">
+            <i class="mdi mdi-information-outline"></i>
+            <span class="nav-text">Logs</span>
+          </a>
+        </li>
         <!-- {{if eq . "watched-folders"}}
         <li class="active">
           {{else}}

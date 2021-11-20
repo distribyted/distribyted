@@ -1,4 +1,5 @@
-# This is a configuration file example. You can edit it and add and remove torrents and magnet URIs. Read the following comments for more info.
+# This is a configuration file example. You can edit it and add and remove torrents
+# and magnet URIs. Read the following comments for more info.
 
 # HTTP specific configuration.
 http:
@@ -12,20 +13,47 @@ webdav:
 
 # Specific configuration for torrent backend.
 torrent:
-  # Size in MB for the cache. This is the maximum space used by distribyted to store torrent data. Less used torrent data will be discarded if this value is reached.
+  # Size in MB for the cache. This is the maximum space used by distribyted to store
+  # torrent data. Less used torrent data will be discarded if this value is reached.
   # global_cache_size: -1 #No limit
-  global_cache_size: 1024
+  global_cache_size: 2048
+
   # Folder where distribyted metadata will be stored.
   metadata_folder: ./distribyted-data/metadata
-  # Disable IPv6
+
+  # Disable IPv6.
   #disable_ipv6: true
 
+  # Timeout in seconds when adding a magnet or a torrent.
+  add_timeout: 60
 fuse:
   # Folder where fuse will mount torrent filesystem
   # For windows users: You can set here also a disk letter like X: or Z:
   path: ./distribyted-data/mount
-  # Add this flag if you want to allow other users to access this fuse mountpoint. You need to add user_allow_other flag to /etc/fuse.conf file.
+  # Add this flag if you want to allow other users to access this fuse mountpoint.
+  # You need to add user_allow_other flag to /etc/fuse.conf file.
   # allow_other: true 
+
+log:
+  path: ./distribyted-data/logs
+
+  # MaxBackups is the maximum number of old log files to retain.  The default
+	# is to retain all old log files (though MaxAge may still cause them to get
+	# deleted.)
+  max_backups: 2
+
+  # MaxAge is the maximum number of days to retain old log files based on the
+	# timestamp encoded in their filename.  Note that a day is defined as 24
+	# hours and may not exactly correspond to calendar days due to daylight
+	# savings, leap seconds, etc. The default is not to remove old log files
+	# based on age.
+  # max_age: 30
+
+  # MaxSize is the maximum size in megabytes of the log file before it gets
+	# rotated. It defaults to 100 megabytes.
+  max_size: 50
+
+  # debug: true
 
 # List of folders where torrents will be mounted as a filesystem.
 routes:

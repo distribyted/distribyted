@@ -13,7 +13,7 @@ import (
 	"github.com/shurcooL/httpfs/html/vfstemplate"
 )
 
-func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.Handler, port int) error {
+func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.Handler, port int, logPath string) error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
@@ -30,9 +30,11 @@ func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.
 
 	r.GET("/", indexHandler)
 	r.GET("/routes", routesHandler(ss))
+	r.GET("/logs", logsHandler)
 
 	api := r.Group("/api")
 	{
+		api.GET("/log", apiLogHandler(logPath))
 		api.GET("/status", apiStatusHandler(fc, ss))
 		api.GET("/routes", apiRoutesHandler(ss))
 		api.POST("/routes/:route/torrent", apiAddTorrentHandler(s))

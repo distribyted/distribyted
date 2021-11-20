@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/distribyted/distribyted"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
 
@@ -43,7 +42,7 @@ func (c *Handler) createFromTemplateFile() ([]byte, error) {
 func (c *Handler) GetRaw() ([]byte, error) {
 	f, err := ioutil.ReadFile(c.p)
 	if os.IsNotExist(err) {
-		log.Info().Str("file", c.p).Msg("configuration file does not exist, creating from template file")
+		fmt.Println("configuration file does not exist, creating from template file:", c.p)
 		return c.createFromTemplateFile()
 	}
 
@@ -68,12 +67,4 @@ func (c *Handler) Get() (*Root, error) {
 	conf = AddDefaults(conf)
 
 	return conf, nil
-}
-
-func (c *Handler) Set(b []byte) error {
-	if err := yaml.Unmarshal(b, &Root{}); err != nil {
-		return fmt.Errorf("error parsing configuration file: %w", err)
-	}
-
-	return ioutil.WriteFile(c.p, b, 0644)
 }
