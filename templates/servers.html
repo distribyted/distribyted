@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<head>
+    {{template "header.html" "Served Folders"}}
+</head>
+
+
+<body class="header-fixed sidebar-fixed sidebar-dark header-light" id="body">
+    <div class="wrapper">
+        {{template "navbar.html" "served-folders"}}
+
+        <div class="page-wrapper">
+            <!-- Header -->
+            <header class="main-header " id="header">
+                <nav class="navbar navbar-static-top navbar-expand-lg">
+                    <!-- Sidebar toggle button -->
+                    <button id="sidebar-toggler" class="sidebar-toggle">
+                        <span class="sr-only">Toggle navigation</span>
+                    </button>
+                </nav>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="content" id="template_target">
+                   
+                </div>
+                <footer class="footer mt-auto">
+                    <div class="copyright bg-white">
+                    </div>
+                </footer>
+            </div>
+
+            {{template "footer.html"}}
+
+            <script src="assets/js/servers.js"></script>
+            <script>
+                Distribyted.servers.loadView();
+                setInterval(function () {
+                    Distribyted.servers.loadView();
+                }, 5000)
+
+            </script>
+            <script>
+            </script>
+</body>
+
+</html>

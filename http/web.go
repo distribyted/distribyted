@@ -20,3 +20,9 @@ var routesHandler = func(ss *torrent.Stats) gin.HandlerFunc {
 var logsHandler = func(c *gin.Context) {
 	c.HTML(http.StatusOK, "logs.html", nil)
 }
+
+var serversFoldersHandler = func() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.HTML(http.StatusOK, "servers.html", nil)
+	}
+}

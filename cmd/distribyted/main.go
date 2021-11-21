@@ -121,6 +121,25 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error starting torrent client: %w", err)
 	}
 
+	pcp := filepath.Join(conf.Torrent.MetadataFolder, "piece-completion")
+	if err := os.MkdirAll(pcp, 0744); err != nil {
+		return fmt.Errorf("error creating piece completion folder: %w", err)
+	}
+
+	pc, err := storage.NewBoltPieceCompletion(pcp)
+	if err != nil {
+		return fmt.Errorf("error creating servers piece completion: %w", err)
+	}
+
+	var servers []*torrent.Server
+	for _, s := range conf.Servers {
+		server := torrent.NewServer(c, pc, s)
+		servers = append(servers, server)
+		if err := server.Start(); err != nil {
+			return fmt.Errorf("error starting server: %w", err)
+		}
+	}
+
 	cl := loader.NewConfig(conf.Routes)
 	ss := torrent.NewStats()
 
@@ -139,6 +158,12 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	go func() {
 
 		<-sigChan
+		log.Info().Msg("closing servers...")
+		for _, s := range servers {
+			if err := s.Close(); err != nil {
+				log.Warn().Err(err).Msg("problem closing server")
+			}
+		}
 		log.Info().Msg("closing items database...")
 		fis.Close()
 		log.Info().Msg("closing magnet database...")
@@ -189,7 +214,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 
 	logFilename := filepath.Join(conf.Log.Path, dlog.FileName)
 
-	err = http.New(fc, ss, ts, ch, port, logFilename)
+	err = http.New(fc, ss, ts, ch, servers, port, logFilename)
 	log.Error().Err(err).Msg("error initializing HTTP server")
 	return err
 }

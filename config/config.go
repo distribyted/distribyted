@@ -12,6 +12,7 @@ const (
 	metadataFolder = "./distribyted-data/metadata"
 	mountFolder    = "./distribyted-data/mount"
 	logsFolder     = "./distribyted-data/logs"
+	serverFolder   = "./distribyted-data/served-folders/server"
 )
 
 func DefaultConfig() *Root {
@@ -57,6 +58,35 @@ func DefaultConfig() *Root {
 					{
 						MagnetURI: m5,
 					},
+				},
+			},
+		},
+
+		Servers: []*Server{
+			{
+				Name: "server",
+				Path: serverFolder,
+				Trackers: []string{
+					"http://p4p.arenabg.com:1337/announce",
+					"udp://tracker.opentrackr.org:1337/announce",
+					"udp://9.rarbg.com:2810/announce",
+					"udp://open.tracker.cl:1337/announce",
+					"udp://open.stealth.si:80/announce",
+					"udp://exodus.desync.com:6969/announce",
+					"http://openbittorrent.com:80/announce",
+					"udp://www.torrent.eu.org:451/announce",
+					"udp://vibe.sleepyinternetfun.xyz:1738/announce",
+					"udp://udp-tracker.shittyurl.org:6969/announce",
+					"udp://tracker1.bt.moack.co.kr:80/announce",
+					"udp://tracker0.ufibox.com:6969/announce",
+					"udp://tracker.zerobytes.xyz:1337/announce",
+					"udp://tracker.torrent.eu.org:451/announce",
+					"udp://tracker.tiny-vps.com:6969/announce",
+					"udp://tracker.theoks.net:6969/announce",
+					"udp://tracker.pomf.se:80/announce",
+					"udp://tracker.moeking.me:6969/announce",
+					"udp://tracker.leech.ie:1337/announce",
+					"udp://tracker.altrosky.nl:6969/announce",
 				},
 			},
 		},
