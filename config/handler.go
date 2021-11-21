@@ -22,7 +22,7 @@ func NewHandler(path string) *Handler {
 }
 
 func (c *Handler) createFromTemplateFile() ([]byte, error) {
-	t, err := distribyted.HttpFS.Open("/templates/config_template.yaml")
+	t, err := distribyted.Templates.Open("templates/config_template.yaml")
 	if err != nil {
 		return nil, err
 	}
