@@ -126,7 +126,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error creating piece completion folder: %w", err)
 	}
 
-	pc, err := storage.NewSqlitePieceCompletion(pcp)
+	pc, err := storage.NewBoltPieceCompletion(pcp)
 	if err != nil {
 		return fmt.Errorf("error creating servers piece completion: %w", err)
 	}
