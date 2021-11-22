@@ -7,3 +7,8 @@ type Reader interface {
 	io.Closer
 	io.Reader
 }
+
+type ReaderSeeker interface {
+	Reader
+	io.Seeker
+}

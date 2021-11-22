@@ -212,9 +212,15 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		log.Warn().Msg("webDAV configuration not found!")
 	}()
 
+	cfs, err := fs.NewContainerFs(fss)
+	if err != nil {
+		return fmt.Errorf("error when loading torrents: %w", err)
+	}
+
+	httpfs := torrent.NewHTTPFS(cfs)
 	logFilename := filepath.Join(conf.Log.Path, dlog.FileName)
 
-	err = http.New(fc, ss, ts, ch, servers, port, logFilename)
+	err = http.New(fc, ss, ts, ch, servers, httpfs, logFilename, conf.HTTPGlobal)
 	log.Error().Err(err).Msg("error initializing HTTP server")
 	return err
 }

@@ -34,7 +34,9 @@ type WebDAVGlobal struct {
 }
 
 type HTTPGlobal struct {
-	Port int `yaml:"port"`
+	Port   int    `yaml:"port"`
+	IP     string `yaml:"ip"`
+	HTTPFS bool   `yaml:"httpfs"`
 }
 
 type FuseGlobal struct {
@@ -63,8 +65,13 @@ func AddDefaults(r *Root) *Root {
 	if r.Torrent == nil {
 		r.Torrent = &TorrentGlobal{}
 	}
+
+	if r.Torrent.AddTimeout == 0 {
+		r.Torrent.AddTimeout = 60
+	}
+
 	if r.Torrent.GlobalCacheSize == 0 {
-		r.Torrent.GlobalCacheSize = 1024 // 1GB
+		r.Torrent.GlobalCacheSize = 2048 // 2GB
 	}
 
 	if r.Torrent.MetadataFolder == "" {
@@ -76,6 +83,14 @@ func AddDefaults(r *Root) *Root {
 	}
 	if r.Fuse.Path == "" {
 		r.Fuse.Path = mountFolder
+	}
+
+	if r.HTTPGlobal == nil {
+		r.HTTPGlobal = &HTTPGlobal{}
+	}
+
+	if r.HTTPGlobal.IP == "" {
+		r.HTTPGlobal.IP = "0.0.0.0"
 	}
 
 	return r

@@ -32,10 +32,6 @@ type Service struct {
 
 func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, timeout int) *Service {
 	l := log.Logger.With().Str("component", "torrent-service").Logger()
-
-	if timeout == 0 {
-		timeout = 60
-	}
 	return &Service{
 		log:       l,
 		s:         stats,
