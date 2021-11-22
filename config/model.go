@@ -93,5 +93,9 @@ func AddDefaults(r *Root) *Root {
 		r.HTTPGlobal.IP = "0.0.0.0"
 	}
 
+	if r.Log == nil {
+		r.Log = &Log{}
+	}
+
 	return r
 }

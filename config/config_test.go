@@ -25,3 +25,17 @@ func TestTemplateConfig(t *testing.T) {
 
 	require.Equal(DefaultConfig(), conf)
 }
+
+func TestDefaults(t *testing.T) {
+	t.Parallel()
+
+	require := require.New(t)
+
+	r := &Root{}
+	dr := AddDefaults(r)
+	require.NotNil(dr)
+	require.NotNil(dr.Fuse)
+	require.NotNil(dr.HTTPGlobal)
+	require.NotNil(dr.Log)
+	require.NotNil(dr.Torrent)
+}
