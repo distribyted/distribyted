@@ -4,6 +4,11 @@
 # HTTP specific configuration.
 http:
   port: 4444
+  
+  ip: "0.0.0.0"
+
+  # Serve all routes content over http on IP:PORT/fs
+  httpfs: true
 
 # WebDAV specific configuration. Remove this to disable WebDAV.
 webdav:

@@ -13,7 +13,7 @@ import (
 	"github.com/shurcooL/httpfs/html/vfstemplate"
 )
 
-func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.Handler, tss []*torrent.Server, port int, logPath string) error {
+func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.Handler, tss []*torrent.Server, fs http.FileSystem, logPath string, cfg *config.HTTPGlobal) error {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 	r.Use(gin.Recovery())
@@ -22,6 +22,14 @@ func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.
 	r.GET("/assets/*filepath", func(c *gin.Context) {
 		c.FileFromFS(c.Request.URL.Path, http.FS(distribyted.Assets))
 	})
+
+	if cfg.HTTPFS {
+		log.Info().Str("host", fmt.Sprintf("%s:%d/fs", cfg.IP, cfg.Port)).Msg("starting HTTPFS")
+		r.GET("/fs/*filepath", func(c *gin.Context) {
+			path := c.Param("filepath")
+			c.FileFromFS(path, fs)
+		})
+	}
 
 	t, err := vfstemplate.ParseGlob(http.FS(distribyted.Templates), nil, "/templates/*")
 	if err != nil {
@@ -47,9 +55,9 @@ func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.
 
 	}
 
-	log.Info().Str("host", fmt.Sprintf("0.0.0.0:%d", port)).Msg("starting webserver")
+	log.Info().Str("host", fmt.Sprintf("%s:%d", cfg.IP, cfg.Port)).Msg("starting webserver")
 
-	if err := r.Run(fmt.Sprintf(":%d", port)); err != nil {
+	if err := r.Run(fmt.Sprintf("%s:%d", cfg.IP, cfg.Port)); err != nil {
 		return fmt.Errorf("error initializing server: %w", err)
 	}
 

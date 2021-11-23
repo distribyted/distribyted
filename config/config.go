@@ -18,7 +18,9 @@ const (
 func DefaultConfig() *Root {
 	return &Root{
 		HTTPGlobal: &HTTPGlobal{
-			Port: 4444,
+			Port:   4444,
+			IP:     "0.0.0.0",
+			HTTPFS: true,
 		},
 		WebDAV: &WebDAVGlobal{
 			Port: 36911,

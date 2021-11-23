@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/goccy/go-yaml"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v3"
 )
 
 func TestTemplateConfig(t *testing.T) {
@@ -24,4 +24,18 @@ func TestTemplateConfig(t *testing.T) {
 	require.NoError(err)
 
 	require.Equal(DefaultConfig(), conf)
+}
+
+func TestDefaults(t *testing.T) {
+	t.Parallel()
+
+	require := require.New(t)
+
+	r := &Root{}
+	dr := AddDefaults(r)
+	require.NotNil(dr)
+	require.NotNil(dr.Fuse)
+	require.NotNil(dr.HTTPGlobal)
+	require.NotNil(dr.Log)
+	require.NotNil(dr.Torrent)
 }
