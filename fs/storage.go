@@ -12,7 +12,13 @@ type FsFactory func(f File) (Filesystem, error)
 
 var SupportedFactories = map[string]FsFactory{
 	".zip": func(f File) (Filesystem, error) {
-		return NewZip(f, f.Size()), nil
+		return NewArchive(f, f.Size(), &Zip{}), nil
+	},
+	".rar": func(f File) (Filesystem, error) {
+		return NewArchive(f, f.Size(), &Rar{}), nil
+	},
+	".7z": func(f File) (Filesystem, error) {
+		return NewArchive(f, f.Size(), &SevenZip{}), nil
 	},
 }
 
@@ -116,20 +122,20 @@ func (s *storage) createParent(p string, f File) error {
 	return nil
 }
 
-func (s *storage) Children(path string) map[string]File {
+func (s *storage) Children(path string) (map[string]File, error) {
 	path = clean(path)
-
-	out, err := s.getDirFromFs(path)
-	if err == nil {
-		return out
-	}
 
 	l := make(map[string]File)
 	for n, f := range s.children[path] {
 		l[n] = f
 	}
 
-	return l
+	if len(l) != 0 {
+		return l, nil
+	}
+
+	return s.getDirFromFs(path)
+
 }
 
 func (s *storage) Get(path string) (File, error) {

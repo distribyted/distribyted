@@ -31,17 +31,9 @@ func (wd *WebDAV) OpenFile(ctx context.Context, name string, flag int, perm os.F
 		return nil, err
 	}
 
-	var dirContent []os.FileInfo
-	if f.IsDir() {
-		dir, err := wd.listDir(p)
-		if err != nil {
-			return nil, err
-		}
-
-		dirContent = dir
-	}
-
-	wdf := newFile(filepath.Base(p), f, dirContent)
+	wdf := newFile(filepath.Base(p), f, func() ([]os.FileInfo, error) {
+		return wd.listDir(p)
+	})
 	return wdf, nil
 }
 
@@ -92,27 +84,37 @@ type webDAVFile struct {
 
 	fi os.FileInfo
 
-	mu sync.Mutex
-	// dirPos and pos are protected by mu.
-	dirPos     int
+	mudp   sync.Mutex
+	dirPos int
+
+	mup        sync.Mutex
 	pos        int64
+	dirFunc    func() ([]os.FileInfo, error)
 	dirContent []os.FileInfo
 }
 
-func newFile(name string, f fs.File, dir []os.FileInfo) *webDAVFile {
+func newFile(name string, f fs.File, df func() ([]os.FileInfo, error)) *webDAVFile {
 	return &webDAVFile{
-		fi:         newFileInfo(name, f.Size(), f.IsDir()),
-		dirContent: dir,
-		Reader:     f,
+		fi:      newFileInfo(name, f.Size(), f.IsDir()),
+		dirFunc: df,
+		Reader:  f,
 	}
 }
 
 func (wdf *webDAVFile) Readdir(count int) ([]os.FileInfo, error) {
-	wdf.mu.Lock()
-	defer wdf.mu.Unlock()
+	wdf.mudp.Lock()
+	defer wdf.mudp.Unlock()
 
 	if !wdf.fi.IsDir() {
 		return nil, os.ErrInvalid
+	}
+
+	if wdf.dirContent == nil {
+		dc, err := wdf.dirFunc()
+		if err != nil {
+			return nil, err
+		}
+		wdf.dirContent = dc
 	}
 
 	old := wdf.dirPos
@@ -142,8 +144,8 @@ func (wdf *webDAVFile) Stat() (os.FileInfo, error) {
 }
 
 func (wdf *webDAVFile) Read(p []byte) (int, error) {
-	wdf.mu.Lock()
-	defer wdf.mu.Unlock()
+	wdf.mup.Lock()
+	defer wdf.mup.Unlock()
 
 	n, err := wdf.Reader.ReadAt(p, wdf.pos)
 	wdf.pos += int64(n)
@@ -152,8 +154,8 @@ func (wdf *webDAVFile) Read(p []byte) (int, error) {
 }
 
 func (wdf *webDAVFile) Seek(offset int64, whence int) (int64, error) {
-	wdf.mu.Lock()
-	defer wdf.mu.Unlock()
+	wdf.mup.Lock()
+	defer wdf.mup.Unlock()
 
 	switch whence {
 	case io.SeekStart:

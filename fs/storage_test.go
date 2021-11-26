@@ -40,7 +40,8 @@ func TestStorage(t *testing.T) {
 	require.Error(err)
 	require.Nil(file)
 
-	files := s.Children("/path/to/dummy/")
+	files, err := s.Children("/path/to/dummy/")
+	require.NoError(err)
 	require.Len(files, 2)
 	require.Contains(files, "file.txt")
 	require.Contains(files, "file2.txt")
@@ -48,7 +49,8 @@ func TestStorage(t *testing.T) {
 	err = s.Add(&Dummy{}, "/path/to/dummy/folder/file.txt")
 	require.NoError(err)
 
-	files = s.Children("/path/to/dummy/")
+	files, err = s.Children("/path/to/dummy/")
+	require.NoError(err)
 	require.Len(files, 3)
 	require.Contains(files, "file.txt")
 	require.Contains(files, "file2.txt")
@@ -59,7 +61,8 @@ func TestStorage(t *testing.T) {
 
 	require.True(s.Has("/path/file4.txt"))
 
-	files = s.Children("/")
+	files, err = s.Children("/")
+	require.NoError(err)
 	require.Len(files, 1)
 
 	err = s.Add(&Dummy{}, "/path/special_file.test")
@@ -69,10 +72,12 @@ func TestStorage(t *testing.T) {
 	require.NoError(err)
 	require.Equal(&Dummy{}, file)
 
-	files = s.Children("/path/special_file.test")
-	require.Len(files, 0)
+	files, err = s.Children("/path/special_file.test")
+	require.Error(err)
+	require.Nil(files)
 
-	files = s.Children("/path/special_file.test/dir/here")
+	files, err = s.Children("/path/special_file.test/dir/here")
+	require.NoError(err)
 	require.Len(files, 2)
 
 	err = s.Add(&Dummy{}, "/path/to/__special__path/file3.txt")

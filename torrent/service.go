@@ -26,20 +26,20 @@ type Service struct {
 	cfgLoader loader.Loader
 	db        loader.LoaderAdder
 
-	log     zerolog.Logger
-	timeout int
+	log                     zerolog.Logger
+	addTimeout, readTimeout int
 }
 
-func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, timeout int) *Service {
+func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, addTimeout, readTimeout int) *Service {
 	l := log.Logger.With().Str("component", "torrent-service").Logger()
 	return &Service{
-		log:       l,
-		s:         stats,
-		c:         c,
-		fss:       make(map[string]fs.Filesystem),
-		cfgLoader: cfg,
-		db:        db,
-		timeout:   timeout,
+		log:        l,
+		s:          stats,
+		c:          c,
+		fss:        make(map[string]fs.Filesystem),
+		cfgLoader:  cfg,
+		db:         db,
+		addTimeout: addTimeout,
 	}
 }
 
@@ -118,7 +118,7 @@ func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	if t.Info() == nil {
 		s.log.Info().Str("hash", t.InfoHash().String()).Msg("getting torrent info")
 		select {
-		case <-time.After(time.Duration(s.timeout) * time.Second):
+		case <-time.After(time.Duration(s.addTimeout) * time.Second):
 			s.log.Error().Str("hash", t.InfoHash().String()).Msg("timeout getting torrent info")
 			return errors.New("timeout getting torrent info")
 		case <-t.GotInfo():
@@ -136,7 +136,7 @@ func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	defer s.mu.Unlock()
 	_, ok := s.fss[folder]
 	if !ok {
-		s.fss[folder] = fs.NewTorrent()
+		s.fss[folder] = fs.NewTorrent(s.readTimeout)
 	}
 
 	tfs, ok := s.fss[folder].(*fs.Torrent)

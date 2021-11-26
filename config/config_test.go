@@ -34,7 +34,9 @@ func TestDefaults(t *testing.T) {
 	r := &Root{}
 	dr := AddDefaults(r)
 	require.NotNil(dr)
-	require.NotNil(dr.Fuse)
+
+	// FUSE can be deactivated
+	require.Nil(dr.Fuse)
 	require.NotNil(dr.HTTPGlobal)
 	require.NotNil(dr.Log)
 	require.NotNil(dr.Torrent)
