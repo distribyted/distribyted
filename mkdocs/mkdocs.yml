@@ -18,6 +18,8 @@ theme:
     primary: white
   features:
     - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
     - navigation.instant
     - navigation.tracking
     - navigation.expand
@@ -29,11 +31,15 @@ edit_uri: edit/master/mkdocs/docs/
 
 plugins:
   - git-revision-date
+  - search
 
 extra:
   version:
     default: latest
     provider: mike
+  analytics:
+    provider: google
+    property: !ENV GOOGLE_ANALYTICS_KEY
 
 markdown_extensions:
   - toc:
