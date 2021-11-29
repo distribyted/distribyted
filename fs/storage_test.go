@@ -86,6 +86,8 @@ func TestStorage(t *testing.T) {
 	file, err = s.Get("/path/to/__special__path/file3.txt")
 	require.NoError(err)
 	require.Equal(&Dummy{}, file)
+
+	s.Clear()
 }
 
 func TestStorageWindowsPath(t *testing.T) {
@@ -123,6 +125,28 @@ func TestStorageAddFs(t *testing.T) {
 
 	err = s.AddFS(&DummyFs{}, "/test")
 	require.Error(err)
+}
+
+func TestSupportedFactories(t *testing.T) {
+	t.Parallel()
+
+	require := require.New(t)
+
+	require.Contains(SupportedFactories, ".zip")
+	require.Contains(SupportedFactories, ".rar")
+	require.Contains(SupportedFactories, ".7z")
+
+	fs, err := SupportedFactories[".zip"](&Dummy{})
+	require.NoError(err)
+	require.NotNil(fs)
+
+	fs, err = SupportedFactories[".rar"](&Dummy{})
+	require.NoError(err)
+	require.NotNil(fs)
+
+	fs, err = SupportedFactories[".7z"](&Dummy{})
+	require.NoError(err)
+	require.NotNil(fs)
 }
 
 var _ Filesystem = &DummyFs{}

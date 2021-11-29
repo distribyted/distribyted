@@ -43,6 +43,8 @@ func (s *storage) Clear() {
 	s.files = make(map[string]File)
 	s.children = make(map[string]map[string]File)
 	s.filesystems = make(map[string]Filesystem)
+
+	s.Add(&Dir{}, "/")
 }
 
 func (s *storage) Has(path string) bool {
@@ -130,7 +132,7 @@ func (s *storage) Children(path string) (map[string]File, error) {
 		l[n] = f
 	}
 
-	if len(l) != 0 {
+	if _, ok := s.children[path]; ok {
 		return l, nil
 	}
 

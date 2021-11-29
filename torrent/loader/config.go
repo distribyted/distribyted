@@ -17,6 +17,7 @@ func NewConfig(r []*config.Route) *Config {
 func (l *Config) ListMagnets() (map[string][]string, error) {
 	out := make(map[string][]string)
 	for _, r := range l.c {
+		out[r.Name] = make([]string, 0)
 		for _, t := range r.Torrents {
 			if t.MagnetURI == "" {
 				continue
@@ -32,6 +33,7 @@ func (l *Config) ListMagnets() (map[string][]string, error) {
 func (l *Config) ListTorrentPaths() (map[string][]string, error) {
 	out := make(map[string][]string)
 	for _, r := range l.c {
+		out[r.Name] = make([]string, 0)
 		for _, t := range r.Torrents {
 			if t.TorrentPath == "" {
 				continue

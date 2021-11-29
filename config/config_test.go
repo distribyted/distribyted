@@ -40,4 +40,14 @@ func TestDefaults(t *testing.T) {
 	require.NotNil(dr.HTTPGlobal)
 	require.NotNil(dr.Log)
 	require.NotNil(dr.Torrent)
+
+	// Add defaults when fuse is set
+	r = &Root{
+		Fuse: &FuseGlobal{},
+	}
+
+	dr = AddDefaults(r)
+	require.NotNil(dr.Fuse)
+	require.Equal(mountFolder, dr.Fuse.Path)
+
 }

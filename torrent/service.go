@@ -61,6 +61,7 @@ func (s *Service) load(l loader.Loader) error {
 		return err
 	}
 	for r, ms := range list {
+		s.addRoute(r)
 		for _, m := range ms {
 			if err := s.addMagnet(r, m); err != nil {
 				return err
@@ -73,6 +74,7 @@ func (s *Service) load(l loader.Loader) error {
 		return err
 	}
 	for r, ms := range list {
+		s.addRoute(r)
 		for _, p := range ms {
 			if err := s.addTorrentPath(r, p); err != nil {
 				return err
@@ -113,6 +115,19 @@ func (s *Service) addMagnet(r, m string) error {
 
 }
 
+func (s *Service) addRoute(r string) {
+	s.s.AddRoute(r)
+
+	// Add to filesystems
+	folder := path.Join("/", r)
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_, ok := s.fss[folder]
+	if !ok {
+		s.fss[folder] = fs.NewTorrent(s.readTimeout)
+	}
+}
+
 func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	// only get info if name is not available
 	if t.Info() == nil {
@@ -134,10 +149,6 @@ func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	folder := path.Join("/", r)
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	_, ok := s.fss[folder]
-	if !ok {
-		s.fss[folder] = fs.NewTorrent(s.readTimeout)
-	}
 
 	tfs, ok := s.fss[folder].(*fs.Torrent)
 	if !ok {

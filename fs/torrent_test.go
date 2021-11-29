@@ -73,6 +73,11 @@ func TestTorrentFilesystem(t *testing.T) {
 	require.NoError(err)
 	require.Equal(10, n)
 
+	tfs.RemoveTorrent(to.InfoHash().String())
+	files, err = tfs.ReadDir("/")
+	require.NoError(err)
+	require.Len(files, 0)
+
 	require.NoError(f.Close())
 }
 
