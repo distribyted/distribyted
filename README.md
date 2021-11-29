@@ -58,9 +58,9 @@ Some areas need more care than others:
 
 ## Special thanks
 
-- [Anacrolix BitTorrent client package and utilities](torrent-repo-url). An amazing torrent library with file seek support.
-- [Nwaples rardecode library, experimental branch](rardecode-repo-url). The only go library that is able to seek over rar files and avoid to use `io.Discard`.
-- [Bodgit 7zip library](sevenzip-repo-url). Amazing library to decode 7zip files.
+- [Anacrolix BitTorrent client package and utilities][torrent-repo-url]. An amazing torrent library with file seek support.
+- [Nwaples rardecode library, experimental branch][rardecode-repo-url]. The only go library that is able to seek over rar files and avoid to use `io.Discard`.
+- [Bodgit 7zip library][sevenzip-repo-url]. Amazing library to decode 7zip files.
 
 
 ## License
