@@ -56,10 +56,20 @@ Some areas need more care than others:
 - Web interface. Web development is not my _forte_.
 - Tutorials. Share with the community your use case!
 
+## Special thanks
+
+- [Anacrolix BitTorrent client package and utilities](torrent-repo-url). An amazing torrent library with file seek support.
+- [Nwaples rardecode library, experimental branch](rardecode-repo-url). The only go library that is able to seek over rar files and avoid to use `io.Discard`.
+- [Bodgit 7zip library](sevenzip-repo-url). Amazing library to decode 7zip files.
+
+
 ## License
 
 Distributed under the GPL3 license. See `LICENSE` for more information.
 
+[sevenzip-repo-url]: https://github.com/bodgit/sevenzip
+[rardecode-repo-url]: https://github.com/nwaples/rardecode/tree/experimental
+[torrent-repo-url]: https://github.com/anacrolix/torrent
 [main-url]: https://distribyted.com
 [releases-shield]: https://img.shields.io/github/v/release/distribyted/distribyted.svg?style=flat-square
 [releases-url]: https://github.com/distribyted/distribyted/releases
