@@ -31,6 +31,10 @@ torrent:
 
   # Timeout in seconds when adding a magnet or a torrent.
   add_timeout: 60
+
+  # Timeout in seconds when reading any torrent content. Usefult when reading 
+  # archived content from .rar, .zip or .7z.
+  read_timeout: 120
 fuse:
   # Folder where fuse will mount torrent filesystem
   # For windows users: You can set here also a disk letter like X: or Z:

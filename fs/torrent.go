@@ -1,25 +1,29 @@
 package fs
 
 import (
+	"context"
+	"io"
 	"sync"
+	"time"
 
 	"github.com/anacrolix/torrent"
-	"github.com/distribyted/distribyted/iio"
 )
 
 var _ Filesystem = &Torrent{}
 
 type Torrent struct {
-	mu     sync.Mutex
-	ts     map[string]*torrent.Torrent
-	s      *storage
-	loaded bool
+	mu          sync.RWMutex
+	ts          map[string]*torrent.Torrent
+	s           *storage
+	loaded      bool
+	readTimeout int
 }
 
-func NewTorrent() *Torrent {
+func NewTorrent(readTimeout int) *Torrent {
 	return &Torrent{
-		s:  newStorage(SupportedFactories),
-		ts: make(map[string]*torrent.Torrent),
+		s:           newStorage(SupportedFactories),
+		ts:          make(map[string]*torrent.Torrent),
+		readTimeout: readTimeout,
 	}
 }
 
@@ -45,14 +49,17 @@ func (fs *Torrent) load() {
 	if fs.loaded {
 		return
 	}
-
-	fs.mu.Lock()
-	defer fs.mu.Unlock()
+	fs.mu.RLock()
+	defer fs.mu.RUnlock()
 
 	for _, t := range fs.ts {
 		<-t.GotInfo()
 		for _, file := range t.Files() {
-			fs.s.Add(&torrentFile{readerFunc: file.NewReader, len: file.Length()}, file.Path())
+			fs.s.Add(&torrentFile{
+				reader:  file.NewReader(),
+				len:     file.Length(),
+				timeout: fs.readTimeout,
+			}, file.Path())
 		}
 	}
 
@@ -66,23 +73,18 @@ func (fs *Torrent) Open(filename string) (File, error) {
 
 func (fs *Torrent) ReadDir(path string) (map[string]File, error) {
 	fs.load()
-	return fs.s.Children(path), nil
+	return fs.s.Children(path)
 }
 
 var _ File = &torrentFile{}
 
 type torrentFile struct {
-	readerFunc func() torrent.Reader
-	reader     iio.Reader
-	len        int64
-}
+	mu sync.Mutex
 
-func (d *torrentFile) load() {
-	if d.reader != nil {
-		return
-	}
+	reader torrent.Reader
+	len    int64
 
-	d.reader = iio.NewReadAtWrapper(d.readerFunc())
+	timeout int
 }
 
 func (d *torrentFile) Size() int64 {
@@ -94,22 +96,58 @@ func (d *torrentFile) IsDir() bool {
 }
 
 func (d *torrentFile) Close() error {
-	var err error
-	if d.reader != nil {
-		err = d.reader.Close()
-	}
-
-	d.reader = nil
-
-	return err
+	return d.reader.Close()
 }
 
 func (d *torrentFile) Read(p []byte) (n int, err error) {
-	d.load()
-	return d.reader.Read(p)
+	ctx, cancel := context.WithCancel(context.Background())
+	timer := time.AfterFunc(
+		time.Duration(d.timeout)*time.Second,
+		func() {
+			cancel()
+		},
+	)
+
+	defer timer.Stop()
+
+	return d.reader.ReadContext(ctx, p)
 }
 
-func (d *torrentFile) ReadAt(p []byte, off int64) (n int, err error) {
-	d.load()
-	return d.reader.ReadAt(p, off)
+func (d *torrentFile) ReadAt(p []byte, off int64) (int, error) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	_, err := d.reader.Seek(off, io.SeekStart)
+	if err != nil {
+		return 0, err
+	}
+	i, err := d.readAtLeast(p, len(p))
+	return i, err
+}
+
+func (d *torrentFile) readAtLeast(buf []byte, min int) (n int, err error) {
+	if len(buf) < min {
+		return 0, io.ErrShortBuffer
+	}
+	for n < min && err == nil {
+		var nn int
+
+		ctx, cancel := context.WithCancel(context.Background())
+		timer := time.AfterFunc(
+			time.Duration(d.timeout)*time.Second,
+			func() {
+				cancel()
+			},
+		)
+
+		nn, err = d.reader.ReadContext(ctx, buf[n:])
+		n += nn
+
+		timer.Stop()
+	}
+	if n >= min {
+		err = nil
+	} else if n > 0 && err == io.EOF {
+		err = io.ErrUnexpectedEOF
+	}
+	return
 }

@@ -21,6 +21,7 @@ type Log struct {
 }
 
 type TorrentGlobal struct {
+	ReadTimeout     int    `yaml:"read_timeout,omitempty"`
 	AddTimeout      int    `yaml:"add_timeout,omitempty"`
 	GlobalCacheSize int64  `yaml:"global_cache_size,omitempty"`
 	MetadataFolder  string `yaml:"metadata_folder,omitempty"`
@@ -70,6 +71,10 @@ func AddDefaults(r *Root) *Root {
 		r.Torrent.AddTimeout = 60
 	}
 
+	if r.Torrent.ReadTimeout == 0 {
+		r.Torrent.ReadTimeout = 120
+	}
+
 	if r.Torrent.GlobalCacheSize == 0 {
 		r.Torrent.GlobalCacheSize = 2048 // 2GB
 	}
@@ -78,11 +83,10 @@ func AddDefaults(r *Root) *Root {
 		r.Torrent.MetadataFolder = metadataFolder
 	}
 
-	if r.Fuse == nil {
-		r.Fuse = &FuseGlobal{}
-	}
-	if r.Fuse.Path == "" {
-		r.Fuse.Path = mountFolder
+	if r.Fuse != nil {
+		if r.Fuse.Path == "" {
+			r.Fuse.Path = mountFolder
+		}
 	}
 
 	if r.HTTPGlobal == nil {

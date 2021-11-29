@@ -31,6 +31,7 @@ func DefaultConfig() *Root {
 			GlobalCacheSize: 2048,
 			MetadataFolder:  metadataFolder,
 			AddTimeout:      60,
+			ReadTimeout:     120,
 		},
 		Fuse: &FuseGlobal{
 			AllowOther: false,
