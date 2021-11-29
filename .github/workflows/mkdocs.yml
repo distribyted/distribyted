@@ -63,8 +63,12 @@ jobs:
           mike deploy master dev --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
         env:
           CUSTOM_DOMAIN: distribyted.com
+          GOOGLE_ANALYTICS_KEY: ${{ secrets.GOOGLE_ANALYTICS_KEY }}
 
       - name: Deploy docs (Versions)
+        env:
+          GOOGLE_ANALYTICS_KEY: ${{ secrets.GOOGLE_ANALYTICS_KEY }}
+          
         if: startsWith(github.ref, 'refs/tags/v')        
         run: |
           git fetch origin gh-pages --verbose

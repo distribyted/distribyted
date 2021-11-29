@@ -69,8 +69,17 @@ distribyted:
 After executing and load all torrent or magnet files, a web interface will be available at `http://localhost:4444`
 It contains information about the mounted routes and torrent files like download/upload speed, leechers, seeders...
 
-You can also modify the configuration file and reload the server from `http://localhost:4444/config` .
-
 ### Configuration File
 
 You can see the default configuration file with some explanation comments [here](https://github.com/distribyted/distribyted/blob/master/templates/config_template.yaml).
+
+### Routes
+
+Here there is a list of all available routes with their torrents and some info. You can add and remove torrents from here too.
+
+### Servers
+
+Servers is a way to generate magnet files from folders. 
+All servers configured using the config yaml file will be here. 
+When some data is changed on these folders, a new magnet URI will be generated. 
+You can share that magnet URI with anyone to share these files.

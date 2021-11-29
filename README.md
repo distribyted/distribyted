@@ -30,35 +30,36 @@
 ![Distribyted Screen Shot][product-screenshot]
 
 Distribyted is an alternative torrent client. 
-It can expose torrent files as a standard FUSE mount or webDAV endpoint and download them on demand, allowing random reads using a fixed amount of disk space. 
+It can expose torrent files as a standard FUSE, webDAV or HTTP endpoint and download them on demand, allowing random reads using a fixed amount of disk space. 
 
 Distribyted tries to make easier integrations with other applications using torrent files, presenting them as a standard filesystem. 
 
-**Note that distribyted is in alpha version, it is a proof of concept with a lot of bugs.**
+**Note that distribyted is in beta version, it is a proof of concept with a lot of bugs.**
 
 ## Use Cases
 
 - Play **multimedia files** on your favorite video or audio player. These files will be downloaded on demand and only the needed parts.
 - Explore TBs of data from public **datasets** only downloading the parts you need. Use **Jupyter Notebooks** directly to process or analyze this data.
+- Share your latest dataset creation just sharing a magnet link. People will start access your data in seconds.
 - Play your **ROM backups** directly from the torrent file. You can have virtually GBs in games and only downloaded the needed ones.
 
 ## Documentation
 
-Check [here][main-url] or [here][doc-folder-url] for further documentation.
+Check [here][main-url] for further documentation.
 
 ## Contributing
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-Any contribution is welcome, but some areas need more care than others:
+Some areas need more care than others:
 - Windows and macOS tests and compatibility. I don't have any easy way to test distribyted on these operating systems.
-- Web interface. Web development is not my _forte_. 
+- Web interface. Web development is not my _forte_.
+- Tutorials. Share with the community your use case!
 
 ## License
 
 Distributed under the GPL3 license. See `LICENSE` for more information.
 
-[doc-folder-url]: https://github.com/distribyted/distribyted/blob/master/mkdocs/docs/index.md
 [main-url]: https://distribyted.com
 [releases-shield]: https://img.shields.io/github/v/release/distribyted/distribyted.svg?style=flat-square
 [releases-url]: https://github.com/distribyted/distribyted/releases
