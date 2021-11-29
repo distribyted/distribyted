@@ -40,7 +40,7 @@ Distribyted tries to make easier integrations with other applications using torr
 
 - Play **multimedia files** on your favorite video or audio player. These files will be downloaded on demand and only the needed parts.
 - Explore TBs of data from public **datasets** only downloading the parts you need. Use **Jupyter Notebooks** directly to process or analyze this data.
-- Share your latest dataset creation just sharing a magnet link. People will start access your data in seconds.
+- Give access to your latest dataset creation just by sharing a magnet link. People will start using your data in seconds.
 - Play your **ROM backups** directly from the torrent file. You can have virtually GBs in games and only downloaded the needed ones.
 
 ## Documentation
