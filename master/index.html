@@ -45,6 +45,17 @@
     
       
 
+  
+
+
+  
+
+  
+
+
+  <script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-DW8WF68VW3"),document.addEventListener("DOMContentLoaded",function(){"undefined"!=typeof location$&&location$.subscribe(function(t){gtag("config","G-DW8WF68VW3",{page_path:t.pathname})})})</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DW8WF68VW3"></script>
+
 
     
     
@@ -78,7 +89,9 @@
     
       
 
-<header class="md-header" data-md-component="header">
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="Distribyted" class="md-header__button md-logo" aria-label="Distribyted" data-md-component="logo">
       
@@ -107,6 +120,40 @@
     
     
     
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
     
       <div class="md-header__source">
         
@@ -123,14 +170,8 @@
     
   </nav>
   
-</header>
     
-    <div class="md-container" data-md-component="container">
       
-      
-        
-          
-            
 <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-tabs__inner md-grid">
     <ul class="md-tabs__list">
@@ -188,7 +229,13 @@
     </ul>
   </div>
 </nav>
-          
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
         
       
       <main class="md-main" data-md-component="main">
@@ -290,13 +337,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#to-be-supported" class="md-nav__link">
-    To be supported
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -318,7 +358,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#to-be-supported_1" class="md-nav__link">
+  <a href="#to-be-supported" class="md-nav__link">
     To Be Supported
   </a>
   
@@ -423,21 +463,18 @@ It can expose torrent files as a standard FUSE mount or webDAV endpoint and down
 <ul>
 <li>FUSE: Other applications can access to torrent files directly as a filesystem.</li>
 <li>WebDAV: Applications that supports WebDAV can access torrent files using this protocol. It is recommended when distribyted is running in a remote machine or using docker.</li>
-</ul>
-<h4 id="to-be-supported">To be supported<a class="headerlink" href="#to-be-supported" title="Permanent link">&para;</a></h4>
-<ul>
-<li>HTTP: distribyted will support direct HTTP access to files.</li>
+<li>HTTP: A simple HTTP interface for all the available routes. You can acces it from <code>http://[HOST]:[PORT]/fs</code></li>
 </ul>
 <h3 id="expandable-file-formats"><em>Expandable</em> File Formats<a class="headerlink" href="#expandable-file-formats" title="Permanent link">&para;</a></h3>
 <p>Distribyted can show some kind of files directly as folders, making it possible for applications read only the parts that they need. Here is a list of supported, to be supported and not supported formats.</p>
 <h4 id="supported_1">Supported<a class="headerlink" href="#supported_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>zip: Able to uncompress just one file. The file is decompressed to a temporal file sequentially to make possible seek over it. The decompression stops if no one is reading it.</li>
+<li>rar: Thanks to <a href="https://github.com/nwaples/rardecode/tree/experimental">rardecode</a> experimental branch library, it is possible to seek through rar files.</li>
+<li>7zip: Thanks to <a href="https://github.com/bodgit/sevenzip">sevenzip</a> library, it is possible to read <code>7z</code> files in a similar way that is done using the <code>zip</code> implementation.</li>
 </ul>
-<h4 id="to-be-supported_1">To Be Supported<a class="headerlink" href="#to-be-supported_1" title="Permanent link">&para;</a></h4>
+<h4 id="to-be-supported">To Be Supported<a class="headerlink" href="#to-be-supported" title="Permanent link">&para;</a></h4>
 <ul>
-<li>tar: Seek to any file and inside that files using a <a href="https://github.com/ajnavarro/go-tar">modified standard library</a>. Not useful on <code>.tar.gz</code> files.</li>
-<li>7zip: Similar to Zip. Need for a library similar to <a href="https://github.com/saracen/go7z">zip</a>.</li>
 <li>xz: Only worth it when the file is created using blocks. Possible library <a href="https://github.com/ulikunitz/xz">here</a> and <a href="https://github.com/frrad/bxzf">here</a>.</li>
 </ul>
 <h4 id="not-supported">Not Supported<a class="headerlink" href="#not-supported" title="Permanent link">&para;</a></h4>
@@ -452,7 +489,7 @@ It can expose torrent files as a standard FUSE mount or webDAV endpoint and down
 <div class="md-source-date">
   <small>
     
-      Last update: 2021-10-08
+      Last update: 2021-11-29
     
   </small>
 </div>
@@ -519,7 +556,7 @@ It can expose torrent files as a standard FUSE mount or webDAV endpoint and down
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.tabs", "navigation.instant", "navigation.tracking", "navigation.expand", "navigation.indexes", "navigation.top", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.e99e714c.min.js", "version": {"default": "latest", "provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.instant", "navigation.tracking", "navigation.expand", "navigation.indexes", "navigation.top", "toc.integrate"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.e99e714c.min.js", "version": {"default": "latest", "provider": "mike"}}</script>
     
     
       <script src="assets/javascripts/bundle.bc35569b.min.js"></script>
