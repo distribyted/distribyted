@@ -33,13 +33,14 @@ type Service struct {
 func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, addTimeout, readTimeout int) *Service {
 	l := log.Logger.With().Str("component", "torrent-service").Logger()
 	return &Service{
-		log:        l,
-		s:          stats,
-		c:          c,
-		fss:        make(map[string]fs.Filesystem),
-		cfgLoader:  cfg,
-		db:         db,
-		addTimeout: addTimeout,
+		log:         l,
+		s:           stats,
+		c:           c,
+		fss:         make(map[string]fs.Filesystem),
+		cfgLoader:   cfg,
+		db:          db,
+		addTimeout:  addTimeout,
+		readTimeout: readTimeout,
 	}
 }
 
