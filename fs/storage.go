@@ -127,17 +127,21 @@ func (s *storage) createParent(p string, f File) error {
 func (s *storage) Children(path string) (map[string]File, error) {
 	path = clean(path)
 
+	files, err := s.getDirFromFs(path)
+	if err == nil {
+		return files, nil
+	}
+
+	if !os.IsNotExist(err) {
+		return nil, err
+	}
+
 	l := make(map[string]File)
 	for n, f := range s.children[path] {
 		l[n] = f
 	}
 
-	if _, ok := s.children[path]; ok {
-		return l, nil
-	}
-
-	return s.getDirFromFs(path)
-
+	return l, nil
 }
 
 func (s *storage) Get(path string) (File, error) {
