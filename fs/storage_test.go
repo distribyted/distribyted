@@ -73,8 +73,8 @@ func TestStorage(t *testing.T) {
 	require.Equal(&Dummy{}, file)
 
 	files, err = s.Children("/path/special_file.test")
-	require.Error(err)
-	require.Nil(files)
+	require.NoError(err)
+	require.NotNil(files)
 
 	files, err = s.Children("/path/special_file.test/dir/here")
 	require.NoError(err)

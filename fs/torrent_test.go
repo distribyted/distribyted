@@ -81,7 +81,7 @@ func TestTorrentFilesystem(t *testing.T) {
 	require.NoError(f.Close())
 }
 
-func TestReadAtWrapper(t *testing.T) {
+func TestReadAtTorrent(t *testing.T) {
 	require := require.New(t)
 
 	to, err := Cli.AddMagnet(testMagnet)
@@ -91,9 +91,9 @@ func TestReadAtWrapper(t *testing.T) {
 	torrFile := to.Files()[0]
 
 	tf := torrentFile{
-		reader:  torrFile.NewReader(),
-		len:     torrFile.Length(),
-		timeout: 500,
+		readerFunc: torrFile.NewReader,
+		len:        torrFile.Length(),
+		timeout:    500,
 	}
 
 	defer tf.Close()
@@ -105,6 +105,32 @@ func TestReadAtWrapper(t *testing.T) {
 	require.Equal([]byte{0x0, 0x0, 0x1f, 0x76, 0x54}, toRead)
 
 	n, err = tf.ReadAt(toRead, 0)
+	require.NoError(err)
+	require.Equal(5, n)
+	require.Equal([]byte{0x49, 0x44, 0x33, 0x3, 0x0}, toRead)
+}
+
+func TestReadAtWrapper(t *testing.T) {
+	t.Parallel()
+
+	require := require.New(t)
+
+	to, err := Cli.AddMagnet(testMagnet)
+	require.NoError(err)
+
+	<-to.GotInfo()
+	torrFile := to.Files()[0]
+
+	r := newReadAtWrapper(torrFile.NewReader(), 10)
+	defer r.Close()
+
+	toRead := make([]byte, 5)
+	n, err := r.ReadAt(toRead, 6)
+	require.NoError(err)
+	require.Equal(5, n)
+	require.Equal([]byte{0x0, 0x0, 0x1f, 0x76, 0x54}, toRead)
+
+	n, err = r.ReadAt(toRead, 0)
 	require.NoError(err)
 	require.Equal(5, n)
 	require.Equal([]byte{0x49, 0x44, 0x33, 0x3, 0x0}, toRead)
