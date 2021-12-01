@@ -18,7 +18,7 @@ func TestZipFilesystem(t *testing.T) {
 
 	zReader, len := createTestZip(require)
 
-	zfs := NewArchive(zReader, len, &Zip{})
+	zfs := NewZip(zReader, len)
 
 	files, err := zfs.ReadDir("/path/to/test/file")
 	require.NoError(err)

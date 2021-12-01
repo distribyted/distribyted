@@ -90,13 +90,6 @@ func NewStats() *Stats {
 	}
 }
 
-func (s *Stats) AddRoute(route string) {
-	_, ok := s.torrentsByRoute[route]
-	if !ok {
-		s.torrentsByRoute[route] = make(map[string]*torrent.Torrent)
-	}
-}
-
 func (s *Stats) Add(route string, t *torrent.Torrent) {
 	s.mut.Lock()
 	defer s.mut.Unlock()

@@ -148,12 +148,9 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error starting magnet database: %w", err)
 	}
 
-	ts := torrent.NewService(cl, dbl, ss, c, conf.Torrent.AddTimeout, conf.Torrent.ReadTimeout)
+	ts := torrent.NewService(cl, dbl, ss, c, conf.Torrent.AddTimeout)
 
-	var mh *fuse.Handler
-	if conf.Fuse != nil {
-		mh = fuse.NewHandler(fuseAllowOther || conf.Fuse.AllowOther, conf.Fuse.Path)
-	}
+	mh := fuse.NewHandler(fuseAllowOther || conf.Fuse.AllowOther, conf.Fuse.Path)
 
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -173,10 +170,8 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		dbl.Close()
 		log.Info().Msg("closing torrent client...")
 		c.Close()
-		if mh != nil {
-			log.Info().Msg("unmounting fuse filesystem...")
-			mh.Unmount()
-		}
+		log.Info().Msg("unmounting fuse filesystem...")
+		mh.Unmount()
 
 		log.Info().Msg("exiting")
 		os.Exit(1)
@@ -191,10 +186,6 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	}
 
 	go func() {
-		if mh == nil {
-			return
-		}
-
 		if err := mh.Mount(fss); err != nil {
 			log.Info().Err(err).Msg("error mounting filesystems")
 		}

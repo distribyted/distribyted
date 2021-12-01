@@ -20,5 +20,5 @@ func (fs *ContainerFs) Open(filename string) (File, error) {
 }
 
 func (fs *ContainerFs) ReadDir(path string) (map[string]File, error) {
-	return fs.s.Children(path)
+	return fs.s.Children(path), nil
 }

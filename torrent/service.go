@@ -26,21 +26,20 @@ type Service struct {
 	cfgLoader loader.Loader
 	db        loader.LoaderAdder
 
-	log                     zerolog.Logger
-	addTimeout, readTimeout int
+	log     zerolog.Logger
+	timeout int
 }
 
-func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, addTimeout, readTimeout int) *Service {
+func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, timeout int) *Service {
 	l := log.Logger.With().Str("component", "torrent-service").Logger()
 	return &Service{
-		log:         l,
-		s:           stats,
-		c:           c,
-		fss:         make(map[string]fs.Filesystem),
-		cfgLoader:   cfg,
-		db:          db,
-		addTimeout:  addTimeout,
-		readTimeout: readTimeout,
+		log:       l,
+		s:         stats,
+		c:         c,
+		fss:       make(map[string]fs.Filesystem),
+		cfgLoader: cfg,
+		db:        db,
+		timeout:   timeout,
 	}
 }
 
@@ -62,7 +61,6 @@ func (s *Service) load(l loader.Loader) error {
 		return err
 	}
 	for r, ms := range list {
-		s.addRoute(r)
 		for _, m := range ms {
 			if err := s.addMagnet(r, m); err != nil {
 				return err
@@ -75,7 +73,6 @@ func (s *Service) load(l loader.Loader) error {
 		return err
 	}
 	for r, ms := range list {
-		s.addRoute(r)
 		for _, p := range ms {
 			if err := s.addTorrentPath(r, p); err != nil {
 				return err
@@ -116,25 +113,12 @@ func (s *Service) addMagnet(r, m string) error {
 
 }
 
-func (s *Service) addRoute(r string) {
-	s.s.AddRoute(r)
-
-	// Add to filesystems
-	folder := path.Join("/", r)
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	_, ok := s.fss[folder]
-	if !ok {
-		s.fss[folder] = fs.NewTorrent(s.readTimeout)
-	}
-}
-
 func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	// only get info if name is not available
 	if t.Info() == nil {
 		s.log.Info().Str("hash", t.InfoHash().String()).Msg("getting torrent info")
 		select {
-		case <-time.After(time.Duration(s.addTimeout) * time.Second):
+		case <-time.After(time.Duration(s.timeout) * time.Second):
 			s.log.Error().Str("hash", t.InfoHash().String()).Msg("timeout getting torrent info")
 			return errors.New("timeout getting torrent info")
 		case <-t.GotInfo():
@@ -150,6 +134,10 @@ func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 	folder := path.Join("/", r)
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	_, ok := s.fss[folder]
+	if !ok {
+		s.fss[folder] = fs.NewTorrent()
+	}
 
 	tfs, ok := s.fss[folder].(*fs.Torrent)
 	if !ok {

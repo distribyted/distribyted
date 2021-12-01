@@ -18,7 +18,6 @@ func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(gin.ErrorLogger())
-	r.Use(Logger())
 
 	r.GET("/assets/*filepath", func(c *gin.Context) {
 		c.FileFromFS(c.Request.URL.Path, http.FS(distribyted.Assets))
@@ -63,30 +62,4 @@ func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.
 	}
 
 	return nil
-}
-
-func Logger() gin.HandlerFunc {
-	l := log.Logger.With().Str("component", "http").Logger()
-	return func(c *gin.Context) {
-		path := c.Request.URL.Path
-		raw := c.Request.URL.RawQuery
-		c.Next()
-		if raw != "" {
-			path = path + "?" + raw
-		}
-		msg := c.Errors.String()
-		if msg == "" {
-			msg = "Request"
-		}
-
-		s := c.Writer.Status()
-		switch {
-		case s >= 400 && s < 500:
-			l.Warn().Str("path", path).Int("status", s).Msg(msg)
-		case s >= 500:
-			l.Error().Str("path", path).Int("status", s).Msg(msg)
-		default:
-			l.Debug().Str("path", path).Int("status", s).Msg(msg)
-		}
-	}
 }

@@ -21,7 +21,7 @@ func (fs *Memory) Open(filename string) (File, error) {
 }
 
 func (fs *Memory) ReadDir(path string) (map[string]File, error) {
-	return fs.Storage.Children(path)
+	return fs.Storage.Children(path), nil
 }
 
 var _ File = &MemoryFile{}

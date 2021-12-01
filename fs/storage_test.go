@@ -40,8 +40,7 @@ func TestStorage(t *testing.T) {
 	require.Error(err)
 	require.Nil(file)
 
-	files, err := s.Children("/path/to/dummy/")
-	require.NoError(err)
+	files := s.Children("/path/to/dummy/")
 	require.Len(files, 2)
 	require.Contains(files, "file.txt")
 	require.Contains(files, "file2.txt")
@@ -49,8 +48,7 @@ func TestStorage(t *testing.T) {
 	err = s.Add(&Dummy{}, "/path/to/dummy/folder/file.txt")
 	require.NoError(err)
 
-	files, err = s.Children("/path/to/dummy/")
-	require.NoError(err)
+	files = s.Children("/path/to/dummy/")
 	require.Len(files, 3)
 	require.Contains(files, "file.txt")
 	require.Contains(files, "file2.txt")
@@ -61,8 +59,7 @@ func TestStorage(t *testing.T) {
 
 	require.True(s.Has("/path/file4.txt"))
 
-	files, err = s.Children("/")
-	require.NoError(err)
+	files = s.Children("/")
 	require.Len(files, 1)
 
 	err = s.Add(&Dummy{}, "/path/special_file.test")
@@ -72,12 +69,10 @@ func TestStorage(t *testing.T) {
 	require.NoError(err)
 	require.Equal(&Dummy{}, file)
 
-	files, err = s.Children("/path/special_file.test")
-	require.Error(err)
-	require.Nil(files)
+	files = s.Children("/path/special_file.test")
+	require.Len(files, 0)
 
-	files, err = s.Children("/path/special_file.test/dir/here")
-	require.NoError(err)
+	files = s.Children("/path/special_file.test/dir/here")
 	require.Len(files, 2)
 
 	err = s.Add(&Dummy{}, "/path/to/__special__path/file3.txt")
@@ -86,8 +81,6 @@ func TestStorage(t *testing.T) {
 	file, err = s.Get("/path/to/__special__path/file3.txt")
 	require.NoError(err)
 	require.Equal(&Dummy{}, file)
-
-	s.Clear()
 }
 
 func TestStorageWindowsPath(t *testing.T) {
@@ -125,28 +118,6 @@ func TestStorageAddFs(t *testing.T) {
 
 	err = s.AddFS(&DummyFs{}, "/test")
 	require.Error(err)
-}
-
-func TestSupportedFactories(t *testing.T) {
-	t.Parallel()
-
-	require := require.New(t)
-
-	require.Contains(SupportedFactories, ".zip")
-	require.Contains(SupportedFactories, ".rar")
-	require.Contains(SupportedFactories, ".7z")
-
-	fs, err := SupportedFactories[".zip"](&Dummy{})
-	require.NoError(err)
-	require.NotNil(fs)
-
-	fs, err = SupportedFactories[".rar"](&Dummy{})
-	require.NoError(err)
-	require.NotNil(fs)
-
-	fs, err = SupportedFactories[".7z"](&Dummy{})
-	require.NoError(err)
-	require.NotNil(fs)
 }
 
 var _ Filesystem = &DummyFs{}
