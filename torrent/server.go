@@ -94,12 +94,14 @@ func (s *Server) Start() error {
 	}
 
 	s.fw = w
+	go func() {
+		if err := s.makeMagnet(); err != nil {
+			s.updateState(ERROR)
+			s.log.Error().Err(err).Msg("error generating magnet on start")
+		}
 
-	if err := s.makeMagnet(); err != nil {
-		return err
-	}
-
-	go s.watch()
+		s.watch()
+	}()
 
 	go func() {
 		for {
@@ -149,7 +151,7 @@ func (s *Server) makeMagnet() error {
 	s.log.Info().Msg("starting serving new torrent")
 
 	info := metainfo.Info{
-		PieceLength: 1 << 8,
+		PieceLength: 2 << 18,
 	}
 
 	s.updateState(READING)

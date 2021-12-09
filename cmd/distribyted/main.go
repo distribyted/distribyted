@@ -116,7 +116,12 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error starting item store: %w", err)
 	}
 
-	c, err := torrent.NewClient(st, fis, conf.Torrent)
+	id, err := torrent.GetOrCreatePeerID(filepath.Join(conf.Torrent.MetadataFolder, "ID"))
+	if err != nil {
+		return fmt.Errorf("error creating node ID: %w", err)
+	}
+
+	c, err := torrent.NewClient(st, fis, conf.Torrent, id)
 	if err != nil {
 		return fmt.Errorf("error starting torrent client: %w", err)
 	}
