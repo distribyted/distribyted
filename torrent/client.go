@@ -13,11 +13,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func NewClient(st storage.ClientImpl, fis bep44.Store, cfg *config.TorrentGlobal) (*torrent.Client, error) {
+func NewClient(st storage.ClientImpl, fis bep44.Store, cfg *config.TorrentGlobal, id [20]byte) (*torrent.Client, error) {
 	// TODO download and upload limits
 	torrentCfg := torrent.NewDefaultClientConfig()
 	torrentCfg.Seed = true
-	// torrentCfg.DisableWebseeds = true
+	torrentCfg.PeerID = string(id[:])
 	torrentCfg.DefaultStorage = st
 	torrentCfg.DisableIPv6 = cfg.DisableIPv6
 
