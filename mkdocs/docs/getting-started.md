@@ -77,7 +77,7 @@ You can see the default configuration file with some explanation comments [here]
 
 Here there is a list of all available routes with their torrents and some info. You can add and remove torrents from here too.
 
-![routes screen](/images/distribyted-routes-border-large.png)
+![routes screen](images/distribyted-routes-border-large.png)
 
 ### Servers
 
@@ -86,10 +86,10 @@ All servers configured using the config yaml file will be here.
 When some data is changed on these folders, a new magnet URI will be generated. 
 You can share that magnet URI with anyone to share these files.
 
-![server screen](/images/distribyted-server-border.png)
+![server screen](images/distribyted-server-border.png)
 
 ### Logs
 
 You can check logs in real time from the web interface:
 
-![logs screen](/images/distribyted-logs-border.png)
+![logs screen](images/distribyted-logs-border.png)
