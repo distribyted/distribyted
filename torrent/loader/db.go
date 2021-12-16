@@ -19,7 +19,12 @@ type DB struct {
 
 func NewDB(path string) (*DB, error) {
 	l := log.Logger.With().Str("component", "torrent-store").Logger()
-	db, err := badger.Open(badger.DefaultOptions(path).WithLogger(&dlog.Badger{L: l}))
+
+	opts := badger.DefaultOptions(path).
+		WithLogger(&dlog.Badger{L: l}).
+		WithValueLogFileSize(1<<26 - 1)
+
+	db, err := badger.Open(opts)
 	if err != nil {
 		return nil, err
 	}
