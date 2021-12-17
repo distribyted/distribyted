@@ -31,7 +31,6 @@ jobs:
             mkdir -p "${PWD}/artifacts"
           dockerRunArgs: |
             --volume "${PWD}/artifacts:/artifacts"
-          # shell: /bin/sh
           install: |
             apt update
             apt install -y fuse libfuse-dev rpm pkg-config curl git make gcc g++
@@ -45,3 +44,10 @@ jobs:
 
             make test
             make build
+            cp bin/* /artifacts/
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          if-no-files-found: error
+          name: build-armv7
+          path: "${PWD}/artifacts/*"
