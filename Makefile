@@ -22,9 +22,13 @@ run:
 ## build: build binary.
 build: go-generate go-build
 
-## test: execute all tests.
-test:
+## test-race: execute all tests with race enabled.
+test-race:
 	CGO_ENABLED=1 go test -v --race -coverprofile=coverage.out ./...
+
+## test: execute all tests
+test:
+	CGO_ENABLED=1 go test -v -coverprofile=coverage.out ./...
 
 ## cross-compile: compile for other platforms using xgo.
 cross-compile: go-generate go-cross-compile
