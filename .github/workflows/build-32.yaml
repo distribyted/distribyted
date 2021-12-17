@@ -28,9 +28,9 @@ jobs:
           githubToken: ${{ github.token }}
 
           setup: |
-            mkdir -p "${PWD}/artifacts"
+            mkdir -p "/tmp/artifacts"
           dockerRunArgs: |
-            --volume "${PWD}/artifacts:/artifacts"
+            --volume "/tmp/artifacts:/artifacts"
           install: |
             apt update
             apt install -y fuse libfuse-dev rpm pkg-config curl git make gcc g++
@@ -44,10 +44,13 @@ jobs:
 
             make test
             make build
-            cp bin/* /artifacts/
+            cp bin/* /artifacts
+      - name: Show the artifact
+        run: |
+          ls -al "/tmp/artifacts"
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: error
           name: build-armv7
-          path: "${PWD}/artifacts/*"
+          path: "/tmp/artifacts/*"
