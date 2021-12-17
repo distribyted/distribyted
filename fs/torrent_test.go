@@ -17,6 +17,9 @@ func TestMain(m *testing.M) {
 	cfg := torrent.NewDefaultClientConfig()
 	cfg.DataDir = os.TempDir()
 
+	// disable webseeds to avoid a panic when closing client on tests
+	cfg.DisableWebseeds = true
+
 	client, err := torrent.NewClient(cfg)
 	if err != nil {
 		panic(err)
