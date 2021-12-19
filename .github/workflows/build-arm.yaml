@@ -1,5 +1,5 @@
 ---
-name: build-32
+name: build-arm
 
 # Trigger the workflow on push or pull request
 on:
