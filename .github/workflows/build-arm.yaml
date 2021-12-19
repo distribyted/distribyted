@@ -13,7 +13,12 @@ on:
 jobs:
   build_job:
     runs-on: ubuntu-20.04
-    name: ubuntu-20.04 armv7
+    name: linux_${{ matrix.arch }}
+    strategy:
+      matrix:
+        include:
+          - arch: armv7
+          - arch: aarch64
     steps:
       - uses: actions/checkout@v2
         name: Checkout
@@ -23,7 +28,7 @@ jobs:
         name: Test and Build
         id: runcmd
         with:
-          arch: armv7
+          arch: ${{ matrix.arch }}
           distro: ubuntu20.04
           githubToken: ${{ github.token }}
 
@@ -45,12 +50,19 @@ jobs:
             make test
             make build
             cp bin/* /artifacts
-      - name: Show the artifact
+      - name: Show artifacts
         run: |
           ls -al "/tmp/artifacts"
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           if-no-files-found: error
-          name: build-armv7
+          name: build-${{ matrix.arch }}
           path: "/tmp/artifacts/*"
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: "/tmp/artifacts/*"
