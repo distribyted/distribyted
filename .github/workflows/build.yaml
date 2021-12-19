@@ -114,11 +114,6 @@ jobs:
         shell: bash
         run: |
           make build
-      - name: Cross-compile
-        shell: bash
-        run: |
-          make cross-compile
-        if: matrix.os == 'ubuntu-latest'
       
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
