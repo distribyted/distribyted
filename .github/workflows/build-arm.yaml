@@ -18,7 +18,11 @@ jobs:
       matrix:
         include:
           - arch: armv7
+            go: 1.17.5
+            go_arch: armv6l
           - arch: aarch64
+            go: 1.17.5
+            go_arch: arm64
     steps:
       - uses: actions/checkout@v2
         name: Checkout
@@ -44,7 +48,7 @@ jobs:
             export PATH=$PATH:/usr/local/go/bin
             rm -rf /usr/local/go
             mkdir -p /usr/local/go 
-            curl -s -L https://golang.org/dl/go1.17.linux-armv6l.tar.gz | tar -C /usr/local -xz
+            curl -s -L https://golang.org/dl/go${{ matrix.go }}.linux-${{ matrix.go_arch }}.tar.gz | tar -C /usr/local -xz
             go version
 
             make test
