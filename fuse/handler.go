@@ -30,8 +30,11 @@ func (s *Handler) Mount(fss map[string]fs.Filesystem) error {
 	if runtime.GOOS == "windows" {
 		folder = filepath.Dir(s.path)
 	}
-	if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
-		return err
+
+	if filepath.VolumeName(folder) == "" {
+		if err := os.MkdirAll(folder, 0744); err != nil && !os.IsExist(err) {
+			return err
+		}
 	}
 
 	cfs, err := fs.NewContainerFs(fss)
@@ -57,7 +60,7 @@ func (s *Handler) Mount(fss map[string]fs.Filesystem) error {
 
 	s.host = host
 
-	log.Info().Str("path", folder).Msg("starting FUSE mount")
+	log.Info().Str("path", s.path).Msg("starting FUSE mount")
 
 	return nil
 }
