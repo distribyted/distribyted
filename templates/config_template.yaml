@@ -37,7 +37,9 @@ torrent:
   read_timeout: 120
 fuse:
   # Folder where fuse will mount torrent filesystem
-  # For windows users: You can set here also a disk letter like X: or Z:
+  # For windows users: 
+  #   - You can set here also a disk letter like X: or Z:.
+  #   - The folder MUST NOT exists.
   path: ./distribyted-data/mount
   # Add this flag if you want to allow other users to access this fuse mountpoint.
   # You need to add user_allow_other flag to /etc/fuse.conf file.
