@@ -105,6 +105,10 @@ func (fs *Rar) getFiles(reader iio.Reader, size int64) (map[string]*ArchiveFile,
 			return nil, err
 		}
 
+		if header.IsDir {
+			continue
+		}
+
 		rf := func() (iio.Reader, error) {
 			return iio.NewDiskTeeReader(r)
 		}
