@@ -96,7 +96,7 @@ jobs:
         run: |
           make test-race
       - name: Convert coverage.out to coverage.lcov
-        uses: jandelgado/gcov2lcov-action@v1.0.8
+        uses: jandelgado/gcov2lcov-action@v1.0.9
         if: matrix.os == 'ubuntu-latest'
       - name: Coveralls
         uses: coverallsapp/github-action@1.1.3
