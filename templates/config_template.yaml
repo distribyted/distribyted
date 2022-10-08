@@ -69,6 +69,8 @@ log:
 # List of folders where torrents will be mounted as a filesystem.
 routes:
   - name: multimedia
+    # Adding a folder will load all torrents on it:
+    # torrent_folder: "/path/to/torrent/folder"
     torrents:
        # You can also add torrents from a specific path
        # - torrent_path: /path/to/torrent/file.torrent

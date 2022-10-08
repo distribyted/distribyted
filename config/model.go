@@ -46,8 +46,9 @@ type FuseGlobal struct {
 }
 
 type Route struct {
-	Name     string     `yaml:"name"`
-	Torrents []*Torrent `yaml:"torrents"`
+	Name          string     `yaml:"name"`
+	Torrents      []*Torrent `yaml:"torrents"`
+	TorrentFolder string     `yaml:"torrent_folder"`
 }
 
 type Server struct {
