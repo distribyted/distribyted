@@ -146,6 +146,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	}
 
 	cl := loader.NewConfig(conf.Routes)
+	fl := loader.NewFolder(conf.Routes)
 	ss := torrent.NewStats()
 
 	dbl, err := loader.NewDB(filepath.Join(conf.Torrent.MetadataFolder, "magnetdb"))
@@ -153,7 +154,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error starting magnet database: %w", err)
 	}
 
-	ts := torrent.NewService(cl, dbl, ss, c, conf.Torrent.AddTimeout, conf.Torrent.ReadTimeout)
+	ts := torrent.NewService([]loader.Loader{cl, fl}, dbl, ss, c, conf.Torrent.AddTimeout, conf.Torrent.ReadTimeout)
 
 	var mh *fuse.Handler
 	if conf.Fuse != nil {

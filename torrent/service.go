@@ -23,21 +23,21 @@ type Service struct {
 	mu  sync.Mutex
 	fss map[string]fs.Filesystem
 
-	cfgLoader loader.Loader
-	db        loader.LoaderAdder
+	loaders []loader.Loader
+	db      loader.LoaderAdder
 
 	log                     zerolog.Logger
 	addTimeout, readTimeout int
 }
 
-func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, addTimeout, readTimeout int) *Service {
+func NewService(loaders []loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, addTimeout, readTimeout int) *Service {
 	l := log.Logger.With().Str("component", "torrent-service").Logger()
 	return &Service{
 		log:         l,
 		s:           stats,
 		c:           c,
 		fss:         make(map[string]fs.Filesystem),
-		cfgLoader:   cfg,
+		loaders:     loaders,
 		db:          db,
 		addTimeout:  addTimeout,
 		readTimeout: readTimeout,
@@ -47,8 +47,10 @@ func NewService(cfg loader.Loader, db loader.LoaderAdder, stats *Stats, c *torre
 func (s *Service) Load() (map[string]fs.Filesystem, error) {
 	// Load from config
 	s.log.Info().Msg("adding torrents from configuration")
-	if err := s.load(s.cfgLoader); err != nil {
-		return nil, err
+	for _, loader := range s.loaders {
+		if err := s.load(loader); err != nil {
+			return nil, err
+		}
 	}
 
 	// Load from DB
