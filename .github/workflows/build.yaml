@@ -55,7 +55,7 @@ jobs:
         run: |
           brew update
           brew install --cask osxfuse
-        if: matrix.os == 'macOS-latest'
+        if: matrix.os == 'macOS-11'
 
       - name: Install Libraries on Windows
         shell: powershell
