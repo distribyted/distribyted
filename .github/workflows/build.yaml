@@ -23,7 +23,7 @@ jobs:
             os: ubuntu-latest
 
           - job_name: mac
-            os: macOS-latest
+            os: macOS-11
 
           - job_name: windows_amd64
             os: windows-latest
