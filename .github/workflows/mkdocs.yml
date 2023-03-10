@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.x"
 
-      - uses: actions/cache@v3.2.6
+      - uses: actions/cache@v3.3.0
         id: cache
         with:
           path: ~/.cache/pip
