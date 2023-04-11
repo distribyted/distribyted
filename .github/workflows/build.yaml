@@ -99,7 +99,7 @@ jobs:
         uses: jandelgado/gcov2lcov-action@v1.0.9
         if: matrix.os == 'ubuntu-latest'
       - name: Coveralls
-        uses: coverallsapp/github-action@v2.0.0
+        uses: coverallsapp/github-action@v2.1.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.lcov
