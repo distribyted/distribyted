@@ -91,7 +91,7 @@ var apiLogHandler = func(path string) gin.HandlerFunc {
 		}
 
 		max := math.Max(float64(-fi.Size()), -1024*8*8)
-		_, err = f.Seek(int64(max), os.SEEK_END)
+		_, err = f.Seek(int64(max), io.SeekEnd)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
