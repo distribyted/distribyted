@@ -5,22 +5,15 @@ import (
 	"github.com/rs/zerolog"
 )
 
-var _ log.LoggerImpl = &Torrent{}
+var _ log.Handler = &Torrent{}
 
 type Torrent struct {
 	L zerolog.Logger
 }
 
-func (l *Torrent) Log(m log.Msg) {
-	level, ok := m.GetLevel()
-
+func (l *Torrent) Handle(r log.Record) {
 	e := l.L.Info()
-
-	if !ok {
-		level = log.Debug
-	}
-
-	switch level {
+	switch r.Level {
 	case log.Debug:
 		e = l.L.Debug()
 	case log.Info:
@@ -31,9 +24,9 @@ func (l *Torrent) Log(m log.Msg) {
 		e = l.L.Warn().Str("error-type", "error")
 	case log.Critical:
 		e = l.L.Warn().Str("error-type", "critical")
-	case log.Fatal:
-		e = l.L.Warn().Str("error-type", "fatal")
 	}
 
-	e.Msgf(m.String())
+	// TODO set log values somehow
+
+	e.Msgf(r.Text())
 }
