@@ -1,39 +1,40 @@
 package log
 
-import (
-	"github.com/anacrolix/log"
-	"github.com/rs/zerolog"
-)
+// import (
+//
+//
 
-var _ log.LoggerImpl = &Torrent{}
+// 	"github.com/anacrolix/log"
+// 	"github.com/rs/zerolog"
+// )
 
-type Torrent struct {
-	L zerolog.Logger
-}
+// var _ log.Logger = &Torrent{}
 
-func (l *Torrent) Log(m log.Msg) {
-	level, ok := m.GetLevel()
+// type Torrent struct {
+// 	L zerolog.Logger
+// }
 
-	e := l.L.Info()
+// func (l *Torrent) Log(m log.Msg) {
+// 	level, ok := m.GetLevel()
 
-	if !ok {
-		level = log.Debug
-	}
+// 	e := l.L.Info()
 
-	switch level {
-	case log.Debug:
-		e = l.L.Debug()
-	case log.Info:
-		e = l.L.Debug().Str("error-type", "info")
-	case log.Warning:
-		e = l.L.Warn()
-	case log.Error:
-		e = l.L.Warn().Str("error-type", "error")
-	case log.Critical:
-		e = l.L.Warn().Str("error-type", "critical")
-	case log.Fatal:
-		e = l.L.Warn().Str("error-type", "fatal")
-	}
+// 	if !ok {
+// 		level = log.Debug
+// 	}
 
-	e.Msgf(m.String())
-}
+// 	switch level {
+// 	case log.Debug:
+// 		e = l.L.Debug()
+// 	case log.Info:
+// 		e = l.L.Debug().Str("error-type", "info")
+// 	case log.Warning:
+// 		e = l.L.Warn()
+// 	case log.Error:
+// 		e = l.L.Warn().Str("error-type", "error")
+// 	case log.Critical:
+// 		e = l.L.Warn().Str("error-type", "critical")
+// 	}
+
+// 	e.Msgf(m.String())
+// }

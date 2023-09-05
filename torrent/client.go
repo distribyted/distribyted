@@ -8,9 +8,9 @@ import (
 	tlog "github.com/anacrolix/log"
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/storage"
+	// "github.com/rs/zerolog/log"
+
 	"github.com/distribyted/distribyted/config"
-	dlog "github.com/distribyted/distribyted/log"
-	"github.com/rs/zerolog/log"
 )
 
 func NewClient(st storage.ClientImpl, fis bep44.Store, cfg *config.TorrentGlobal, id [20]byte) (*torrent.Client, error) {
@@ -21,8 +21,10 @@ func NewClient(st storage.ClientImpl, fis bep44.Store, cfg *config.TorrentGlobal
 	torrentCfg.DefaultStorage = st
 	torrentCfg.DisableIPv6 = cfg.DisableIPv6
 
-	l := log.Logger.With().Str("component", "torrent-client").Logger()
-	torrentCfg.Logger = tlog.Logger{LoggerImpl: &dlog.Torrent{L: l}}
+	// TODO newer torrent client version does not allow to override the Logger
+	// l := log.Logger.With().Str("component", "torrent-client").Logger()
+	// torrentCfg.Logger = tlog.Logger{LoggerImpl: &dlog.Torrent{L: l}}
+	torrentCfg.Logger = tlog.Default.WithDefaultLevel(tlog.Critical)
 
 	torrentCfg.ConfigureAnacrolixDhtServer = func(cfg *dht.ServerConfig) {
 		cfg.Store = fis
