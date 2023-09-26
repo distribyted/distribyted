@@ -20,7 +20,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/btree v1.1.2 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
-	github.com/mattn/go-colorable v0.1.12
+	github.com/mattn/go-colorable v0.1.13
 	github.com/nwaples/rardecode/v2 v2.0.0-beta.2
 	github.com/pion/dtls/v2 v2.2.7 // indirect
 	github.com/pion/mdns v0.0.8 // indirect
