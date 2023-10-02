@@ -26,7 +26,7 @@ require (
 	github.com/pion/mdns v0.0.8 // indirect
 	github.com/pion/rtp v1.8.1 // indirect
 	github.com/pion/sctp v1.8.8 // indirect
-	github.com/rs/zerolog v1.30.0
+	github.com/rs/zerolog v1.31.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
 	github.com/stretchr/testify v1.8.4
