@@ -31,9 +31,9 @@ require (
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
-	golang.org/x/crypto v0.13.0 // indirect
-	golang.org/x/net v0.15.0
-	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
+	golang.org/x/net v0.17.0
+	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
