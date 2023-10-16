@@ -5,10 +5,10 @@ go 1.20
 require (
 	github.com/RoaringBitmap/roaring v1.5.0 // indirect
 	github.com/anacrolix/dht/v2 v2.20.0
-	github.com/anacrolix/log v0.14.2
+	github.com/anacrolix/log v0.14.3-0.20230823030427-4b296d71a6b4
 	github.com/anacrolix/missinggo/v2 v2.7.2
 	github.com/anacrolix/multiless v0.3.1-0.20221221005021-2d12701f83f7 // indirect
-	github.com/anacrolix/torrent v1.52.6-0.20230905090324-873da77cca69
+	github.com/anacrolix/torrent v1.53.1
 	github.com/billziss-gh/cgofuse v1.5.0
 	github.com/bodgit/sevenzip v1.4.3
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -50,7 +50,7 @@ require (
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
 	github.com/anacrolix/mmsg v1.0.0 // indirect
 	github.com/anacrolix/stm v0.5.0 // indirect
-	github.com/anacrolix/sync v0.4.0 // indirect
+	github.com/anacrolix/sync v0.5.1 // indirect
 	github.com/anacrolix/upnp v0.1.3-0.20220123035249-922794e51c96 // indirect
 	github.com/anacrolix/utp v0.2.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
@@ -71,8 +71,8 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/go-llsqlite/adapter v0.0.0-20230905083127-a7568332b3ac // indirect
-	github.com/go-llsqlite/crawshaw v0.0.0-20230904103556-219a9360a2c0 // indirect
+	github.com/go-llsqlite/adapter v0.0.0-20230927005056-7f5ce7f0c916 // indirect
+	github.com/go-llsqlite/crawshaw v0.4.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -112,7 +112,7 @@ require (
 	github.com/pion/webrtc/v3 v3.2.18 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rs/dnscache v0.0.0-20230804202142-fc85eb664529 // indirect
 	github.com/ryszard/goskiplist v0.0.0-20150312221310-2dfbae5fcf46 // indirect
 	github.com/tidwall/btree v1.6.0 // indirect
@@ -132,9 +132,9 @@ require (
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
-	modernc.org/libc v1.21.5 // indirect
+	modernc.org/libc v1.22.3 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
-	modernc.org/memory v1.4.0 // indirect
-	modernc.org/sqlite v1.20.0 // indirect
-	zombiezen.com/go/sqlite v0.12.0 // indirect
+	modernc.org/memory v1.5.0 // indirect
+	modernc.org/sqlite v1.21.1 // indirect
+	zombiezen.com/go/sqlite v0.13.1 // indirect
 )
