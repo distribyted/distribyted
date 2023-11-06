@@ -26,6 +26,7 @@ type TorrentGlobal struct {
 	GlobalCacheSize int64  `yaml:"global_cache_size,omitempty"`
 	MetadataFolder  string `yaml:"metadata_folder,omitempty"`
 	DisableIPv6     bool   `yaml:"disable_ipv6,omitempty"`
+	IP              string `yaml:"ip,omitempty"`
 }
 
 type WebDAVGlobal struct {

@@ -1,6 +1,8 @@
 package torrent
 
 import (
+	"fmt"
+	"net"
 	"time"
 
 	"github.com/anacrolix/dht/v2"
@@ -21,6 +23,15 @@ func NewClient(st storage.ClientImpl, fis bep44.Store, cfg *config.TorrentGlobal
 	torrentCfg.PeerID = string(id[:])
 	torrentCfg.DefaultStorage = st
 	torrentCfg.DisableIPv6 = cfg.DisableIPv6
+
+	if cfg.IP != "" {
+		ip := net.ParseIP(cfg.IP)
+		if ip == nil {
+			return nil, fmt.Errorf("invalid provided IP: %q", cfg.IP)
+		}
+
+		torrentCfg.PublicIp4 = ip
+	}
 
 	l := log.Logger.With().Str("component", "torrent-client").Logger()
 

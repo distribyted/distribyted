@@ -35,6 +35,12 @@ torrent:
   # Timeout in seconds when reading any torrent content. Usefult when reading 
   # archived content from .rar, .zip or .7z.
   read_timeout: 120
+
+  # IP will change the default obtained IP from the default connection. Useful when
+  # you are running inside a docker container. If you change this, you have to regenerate your ID file
+  # located into the metadata folder.
+  # ip: "1.2.3.4"
+
 fuse:
   # Folder where fuse will mount torrent filesystem
   # For windows users: 

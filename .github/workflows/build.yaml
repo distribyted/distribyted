@@ -61,10 +61,10 @@ jobs:
         shell: powershell
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          choco install -y winfsp zip
+          choco install --allow-empty-checksums -y winfsp zip
           echo "CPATH=C:\Program Files\WinFsp\inc\fuse;C:\Program Files (x86)\WinFsp\inc\fuse" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           if ($env:GOARCH -eq "386") {
-            choco install -y mingw --forcex86 --force
+            choco install --allow-empty-checksums -y mingw --forcex86 --force
             echo "C:\\ProgramData\\chocolatey\\lib\\mingw\\tools\\install\\mingw32\\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           }
           # Copy mingw32-make.exe to make.exe so the same command line
