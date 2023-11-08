@@ -5,12 +5,13 @@ import (
 	"net/http"
 
 	"github.com/anacrolix/missinggo/v2/filecache"
-	"github.com/distribyted/distribyted"
-	"github.com/distribyted/distribyted/config"
-	"github.com/distribyted/distribyted/torrent"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/shurcooL/httpfs/html/vfstemplate"
+
+	"github.com/distribyted/distribyted"
+	"github.com/distribyted/distribyted/config"
+	"github.com/distribyted/distribyted/torrent"
 )
 
 func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.Handler, tss []*torrent.Server, fs http.FileSystem, logPath string, cfg *config.HTTPGlobal) error {
@@ -26,10 +27,13 @@ func New(fc *filecache.Cache, ss *torrent.Stats, s *torrent.Service, ch *config.
 
 	if cfg.HTTPFS {
 		log.Info().Str("host", fmt.Sprintf("%s:%d/fs", cfg.IP, cfg.Port)).Msg("starting HTTPFS")
-		r.GET("/fs/*filepath", func(c *gin.Context) {
+		h := func(c *gin.Context) {
 			path := c.Param("filepath")
 			c.FileFromFS(path, fs)
-		})
+		}
+		r.GET("/fs/*filepath", h)
+		r.HEAD("/fs/*filepath", h)
+
 	}
 
 	t, err := vfstemplate.ParseGlob(http.FS(distribyted.Templates), nil, "/templates/*")
