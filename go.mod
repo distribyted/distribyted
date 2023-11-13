@@ -31,8 +31,8 @@ require (
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
-	golang.org/x/crypto v0.14.0 // indirect
-	golang.org/x/net v0.17.0
+	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/net v0.18.0
 	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/time v0.4.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -99,19 +99,15 @@ require (
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/pion/datachannel v1.5.5 // indirect
 	github.com/pion/ice/v2 v2.3.11 // indirect
-	github.com/pion/ice/v3 v3.0.2 // indirect
 	github.com/pion/interceptor v0.1.25 // indirect
 	github.com/pion/logging v0.2.2 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
 	github.com/pion/rtcp v1.2.10 // indirect
 	github.com/pion/sdp/v3 v3.0.6 // indirect
 	github.com/pion/srtp/v2 v2.0.17 // indirect
-	github.com/pion/srtp/v3 v3.0.0 // indirect
 	github.com/pion/stun v0.6.1 // indirect
 	github.com/pion/transport/v2 v2.2.4 // indirect
-	github.com/pion/transport/v3 v3.0.1 // indirect
 	github.com/pion/turn/v2 v2.1.4 // indirect
-	github.com/pion/turn/v3 v3.0.1 // indirect
 	github.com/pion/webrtc/v3 v3.2.21 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -132,7 +128,7 @@ require (
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	modernc.org/libc v1.31.0 // indirect
