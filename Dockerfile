@@ -23,11 +23,11 @@ FROM alpine:3
 RUN apk add gcc libc-dev fuse-dev
 
 COPY --from=builder /bin/distribyted /bin/distribyted
-RUN chmod +x /bin/distribyted
+RUN chmod -v +x /bin/distribyted
 
-RUN mkdir /distribyted-data
+RUN mkdir -v /distribyted-data
 
-RUN echo "user_allow_other" >> /etc/fuse.conf
+RUN echo "user_allow_other" | tee /etc/fuse.conf
 ENV DISTRIBYTED_FUSE_ALLOW_OTHER=true
 
-ENTRYPOINT ["./bin/distribyted"]
+ENTRYPOINT [ "./bin/distribyted" ]
