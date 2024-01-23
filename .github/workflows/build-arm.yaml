@@ -16,12 +16,11 @@ jobs:
     name: linux_${{ matrix.arch }}
     strategy:
       matrix:
+        go: [1.21.6]
         include:
           - arch: armv7
-            go: 1.20.7
             go_arch: armv6l
           - arch: aarch64
-            go: 1.20.7
             go_arch: arm64
     steps:
       - uses: actions/checkout@v4
