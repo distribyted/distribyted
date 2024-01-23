@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://distribyted.com/v0.13.0/</loc>
+         <lastmod>2024-01-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://distribyted.com/v0.13.0/api-reference/</loc>
+         <lastmod>2024-01-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://distribyted.com/v0.13.0/architecture/</loc>
+         <lastmod>2024-01-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://distribyted.com/v0.13.0/getting-started/</loc>
+         <lastmod>2024-01-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://distribyted.com/v0.13.0/tutorials/</loc>
+         <lastmod>2024-01-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>
