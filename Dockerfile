@@ -2,7 +2,9 @@
 # Stage 1: Build
 #===============
 
-FROM golang:1.20-alpine as builder
+ARG GO_VERSION=SETGOVERSION
+
+FROM golang:${GO_VERSION}-alpine as builder
 
 ENV BIN_REPO=github.com/distribyted/distribyted
 ENV BIN_PATH=$GOPATH/src/$BIN_REPO
