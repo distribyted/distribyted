@@ -5,10 +5,10 @@ go 1.21
 require (
 	github.com/RoaringBitmap/roaring v1.6.0 // indirect
 	github.com/anacrolix/dht/v2 v2.21.0
-	github.com/anacrolix/log v0.14.5
+	github.com/anacrolix/log v0.14.6-0.20231202035202-ed7a02cad0b4
 	github.com/anacrolix/missinggo/v2 v2.7.3
 	github.com/anacrolix/multiless v0.3.1-0.20221221005021-2d12701f83f7 // indirect
-	github.com/anacrolix/torrent v1.53.2
+	github.com/anacrolix/torrent v1.53.3
 	github.com/billziss-gh/cgofuse v1.5.0
 	github.com/bodgit/sevenzip v1.4.5
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
