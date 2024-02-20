@@ -29,6 +29,12 @@ torrent:
   # Disable IPv6.
   #disable_ipv6: true
 
+  # Disable TCP.
+  #disable_tcp: false
+
+  # Disable uTP.
+  #disable_utp: false
+
   # Do not stop distribyted if some of the torrents are not able to load the info correctly on startup.
   continue_when_add_timeout: false
 

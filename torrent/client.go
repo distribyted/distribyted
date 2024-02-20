@@ -23,6 +23,8 @@ func NewClient(st storage.ClientImpl, fis bep44.Store, cfg *config.TorrentGlobal
 	torrentCfg.PeerID = string(id[:])
 	torrentCfg.DefaultStorage = st
 	torrentCfg.DisableIPv6 = cfg.DisableIPv6
+	torrentCfg.DisableTCP = cfg.DisableTCP
+	torrentCfg.DisableUTP = cfg.DisableUTP
 
 	if cfg.IP != "" {
 		ip := net.ParseIP(cfg.IP)
