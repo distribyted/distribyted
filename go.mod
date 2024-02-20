@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/RoaringBitmap/roaring v1.6.0 // indirect
-	github.com/anacrolix/dht/v2 v2.21.0
+	github.com/anacrolix/dht/v2 v2.21.1
 	github.com/anacrolix/log v0.15.0
 	github.com/anacrolix/missinggo/v2 v2.7.3
 	github.com/anacrolix/multiless v0.3.1-0.20221221005021-2d12701f83f7 // indirect
