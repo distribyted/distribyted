@@ -9,10 +9,11 @@ import (
 
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
-	"github.com/distribyted/distribyted/fs"
-	"github.com/distribyted/distribyted/torrent/loader"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	"github.com/distribyted/distribyted/fs"
+	"github.com/distribyted/distribyted/torrent/loader"
 )
 
 type Service struct {
@@ -28,19 +29,21 @@ type Service struct {
 
 	log                     zerolog.Logger
 	addTimeout, readTimeout int
+	continueWhenAddTimeout  bool
 }
 
-func NewService(loaders []loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, addTimeout, readTimeout int) *Service {
+func NewService(loaders []loader.Loader, db loader.LoaderAdder, stats *Stats, c *torrent.Client, addTimeout, readTimeout int, continueWhenAddTimeout bool) *Service {
 	l := log.Logger.With().Str("component", "torrent-service").Logger()
 	return &Service{
-		log:         l,
-		s:           stats,
-		c:           c,
-		fss:         make(map[string]fs.Filesystem),
-		loaders:     loaders,
-		db:          db,
-		addTimeout:  addTimeout,
-		readTimeout: readTimeout,
+		log:                    l,
+		s:                      stats,
+		c:                      c,
+		fss:                    make(map[string]fs.Filesystem),
+		loaders:                loaders,
+		db:                     db,
+		addTimeout:             addTimeout,
+		readTimeout:            readTimeout,
+		continueWhenAddTimeout: continueWhenAddTimeout,
 	}
 }
 
@@ -137,8 +140,13 @@ func (s *Service) addTorrent(r string, t *torrent.Torrent) error {
 		s.log.Info().Str("hash", t.InfoHash().String()).Msg("getting torrent info")
 		select {
 		case <-time.After(time.Duration(s.addTimeout) * time.Second):
-			s.log.Error().Str("hash", t.InfoHash().String()).Msg("timeout getting torrent info")
-			return errors.New("timeout getting torrent info")
+			s.log.Warn().Str("hash", t.InfoHash().String()).Msg("timeout getting torrent info")
+			if !s.continueWhenAddTimeout {
+				return errors.New("timeout getting torrent info")
+			} else {
+				s.log.Info().Str("hash", t.InfoHash().String()).Msg("ignoring timeout error")
+				return nil
+			}
 		case <-t.GotInfo():
 			s.log.Info().Str("hash", t.InfoHash().String()).Msg("obtained torrent info")
 		}
