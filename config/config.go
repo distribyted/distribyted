@@ -28,10 +28,11 @@ func DefaultConfig() *Root {
 			Pass: "admin",
 		},
 		Torrent: &TorrentGlobal{
-			GlobalCacheSize: 2048,
-			MetadataFolder:  metadataFolder,
-			AddTimeout:      60,
-			ReadTimeout:     120,
+			GlobalCacheSize:        2048,
+			MetadataFolder:         metadataFolder,
+			AddTimeout:             60,
+			ReadTimeout:            120,
+			ContinueWhenAddTimeout: false,
 		},
 		Fuse: &FuseGlobal{
 			AllowOther: false,

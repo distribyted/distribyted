@@ -12,11 +12,11 @@ import (
 
 	"github.com/anacrolix/missinggo/v2/filecache"
 	"github.com/anacrolix/torrent/storage"
-	"github.com/distribyted/distribyted/config"
-	"github.com/distribyted/distribyted/fs"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 
+	"github.com/distribyted/distribyted/config"
+	"github.com/distribyted/distribyted/fs"
 	"github.com/distribyted/distribyted/fuse"
 	"github.com/distribyted/distribyted/http"
 	dlog "github.com/distribyted/distribyted/log"
@@ -154,7 +154,11 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		return fmt.Errorf("error starting magnet database: %w", err)
 	}
 
-	ts := torrent.NewService([]loader.Loader{cl, fl}, dbl, ss, c, conf.Torrent.AddTimeout, conf.Torrent.ReadTimeout)
+	ts := torrent.NewService([]loader.Loader{cl, fl}, dbl, ss, c,
+		conf.Torrent.AddTimeout,
+		conf.Torrent.ReadTimeout,
+		conf.Torrent.ContinueWhenAddTimeout,
+	)
 
 	var mh *fuse.Handler
 	if conf.Fuse != nil {

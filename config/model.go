@@ -21,12 +21,13 @@ type Log struct {
 }
 
 type TorrentGlobal struct {
-	ReadTimeout     int    `yaml:"read_timeout,omitempty"`
-	AddTimeout      int    `yaml:"add_timeout,omitempty"`
-	GlobalCacheSize int64  `yaml:"global_cache_size,omitempty"`
-	MetadataFolder  string `yaml:"metadata_folder,omitempty"`
-	DisableIPv6     bool   `yaml:"disable_ipv6,omitempty"`
-	IP              string `yaml:"ip,omitempty"`
+	ReadTimeout            int    `yaml:"read_timeout,omitempty"`
+	ContinueWhenAddTimeout bool   `yaml:"continue_when_add_timeout,omitempty"`
+	AddTimeout             int    `yaml:"add_timeout,omitempty"`
+	GlobalCacheSize        int64  `yaml:"global_cache_size,omitempty"`
+	MetadataFolder         string `yaml:"metadata_folder,omitempty"`
+	DisableIPv6            bool   `yaml:"disable_ipv6,omitempty"`
+	IP                     string `yaml:"ip,omitempty"`
 }
 
 type WebDAVGlobal struct {

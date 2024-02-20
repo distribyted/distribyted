@@ -1,7 +1,7 @@
 package config
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -16,7 +16,7 @@ func TestTemplateConfig(t *testing.T) {
 	f, err := os.Open("../templates/config_template.yaml")
 	require.NoError(err)
 
-	b, err := ioutil.ReadAll(f)
+	b, err := io.ReadAll(f)
 	require.NoError(err)
 
 	conf := &Root{}
