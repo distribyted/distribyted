@@ -20,11 +20,11 @@ build: go-generate go-build
 
 ## test-race: execute all tests with race enabled.
 test-race:
-	go test -v --race -coverprofile=coverage.out ./...
+	go test -v --race -coverprofile=coverage.out -covermode atomic ./...
 
 ## test: execute all tests
 test:
-	go test -v -coverprofile=coverage.out ./...
+	go test -v -coverprofile=coverage.out -covermode atomic ./...
 
 go-build:
 	@echo "  >  Building binary on $(BIN_OUTPUT)..."

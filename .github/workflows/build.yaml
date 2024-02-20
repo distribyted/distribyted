@@ -95,14 +95,13 @@ jobs:
         shell: bash
         run: |
           make test-race
-      - name: Convert coverage.out to coverage.lcov
-        uses: jandelgado/gcov2lcov-action@v1.0.9
+      - name: Install goveralls
+        run: go install github.com/mattn/goveralls@latest
         if: matrix.os == 'ubuntu-latest'
       - name: Coveralls
-        uses: coverallsapp/github-action@v2.2.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage.lcov
+        env:
+          COVERALLS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goveralls -coverprofile=coverage.out -service=github
         if: matrix.os == 'ubuntu-latest'
 
       - name: Build
