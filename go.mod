@@ -8,7 +8,7 @@ require (
 	github.com/anacrolix/log v0.15.0
 	github.com/anacrolix/missinggo/v2 v2.7.3
 	github.com/anacrolix/multiless v0.3.1-0.20221221005021-2d12701f83f7 // indirect
-	github.com/anacrolix/torrent v1.54.0
+	github.com/anacrolix/torrent v1.54.1
 	github.com/billziss-gh/cgofuse v1.5.0
 	github.com/bodgit/sevenzip v1.5.0
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
