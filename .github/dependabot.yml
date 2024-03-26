@@ -8,3 +8,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      everything:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: "-"
+    reviewers:
+      - "ajnavarro"
