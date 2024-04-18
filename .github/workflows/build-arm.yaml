@@ -27,7 +27,7 @@ jobs:
         name: Checkout
         with:
           fetch-depth: 0
-      - uses: uraimo/run-on-arch-action@v2.7.1
+      - uses: uraimo/run-on-arch-action@v2.7.2
         name: Test and Build
         id: runcmd
         with:
