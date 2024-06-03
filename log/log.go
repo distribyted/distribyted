@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/distribyted/distribyted/config"
 	"github.com/mattn/go-colorable"
@@ -20,7 +21,7 @@ func Load(config *config.Log) {
 	// fix console colors on windows
 	cso := colorable.NewColorableStdout()
 
-	writers = append(writers, zerolog.ConsoleWriter{Out: cso})
+	writers = append(writers, zerolog.ConsoleWriter{Out: cso, TimeFormat: time.DateTime})
 	writers = append(writers, newRollingFile(config))
 	mw := io.MultiWriter(writers...)
 
