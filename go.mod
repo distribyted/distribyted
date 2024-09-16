@@ -6,7 +6,7 @@ require (
 	github.com/RoaringBitmap/roaring v1.6.0 // indirect
 	github.com/anacrolix/dht/v2 v2.21.1
 	github.com/anacrolix/log v0.15.0
-	github.com/anacrolix/missinggo/v2 v2.7.3
+	github.com/anacrolix/missinggo/v2 v2.7.4
 	github.com/anacrolix/multiless v0.3.1-0.20221221005021-2d12701f83f7 // indirect
 	github.com/anacrolix/torrent v1.54.1
 	github.com/billziss-gh/cgofuse v1.5.0
@@ -129,8 +129,8 @@ require (
 	go.opentelemetry.io/otel/trace v1.19.0 // indirect
 	go4.org v0.0.0-20201209231011-d4a079459e60 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
-	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/exp v0.0.0-20240823005443-9b4947da3948 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
