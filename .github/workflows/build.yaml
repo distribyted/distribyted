@@ -54,7 +54,7 @@ jobs:
         shell: bash
         run: |
           brew update
-          brew install --cask osxfuse
+          brew install --cask macfuse
         if: matrix.job_name == 'mac'
 
       - name: Install Libraries on Windows
