@@ -23,7 +23,7 @@ jobs:
             os: ubuntu-latest
 
           - job_name: mac
-            os: macOS-11
+            os: macos-latest
 
           - job_name: windows_amd64
             os: windows-latest
@@ -48,14 +48,14 @@ jobs:
           sudo chmod 666 /dev/fuse
           sudo chown root:$USER /etc/fuse.conf
           sudo apt-get install fuse libfuse-dev rpm pkg-config
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.job_name == 'linux'
 
       - name: Install Libraries on macOS
         shell: bash
         run: |
           brew update
-          brew install --cask osxfuse
-        if: matrix.os == 'macOS-11'
+          brew install --cask macfuse
+        if: matrix.job_name == 'mac'
 
       - name: Install Libraries on Windows
         shell: powershell
@@ -71,7 +71,7 @@ jobs:
           # can be used on Windows as on macOS and Linux
           $path = (get-command mingw32-make.exe).Path
           Copy-Item -Path $path -Destination (Join-Path (Split-Path -Path $path) 'make.exe')
-        if: matrix.os == 'windows-latest'
+        if: matrix.job_name == 'windows_amd64'
 
       - name: Print Go version and environment
         shell: bash
@@ -97,13 +97,13 @@ jobs:
           make test-race
       - name: Convert coverage.out to coverage.lcov
         uses: jandelgado/gcov2lcov-action@v1.0.9
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.job_name == 'linux'
       - name: Coveralls
         uses: coverallsapp/github-action@v2.3.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.lcov
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.job_name == 'linux'
 
       - name: Build
         shell: bash
