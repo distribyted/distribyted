@@ -21,7 +21,7 @@ require (
 	github.com/google/btree v1.1.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13
-	github.com/nwaples/rardecode/v2 v2.0.0-beta.2
+	github.com/nwaples/rardecode/v2 v2.0.0-beta.4
 	github.com/pion/dtls/v2 v2.2.7 // indirect
 	github.com/pion/mdns v0.0.9 // indirect
 	github.com/pion/rtp v1.8.2 // indirect
