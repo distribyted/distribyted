@@ -1,6 +1,7 @@
 module github.com/distribyted/distribyted
 
 go 1.21
+toolchain go1.22.5
 
 require (
 	github.com/RoaringBitmap/roaring v1.6.0 // indirect
@@ -16,7 +17,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
-	github.com/goccy/go-yaml v1.12.0
+	github.com/goccy/go-yaml v1.15.10
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/btree v1.1.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
@@ -70,7 +71,6 @@ require (
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
-	github.com/fatih/color v1.13.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-llsqlite/adapter v0.0.0-20230927005056-7f5ce7f0c916 // indirect
@@ -132,7 +132,6 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
-	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	modernc.org/libc v1.31.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
