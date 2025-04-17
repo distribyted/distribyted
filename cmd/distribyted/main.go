@@ -189,7 +189,7 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		c.Close()
 
 		log.Info().Msg("exiting")
-		os.Exit(1)
+		os.Exit(0)
 	}()
 
 	log.Info().Msg(fmt.Sprintf("setting cache size to %d MB", conf.Torrent.GlobalCacheSize))
