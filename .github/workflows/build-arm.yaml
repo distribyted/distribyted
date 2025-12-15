@@ -12,7 +12,7 @@ on:
 
 jobs:
   build_job:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: linux_${{ matrix.arch }}
     strategy:
       matrix:
@@ -32,7 +32,7 @@ jobs:
         id: runcmd
         with:
           arch: ${{ matrix.arch }}
-          distro: ubuntu20.04
+          distro: ubuntu24.04
           githubToken: ${{ github.token }}
 
           setup: |
