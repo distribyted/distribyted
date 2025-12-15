@@ -12,10 +12,11 @@ import (
 	"github.com/anacrolix/torrent/bencode"
 	"github.com/anacrolix/torrent/metainfo"
 	"github.com/anacrolix/torrent/storage"
-	"github.com/distribyted/distribyted/config"
 	"github.com/fsnotify/fsnotify"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	"github.com/distribyted/distribyted/config"
 )
 
 type ServerState int
@@ -196,8 +197,9 @@ func (s *Server) makeMagnet() error {
 	tks := s.trackers()
 
 	err := to.MergeSpec(&torrent.TorrentSpec{
-		InfoBytes: mi.InfoBytes,
-
+		AddTorrentOpts: torrent.AddTorrentOpts{
+			InfoBytes: mi.InfoBytes,
+		},
 		Trackers: [][]string{tks},
 	})
 	if err != nil {

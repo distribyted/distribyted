@@ -12,7 +12,7 @@ on:
 
 jobs:
   build_job:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: linux_${{ matrix.arch }}
     strategy:
       matrix:
@@ -23,16 +23,16 @@ jobs:
           - arch: aarch64
             go_arch: arm64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         name: Checkout
         with:
           fetch-depth: 0
-      - uses: uraimo/run-on-arch-action@v2.7.2
+      - uses: uraimo/run-on-arch-action@v3
         name: Test and Build
         id: runcmd
         with:
           arch: ${{ matrix.arch }}
-          distro: ubuntu20.04
+          distro: ubuntu24.04
           githubToken: ${{ github.token }}
 
           setup: |
@@ -57,7 +57,7 @@ jobs:
         run: |
           ls -al "/tmp/artifacts"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           if-no-files-found: error
           name: build-${{ matrix.arch }}

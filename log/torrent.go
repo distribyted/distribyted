@@ -28,5 +28,5 @@ func (l *Torrent) Handle(r log.Record) {
 
 	// TODO set log values somehow
 
-	e.Msgf(r.Text())
+	e.Msg(r.Text())
 }
