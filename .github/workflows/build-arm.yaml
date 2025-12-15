@@ -16,7 +16,7 @@ jobs:
     name: linux_${{ matrix.arch }}
     strategy:
       matrix:
-        go: [1.21.6]
+        go: [1.24.11]
         include:
           - arch: armv7
             go_arch: armv6l
