@@ -24,7 +24,7 @@ GLOBAL OPTIONS:
 
 #### Prerequisites on windows
 
-Download and install [WinFsp](http://www.secfs.net/winfsp/).
+Download and install [WinFsp][winfsp-url].
 
 ### Using Docker
 
@@ -71,7 +71,7 @@ It contains information about the mounted routes and torrent files like download
 
 ### Configuration File
 
-You can see the default configuration file with some explanation comments [here](https://github.com/distribyted/distribyted/blob/master/templates/config_template.yaml).
+You can see the default configuration file with some explanation comments [here][config-template-url].
 
 ### Routes
 
@@ -93,3 +93,5 @@ You can share that magnet URI with anyone to share these files.
 You can check logs in real time from the web interface:
 
 ![logs screen](images/distribyted-logs-border.png)
+
+{% include "../_links.md" %}
