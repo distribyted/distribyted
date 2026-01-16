@@ -23,7 +23,7 @@ jobs:
             os: ubuntu-latest
 
           - job_name: mac
-            os: macOS-11
+            os: macos-latest
 
           - job_name: windows_amd64
             os: windows-latest
@@ -32,14 +32,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Install Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: ^1.21
+          go-version: ^1.24
 
       - name: Install Libraries on Linux
         shell: bash
@@ -48,14 +48,14 @@ jobs:
           sudo chmod 666 /dev/fuse
           sudo chown root:$USER /etc/fuse.conf
           sudo apt-get install fuse libfuse-dev rpm pkg-config
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.job_name == 'linux'
 
       - name: Install Libraries on macOS
         shell: bash
         run: |
           brew update
-          brew install --cask osxfuse
-        if: matrix.os == 'macOS-11'
+          brew install --cask macfuse
+        if: matrix.job_name == 'mac'
 
       - name: Install Libraries on Windows
         shell: powershell
@@ -71,7 +71,7 @@ jobs:
           # can be used on Windows as on macOS and Linux
           $path = (get-command mingw32-make.exe).Path
           Copy-Item -Path $path -Destination (Join-Path (Split-Path -Path $path) 'make.exe')
-        if: matrix.os == 'windows-latest'
+        if: matrix.job_name == 'windows_amd64'
 
       - name: Print Go version and environment
         shell: bash
@@ -84,7 +84,7 @@ jobs:
           env
 
       - name: Go module cache
-        uses: actions/cache@v4.0.0
+        uses: actions/cache@v5
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -96,14 +96,14 @@ jobs:
         run: |
           make test-race
       - name: Convert coverage.out to coverage.lcov
-        uses: jandelgado/gcov2lcov-action@v1.0.9
-        if: matrix.os == 'ubuntu-latest'
+        uses: jandelgado/gcov2lcov-action@v1.2.0
+        if: matrix.job_name == 'linux'
       - name: Coveralls
-        uses: coverallsapp/github-action@v2.2.3
+        uses: coverallsapp/github-action@v2.3.7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage.lcov
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.job_name == 'linux'
 
       - name: Build
         shell: bash
@@ -111,14 +111,14 @@ jobs:
           make build
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           if-no-files-found: error
           name: build-${{ matrix.job_name }}
           path: bin/*
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

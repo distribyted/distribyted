@@ -171,6 +171,10 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 	go func() {
 
 		<-sigChan
+		if mh != nil {
+			log.Info().Msg("unmounting fuse filesystem...")
+			mh.Unmount()
+		}
 		log.Info().Msg("closing servers...")
 		for _, s := range servers {
 			if err := s.Close(); err != nil {
@@ -183,13 +187,9 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 		dbl.Close()
 		log.Info().Msg("closing torrent client...")
 		c.Close()
-		if mh != nil {
-			log.Info().Msg("unmounting fuse filesystem...")
-			mh.Unmount()
-		}
 
 		log.Info().Msg("exiting")
-		os.Exit(1)
+		os.Exit(0)
 	}()
 
 	log.Info().Msg(fmt.Sprintf("setting cache size to %d MB", conf.Torrent.GlobalCacheSize))
