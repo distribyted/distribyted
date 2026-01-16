@@ -24,11 +24,13 @@ Distribyted can show some kind of files directly as folders, making it possible 
 
 #### Supported
 - zip: Able to uncompress just one file. The file is decompressed to a temporal file sequentially to make possible seek over it. The decompression stops if no one is reading it.
-- rar: Thanks to [rardecode](https://github.com/nwaples/rardecode/tree/experimental) experimental branch library, it is possible to seek through rar files.
-- 7zip: Thanks to [sevenzip](https://github.com/bodgit/sevenzip) library, it is possible to read `7z` files in a similar way that is done using the `zip` implementation.
+- rar: Thanks to [rardecode][rardecode-url] experimental branch library, it is possible to seek through rar files.
+- 7zip: Thanks to [sevenzip][sevenzip-url] library, it is possible to read `7z` files in a similar way that is done using the `zip` implementation.
 
 #### To Be Supported
-- xz: Only worth it when the file is created using blocks. Possible library [here](https://github.com/ulikunitz/xz) and [here](https://github.com/frrad/bxzf).
+- xz: Only worth it when the file is created using blocks. Possible library [here][xz-url] and [here][bxzf-url].
 
 #### Not Supported
 - gzip: As far as I know, it doesn't support random access.
+
+{% include "../_links.md" %}

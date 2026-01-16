@@ -32,6 +32,7 @@ edit_uri: edit/master/mkdocs/docs/
 plugins:
   - git-revision-date
   - search
+  - include-markdown
 
 extra:
   version:

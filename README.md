@@ -83,7 +83,6 @@ Distributed under the GPL3 license. See `LICENSE` for more information.
 [stars-url]: https://github.com/distribyted/distribyted/stargazers
 [issues-shield]: https://img.shields.io/github/issues/distribyted/distribyted.svg?style=flat-square
 [issues-url]: https://github.com/distribyted/distribyted/issues
-[releases-url]: https://github.com/distribyted/distribyted/releases
 [license-shield]: https://img.shields.io/github/license/distribyted/distribyted.svg?style=flat-square
 [license-url]: https://github.com/distribyted/distribyted/blob/master/LICENSE
 [product-screenshot]: mkdocs/docs/images/distribyted.gif
