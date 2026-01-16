@@ -60,7 +60,7 @@ jobs:
           echo "${CUSTOM_DOMAIN}" > "${GITHUB_WORKSPACE}/mkdocs/docs/CNAME"
           echo -e "User-agent: *\nDisallow: /v*.*/\nSitemap: https://${CUSTOM_DOMAIN}/sitemap.xml" > "${GITHUB_WORKSPACE}/mkdocs/docs/robots.txt"
           git fetch origin gh-pages --verbose
-          mike deploy master dev --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase
+          mike deploy master dev --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push
         env:
           CUSTOM_DOMAIN: distribyted.com
           GOOGLE_ANALYTICS_KEY: ${{ secrets.GOOGLE_ANALYTICS_KEY }}
@@ -72,5 +72,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')        
         run: |
           git fetch origin gh-pages --verbose
-          mike deploy ${GITHUB_REF##*/} latest --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --rebase --update-aliases
+          mike deploy ${GITHUB_REF##*/} latest --config-file "${GITHUB_WORKSPACE}/mkdocs/mkdocs.yml" --push --update-aliases
 
