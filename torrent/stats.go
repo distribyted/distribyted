@@ -46,9 +46,13 @@ func (a byName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byName) Less(i, j int) bool { return a[i].Name < a[j].Name }
 
 type GlobalTorrentStats struct {
-	DownloadedBytes int64   `json:"downloadedBytes"`
-	UploadedBytes   int64   `json:"uploadedBytes"`
-	TimePassed      float64 `json:"timePassed"`
+	DownloadedBytes      int64   `json:"downloadedBytes"`
+	UploadedBytes        int64   `json:"uploadedBytes"`
+	TotalDownloadedBytes int64   `json:"totalDownloadedBytes"`
+	TotalUploadedBytes   int64   `json:"totalUploadedBytes"`
+	TotalTorrents        int     `json:"totalTorrents"`
+	TotalRoutes          int     `json:"totalRoutes"`
+	TimePassed           float64 `json:"timePassed"`
 }
 
 type RouteStats struct {
@@ -175,19 +179,30 @@ func (s *Stats) GlobalStats() *GlobalTorrentStats {
 
 	var totalDownload int64
 	var totalUpload int64
-	for _, torrent := range s.torrents {
-		tStats := s.stats(now, torrent, false)
+	var cumulativeDownload int64
+	var cumulativeUpload int64
+	for _, t := range s.torrents {
+		tStats := s.stats(now, t, false)
 		totalDownload += tStats.DownloadedBytes
 		totalUpload += tStats.UploadedBytes
+
+		if prev, ok := s.previousStats[t.InfoHash().String()]; ok {
+			cumulativeDownload += prev.totalDownloadBytes
+			cumulativeUpload += prev.totalUploadBytes
+		}
 	}
 
 	timePassed := now.Sub(s.gTime)
 	s.gTime = now
 
 	return &GlobalTorrentStats{
-		DownloadedBytes: totalDownload,
-		UploadedBytes:   totalUpload,
-		TimePassed:      timePassed.Seconds(),
+		DownloadedBytes:      totalDownload,
+		UploadedBytes:        totalUpload,
+		TotalDownloadedBytes: cumulativeDownload,
+		TotalUploadedBytes:   cumulativeUpload,
+		TotalTorrents:        len(s.torrents),
+		TotalRoutes:          len(s.torrentsByRoute),
+		TimePassed:           timePassed.Seconds(),
 	}
 }
 

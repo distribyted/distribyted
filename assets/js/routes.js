@@ -7,7 +7,7 @@ Handlebars.registerHelper("torrent_status", function (chunks, totalPieces) {
         "?": { class: "bg-danger", tooltip: "erroed pieces" },
     };
     const chunksAsHTML = chunks.map(chunk => {
-        const percentage = totalPieces * chunk.numPieces / 100;
+        const percentage = (chunk.numPieces / totalPieces) * 100;
         const pcMeta = pieceStatus[chunk.status]
         const pieceStatusClass = pcMeta.class;
         const pieceStatusTip = pcMeta.tooltip;
@@ -27,7 +27,11 @@ Handlebars.registerHelper("torrent_status", function (chunks, totalPieces) {
         return div.outerHTML;
     });
 
-    return '<div class="progress mb-3">' + chunksAsHTML.join("\n"); + '</div>'
+    const totalNumPieces = chunks.reduce((acc, chunk) => acc + chunk.numPieces, 0);
+    const completePieces = chunks.filter(c => c.status === "C").reduce((acc, chunk) => acc + chunk.numPieces, 0);
+    const progressPercent = totalNumPieces > 0 ? (completePieces / totalNumPieces * 100).toFixed(1) : 0;
+
+    return '<div class="d-flex align-items-center"><div class="progress mb-0 flex-grow-1" style="height: 15px;">' + chunksAsHTML.join("\n") + '</div><span class="ml-2 small">' + progressPercent + '%</span></div>';
 });
 
 Handlebars.registerHelper("torrent_info", function (peers, seeders, pieceSize) {

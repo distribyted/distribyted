@@ -9,3 +9,11 @@
 
 <script src="assets/js/humanize.js"></script>
 <script src="assets/js/common.js"></script>
+
+<script>
+  $(document).ready(function() {
+    // Add dynamic current year to footer
+    const currentYear = new Date().getFullYear();
+    $('.copyright').html('<p>&copy; ' + currentYear + ' Distribyted. All rights reserved.</p>');
+  });
+</script>

@@ -23,8 +23,56 @@
 
       <div class="content-wrapper">
         <div class="content">
+          <!-- Top Statistics -->
           <div class="row">
-            <div class="col-xl-12 col-md-12">
+            <div class="col-xl-3 col-sm-6">
+              <div class="card card-mini mb-4">
+                <div class="card-body">
+                  <h2 class="mb-1 text-primary" id="stat-total-torrents">0</h2>
+                  <p>Active Torrents</p>
+                  <div class="chartjs-wrapper">
+                    <i class="mdi mdi-format-list-bulleted float-right text-primary opacity-50" style="font-size: 3rem; margin-top: -3.5rem;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-sm-6">
+              <div class="card card-mini mb-4">
+                <div class="card-body">
+                  <h2 class="mb-1 text-success" id="stat-total-routes">0</h2>
+                  <p>Total Routes</p>
+                  <div class="chartjs-wrapper">
+                    <i class="mdi mdi-folder-multiple-outline float-right text-success opacity-50" style="font-size: 3rem; margin-top: -3.5rem;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-sm-6">
+              <div class="card card-mini mb-4">
+                <div class="card-body">
+                  <h2 class="mb-1 text-info" id="stat-total-downloaded">0 B</h2>
+                  <p>Total Downloaded</p>
+                  <div class="chartjs-wrapper">
+                    <i class="mdi mdi-download float-right text-info opacity-50" style="font-size: 3rem; margin-top: -3.5rem;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-sm-6">
+              <div class="card card-mini mb-4">
+                <div class="card-body">
+                  <h2 class="mb-1 text-warning" id="stat-total-uploaded">0 B</h2>
+                  <p>Total Uploaded</p>
+                  <div class="chartjs-wrapper">
+                    <i class="mdi mdi-upload float-right text-warning opacity-50" style="font-size: 3rem; margin-top: -3.5rem;"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-xl-8 col-md-12">
               <!-- Sales Graph -->
               <div class="card card-default" data-scroll-height="675">
                 <div class="card-header">
@@ -49,8 +97,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="row">
             <div class="col-xl-4 col-md-12">
               <!-- Doughnut Chart -->
               <div class="card card-default" data-scroll-height="675">

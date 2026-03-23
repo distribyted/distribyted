@@ -27,7 +27,11 @@
                             <td class="d-none d-lg-table-cell">
                                 {{{torrent_status pieceChunks totalPieces}}}
                             </td>
-                            <td><i class="mdi mdi-delete-forever" title="delete torrent" onclick='Distribyted.routes.deleteTorrent("{{../name}}","{{hash}}")'></i></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" title="delete torrent" onclick='if(confirm("Are you sure you want to delete this torrent?")) Distribyted.routes.deleteTorrent("{{../name}}","{{hash}}")'>
+                                    <i class="mdi mdi-delete-forever"></i>
+                                </button>
+                            </td>
                         </tr>
                         {{/torrentStats}}
                     </tbody>

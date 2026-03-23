@@ -36,25 +36,40 @@ Distribyted.logs = {
                                 properties += `<b>${key}</b>=${value} `
                             }
 
-                            var tableClass = "table-primary"
+                            var tableClass = ""
+                            var badgeClass = "badge-secondary"
                             switch (json.level) {
                                 case "info":
-                                    tableClass = ""
+                                    badgeClass = "badge-primary"
                                     break;
                                 case "error":
                                     tableClass = "table-danger"
+                                    badgeClass = "badge-danger"
                                     break;
                                 case "warn":
                                     tableClass = "table-warning"
+                                    badgeClass = "badge-warning"
                                     break;
                                 case "debug":
-                                    tableClass = "table-info"
+                                    badgeClass = "badge-info"
                                     break;
                                 default:
                                     break;
                             }
-                            template = `<tr class="${tableClass}"><td>${new Date(json.time*1000).toLocaleString()}</td><td>${json.level}</td><td>${json.component}</td><td>${json.message}</td><td>${properties}</td></tr>`;
+                            template = `<tr class="${tableClass}">
+                                <td class="text-nowrap">${new Date(json.time*1000).toLocaleString()}</td>
+                                <td><span class="badge ${badgeClass}">${json.level}</span></td>
+                                <td><span class="text-dark font-weight-bold">${json.component || ""}</span></td>
+                                <td>${json.message}</td>
+                                <td><small>${properties}</small></td>
+                            </tr>`;
                             document.getElementById("log_table").innerHTML += template;
+
+                            // Auto-scroll to bottom of the log container
+                            const logContainer = document.getElementById('log-container');
+                            if (logContainer) {
+                                logContainer.scrollTop = logContainer.scrollHeight;
+                            }
                         } catch (err) {
                             // server can send some corrupted json line
                             console.log(err);
