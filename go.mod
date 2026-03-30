@@ -24,7 +24,7 @@ require (
 	github.com/nwaples/rardecode/v2 v2.2.2
 	github.com/pion/rtp v1.8.26 // indirect
 	github.com/pion/sctp v1.8.41 // indirect
-	github.com/rs/zerolog v1.34.0
+	github.com/rs/zerolog v1.35.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shurcooL/httpfs v0.0.0-20230704072500-f1e31cf0ba5c
 	github.com/stretchr/testify v1.11.1
