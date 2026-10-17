@@ -18,6 +18,9 @@ run:
 ## build: build binary.
 build: go-generate go-build
 
+## build-nofuse: build binary without FUSE support.
+build-nofuse: go-generate go-build-nofuse
+
 ## test-race: execute all tests with race enabled.
 test-race:
 	go test -v --race -coverprofile=coverage.out ./...
@@ -29,6 +32,10 @@ test:
 go-build:
 	@echo "  >  Building binary on $(BIN_OUTPUT)..."
 	go build -o $(BIN_OUTPUT) -tags "release" -ldflags='$(LDFLAGS)' cmd/distribyted/main.go
+
+go-build-nofuse:
+	@echo "  >  Building binary without FUSE on $(BIN_OUTPUT)..."
+	go build -o $(BIN_OUTPUT) -tags "release,nofuse" -ldflags='$(LDFLAGS)' cmd/distribyted/main.go
 
 go-generate:
 	@echo "  >  Generating code files..."

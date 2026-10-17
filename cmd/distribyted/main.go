@@ -162,10 +162,14 @@ func load(configPath string, port, webDAVPort int, fuseAllowOther bool) error {
 
 	var mh *fuse.Handler
 	if conf.Fuse != nil {
-		mh = fuse.NewHandler(fuseAllowOther || conf.Fuse.AllowOther, conf.Fuse.Path)
+		if !fuse.Supported {
+			log.Warn().Msg("fuse configuration found, but distribyted was built without FUSE support")
+		} else {
+			mh = fuse.NewHandler(fuseAllowOther || conf.Fuse.AllowOther, conf.Fuse.Path)
+		}
 	}
 
-	sigChan := make(chan os.Signal)
+	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
