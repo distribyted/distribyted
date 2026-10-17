@@ -4,6 +4,8 @@
 
 Get the latest release from [releases][releases-url] page or download the source code and execute `make build`.
 
+To build without FUSE support (for environments without FUSE or CGO, such as Android or containers lacking /dev/fuse access), execute `make build-nofuse` or compile with `-tags nofuse`.
+
 Run the program: `./distribyted-[VERSION]-[OS]-[ARCH]`
 
 Defaults are good enough for starters, but you can change them. Here is the output of `./distribyted -help`:

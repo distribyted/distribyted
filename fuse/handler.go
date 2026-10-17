@@ -1,3 +1,5 @@
+//go:build !nofuse && cgo
+
 package fuse
 
 import (
@@ -9,6 +11,9 @@ import (
 	"github.com/distribyted/distribyted/fs"
 	"github.com/rs/zerolog/log"
 )
+
+// Supported indicates whether FUSE is supported in this build.
+const Supported = true
 
 type Handler struct {
 	fuseAllowOther bool
